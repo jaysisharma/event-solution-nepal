@@ -257,6 +257,10 @@
     margin-bottom: 0.75rem;
 }
 
+.cardTitleBlue {
+    color: var(--primary);
+}
+
 .cardDescSmall {
     color: #64748b;
     font-size: 0.875rem;

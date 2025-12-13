@@ -7,29 +7,29 @@ const UpcomingEvents = () => {
     const events = [
         {
             id: 1,
-            date: "12",
-            month: "OCT",
-            title: "Global Tech Summit 2025",
-            location: "San Francisco, CA",
-            time: "09:00 AM - 06:00 PM",
+            date: "14",
+            month: "APR",
+            title: "Nepali New Year 2082 Celebration",
+            location: "Hotel Yak & Yeti, Kathmandu",
+            time: "06:00 PM - 12:00 AM",
             image: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop"
         },
         {
             id: 2,
-            date: "28",
-            month: "NOV",
-            title: "Neon Music Festival",
-            location: "Miami, FL",
-            time: "04:00 PM - 02:00 AM",
+            date: "25",
+            month: "MAY",
+            title: "Kathmandu Music Festival",
+            location: "Tudikhel Ground, Kathmandu",
+            time: "02:00 PM - 10:00 PM",
             image: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=1000&auto=format&fit=crop"
         },
         {
             id: 3,
-            date: "15",
-            month: "DEC",
-            title: "Startup Charity Gala",
-            location: "New York, NY",
-            time: "07:00 PM - 11:00 PM",
+            date: "10",
+            month: "JUN",
+            title: "Pokhara Corporate Retreat",
+            location: "Lakeside, Pokhara",
+            time: "09:00 AM - 05:00 PM",
             image: "https://images.unsplash.com/photo-1519671482502-9759101d4561?q=80&w=1000&auto=format&fit=crop"
         }
     ];

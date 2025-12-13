@@ -11,6 +11,7 @@ import Expertise from "@/components/Expertise";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import SelectedWorks from "@/components/SelectedWorks";
 import CallToAction from "@/components/CallToAction";
+import AppPromo from "@/components/AppPromo";
 import styles from "./page.module.css";
 import Button from "@/components/Button";
 import Testimonials from "@/components/Testimonials";
@@ -102,6 +103,9 @@ export default function HomeClient() {
 
             {/* Upcoming Events Section */}
             <UpcomingEvents />
+
+            {/* App Promotion Section */}
+            <AppPromo />
 
             {/* CTA Section - High Impact */}
             <CallToAction />

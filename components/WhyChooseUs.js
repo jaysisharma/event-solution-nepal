@@ -73,10 +73,10 @@ const WhyChooseUs = () => {
 
                     {/* Floating Left Card (Creative Innovation - Reason 02) */}
                     <div className={`${styles.card} ${styles.sideCard} ${styles.leftCard} why-choose-card`}>
-                        <div className={`${styles.iconBoxSmall} ${styles.iconRed}`}>
+                        <div className={`${styles.iconBoxSmall} ${styles.iconBlue}`}>
                             <Lightbulb color="white" size={28} />
                         </div>
-                        <h3 className={styles.cardTitleSmall}>{reasons[1].title}</h3>
+                        <h3 className={`${styles.cardTitleSmall} ${styles.cardTitleBlue}`}>{reasons[1].title}</h3>
                         <p className={styles.cardDescSmall}>
                             {reasons[1].desc}
                         </p>
