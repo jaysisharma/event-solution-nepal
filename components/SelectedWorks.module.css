@@ -1,0 +1,206 @@
+.section {
+    padding: 8rem 0;
+    background-color: #f8fafc;
+    /* Soft light background */
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    /* Dot pattern */
+    color: var(--neutral-dark);
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+.header {
+    margin-bottom: 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid #e2e8f0;
+    /* Lighter border */
+    padding-bottom: 2rem;
+}
+
+.label {
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    /* Inherits global Blue */
+}
+
+.highlight {
+    color: var(--secondary);
+    /* Red highlight */
+}
+
+.headerRight {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .headerRight {
+        display: block;
+        max-width: 20rem;
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+}
+
+/* List Layout */
+.list {
+    display: flex;
+    flex-direction: column;
+}
+
+.item {
+    padding: 2.5rem 0;
+    border-bottom: 1px solid #e2e8f0;
+    /* Lighter border */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.item:hover {
+    padding-left: 1rem;
+    border-color: var(--primary);
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.itemContent {
+    flex: 1;
+}
+
+.projectTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--secondary);
+    /* Red text */
+    transition: color 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+/* Hover effect on title */
+.item:hover .projectTitle {
+    color: var(--primary);
+    /* Blue on hover */
+}
+
+@media (min-width: 768px) {
+    .projectTitle {
+        font-size: 3.5rem;
+    }
+}
+
+.itemMeta {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.itemAction {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-1rem);
+}
+
+.item:hover .itemAction {
+    opacity: 1;
+    transform: translateX(0);
+    background-color: white;
+    color: black;
+    border-color: white;
+}
+
+/* Floating Image Reveal */
+.floatingImageContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30vw;
+    height: 40vh;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+    border-radius: 12px;
+    /* Smooth corners */
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    .floatingImageContainer {
+        display: none;
+        /* Hide on smaller screens or implement modal */
+    }
+}
+
+/* When hover state is active */
+/* .item:hover~.floatingImageContainer - Removed empty rule */
+
+.floatingImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Footer */
+.footer {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.viewAllBtn {
+    background-color: white;
+    color: #0f172a;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.viewAllBtn:hover {
+    background-color: #e2e8f0;
+    transform: translateY(-2px);
+}

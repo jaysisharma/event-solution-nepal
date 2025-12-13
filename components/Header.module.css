@@ -1,0 +1,179 @@
+/* Deconstructed Header Layout */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    pointer-events: none;
+    /* Let clicks pass through empty areas */
+    transition: all 0.3s ease;
+}
+
+.headerScrolled {
+    height: 80px;
+    padding: 0 40px;
+}
+
+/* Logo - Fixed Top Left */
+.logoWrapper {
+    pointer-events: auto;
+    z-index: 1002;
+}
+
+.logo {
+    font-family: var(--font-poppins);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    text-decoration: none;
+    mix-blend-mode: difference;
+    /* Cool effect over images */
+}
+
+/* Nav - Floating Pill Center */
+.navWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+    z-index: 1001;
+}
+
+.nav {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 8px 12px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.headerScrolled .nav {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.link {
+    font-weight: 500;
+    color: var(--white);
+    font-size: 0.9rem;
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.link:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.headerScrolled .link {
+    color: var(--neutral-dark);
+}
+
+.headerScrolled .link:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+/* CTA - Fixed Top Right */
+.ctaWrapper {
+    pointer-events: auto;
+    z-index: 1002;
+}
+
+/* Mobile Menu */
+.hamburger {
+    display: none;
+    pointer-events: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1003;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+}
+
+.bar {
+    width: 20px;
+    height: 2px;
+    background-color: var(--white);
+    transition: all 0.3s ease;
+    position: absolute;
+}
+
+.bar:nth-child(1) {
+    transform: translateY(-6px);
+}
+
+.bar:nth-child(2) {
+    opacity: 1;
+}
+
+.bar:nth-child(3) {
+    transform: translateY(6px);
+}
+
+.headerScrolled .bar {
+    background-color: var(--neutral-dark);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .header {
+        padding: 0 20px;
+    }
+
+    .navWrapper {
+        display: none;
+        /* Hide pill on tablet/mobile */
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .nav.open {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: var(--neutral-dark);
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 0;
+        padding: 0;
+        z-index: 1000;
+    }
+
+    .nav.open .link {
+        font-size: 2rem;
+        color: var(--white);
+    }
+
+    .ctaWrapper {
+        display: none;
+    }
+}

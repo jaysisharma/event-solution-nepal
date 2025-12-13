@@ -1,0 +1,270 @@
+.page {
+    background-color: #ffffff;
+    color: var(--neutral-dark);
+    min-height: 100vh;
+}
+
+/* --- Hero Section (Light Editorial) --- */
+.hero {
+    padding: 12rem 0 6rem;
+    position: relative;
+    overflow: hidden;
+    background-color: #fafafa;
+}
+
+.heroContent {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.heroLabel {
+    display: block;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--secondary);
+    /* Brand Red */
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.heroTitle {
+    font-size: clamp(4rem, 10vw, 9rem);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    margin-bottom: 3rem;
+    max-width: 1200px;
+    color: #1a1a1a;
+}
+
+.heroSubtitle {
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: #525252;
+    max-width: 700px;
+    line-height: 1.5;
+    font-weight: 300;
+}
+
+/* --- Services List (Minimalist Blocks - Light) --- */
+.servicesSection {
+    padding: 6rem 0;
+    background-color: #ffffff;
+}
+
+.container {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.serviceBlock {
+    border-top: 1px solid #e5e5e5;
+    padding: 4rem 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    transition: all 0.5s ease;
+}
+
+@media (min-width: 1024px) {
+    .serviceBlock {
+        grid-template-columns: 0.5fr 1fr 1fr;
+        /* Index, Title, Content */
+        align-items: flex-start;
+        padding: 6rem 0;
+    }
+}
+
+.serviceIndex {
+    font-size: 1rem;
+    color: #a3a3a3;
+    font-family: monospace;
+}
+
+.serviceTitle {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+}
+
+.serviceDesc {
+    font-size: 1.1rem;
+    color: #525252;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-width: 500px;
+}
+
+.serviceImageWrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 2rem;
+    background-color: #f5f5f5;
+}
+
+@media (min-width: 1024px) {
+    .serviceImageWrapper {
+        height: 600px;
+        margin-top: 0;
+    }
+
+    .serviceBlock:nth-child(even) {
+        grid-template-columns: 0.5fr 1fr 1fr;
+    }
+}
+
+.serviceImage {
+    object-fit: cover;
+    transition: transform 1s ease;
+    filter: grayscale(100%);
+}
+
+.serviceBlock:hover .serviceImage {
+    transform: scale(1.05);
+    filter: grayscale(0%);
+}
+
+.serviceTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+}
+
+.tag {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    color: #737373;
+    background-color: transparent;
+}
+
+/* --- Process (Simple Steps - Light) --- */
+.processSection {
+    padding: 10rem 0;
+    background-color: #f9fafb;
+    /* Very light grey */
+}
+
+.sectionLabel {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #737373;
+    margin-bottom: 4rem;
+    display: block;
+}
+
+.processGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+
+@media (min-width: 768px) {
+    .processGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+}
+
+.processStep {
+    position: relative;
+}
+
+.stepNumber {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #e5e5e5;
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.stepTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1a1a1a;
+}
+
+.stepDesc {
+    font-size: 0.95rem;
+    color: #525252;
+    line-height: 1.6;
+}
+
+/* --- FAQ (Minimal - Light) --- */
+.faqSection {
+    padding: 8rem 0;
+    background-color: #ffffff;
+}
+
+.faqGrid {
+    display: grid;
+    gap: 0;
+}
+
+.faqItem {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.faqQuestion {
+    width: 100%;
+    text-align: left;
+    padding: 2rem 0;
+    background: none;
+    border: none;
+    color: #1a1a1a;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faqAnswer {
+    padding-bottom: 2rem;
+    color: #525252;
+    display: none;
+    max-width: 700px;
+    line-height: 1.6;
+}
+
+.faqItem.active .faqAnswer {
+    display: block;
+}
+
+.faqIcon {
+    color: #EB1F26;
+    transition: transform 0.3s ease;
+}
+
+.faqItem.active .faqIcon {
+    transform: rotate(45deg);
+}
+
+/* --- CTA (Light) --- */
+.ctaSection {
+    padding: 10rem 0 6rem;
+    text-align: center;
+    background-color: #ffffff;
+}
+
+.ctaTitle {
+    font-size: clamp(3rem, 6vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 3rem;
+    color: #1a1a1a;
+}

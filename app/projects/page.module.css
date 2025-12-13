@@ -1,0 +1,128 @@
+.page {
+    width: 100%;
+}
+
+.hero {
+    background-color: var(--secondary);
+    color: var(--white);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.heroTitle {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.heroSubtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.filterBtn {
+    padding: 8px 20px;
+    border: 1px solid var(--neutral-dark);
+    background: transparent;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: var(--font-inter);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.filterBtn.active,
+.filterBtn:hover {
+    background-color: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.item {
+    position: relative;
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.image {
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.item:hover .image {
+    transform: scale(1.05);
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.item:hover .overlay {
+    opacity: 1;
+}
+
+.category {
+    color: var(--white);
+    font-weight: 600;
+}
+
+.lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.lightboxContent {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.lightboxImage {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 4px;
+}
+
+.closeBtn {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+}

@@ -1,0 +1,602 @@
+.hero {
+    position: relative;
+    padding-top: 5rem;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.gradients {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.gradientBlob1 {
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 50%;
+    height: 50%;
+    background-color: rgba(6, 78, 161, 0.05);
+    border-radius: 9999px;
+    filter: blur(100px);
+}
+
+.gradientBlob2 {
+    position: absolute;
+    top: 20%;
+    right: -10%;
+    width: 40%;
+    height: 60%;
+    background-color: rgba(235, 31, 38, 0.05);
+    border-radius: 9999px;
+    filter: blur(100px);
+}
+
+.contentWrapper {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 3rem 1rem 6rem;
+    position: relative;
+    z-index: 10;
+}
+
+.flexContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    align-items: center;
+}
+
+.leftContent {
+    width: 100%;
+    text-align: center;
+}
+
+.trustBadges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 1s ease-out;
+}
+
+.trustBadge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.badgeIcon {
+    color: #064EA1;
+}
+
+.badgeText {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.tagline {
+    display: inline-block;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: #EB1F26;
+    margin-bottom: 1rem;
+    background-color: rgba(235, 31, 38, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+}
+
+.heading {
+    font-size: 3rem;
+    font-weight: 700;
+    /* color: #0f172a; removed to inherit global */
+    color: var(--neutral-dark);
+    /* "Events that" becomes black, spans retain their colors */
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.025em;
+}
+
+.highlightBlue {
+    color: var(--primary);
+}
+
+.highlightRed {
+    color: var(--secondary);
+}
+
+.subtext {
+    font-size: 1.125rem;
+    color: #475569;
+    margin-bottom: 2.5rem;
+    line-height: 1.625;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.buttonGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnPrimary {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: #064EA1;
+    color: white;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 15px -3px rgba(6, 78, 161, 0.2);
+}
+
+.btnPrimary:hover {
+    background-color: #053c7d;
+    box-shadow: 0 10px 15px -3px rgba(6, 78, 161, 0.3);
+}
+
+.btnSecondary {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: white;
+    color: #334155;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btnSecondary:hover {
+    background-color: #f8fafc;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.playIconWrapper {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: rgba(235, 31, 38, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.btnSecondary:hover .playIconWrapper {
+    background-color: #EB1F26;
+}
+
+.playIcon {
+    fill: #EB1F26;
+    color: #EB1F26;
+    transition: fill 0.3s, color 0.3s;
+}
+
+.btnSecondary:hover .playIcon {
+    fill: white;
+    color: white;
+}
+
+.arrowIcon {
+    transition: transform 0.3s;
+}
+
+.btnPrimary:hover .arrowIcon {
+    transform: translateX(4px);
+}
+
+.socialProof {
+    margin-top: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.avatars {
+    display: flex;
+    margin-left: 0.5rem;
+}
+
+.avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid white;
+    background-color: #e2e8f0;
+    overflow: hidden;
+    margin-left: -0.5rem;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.boldText {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Right Content */
+.rightContent {
+    width: 100%;
+    position: relative;
+    margin-top: 2rem;
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.mainImageWrapper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 85%;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(6, 78, 161, 0.1);
+    z-index: 10;
+    position: relative;
+    /* Ensure wrapper handles stacking */
+}
+
+.fadingSlide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 1;
+}
+
+.activeSlide {
+    opacity: 1;
+    z-index: 2;
+}
+
+.mainImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s duration;
+}
+
+.mainImage:hover {
+    transform: scale(1.05);
+}
+
+.imageOverlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent, transparent);
+}
+
+.imageText {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 2rem;
+    color: white;
+}
+
+.imageLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.imageTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.floatingCard1 {
+    position: absolute;
+    top: 5%;
+    right: -1rem;
+    width: 10rem;
+    height: 10rem;
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    animation: float 6s ease-in-out infinite;
+}
+
+.starIconWrapper {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.ratingNumber {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.ratingLabel {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.floatingCard2 {
+    position: absolute;
+    bottom: 5%;
+    right: -0.5rem;
+    width: 12rem;
+    background-color: #EB1F26;
+    color: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(235, 31, 38, 0.2);
+    padding: 1.25rem;
+    z-index: 20;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.cardLabel {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+.cardText {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.decorativeCircle1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+.decorativeCircle2 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140%;
+    height: 140%;
+    border: 1px solid #f1f5f9;
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.3;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.tickerStrip {
+    width: 100%;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: white;
+    padding: 1.5rem 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.tickerTrack {
+    display: flex;
+    width: fit-content;
+    animation: marquee 20s linear infinite;
+}
+
+.tickerTrack:hover {
+    animation-play-state: paused;
+}
+
+.tickerContent {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    /* Space between logos */
+    padding-right: 4rem;
+    /* Space between sets */
+    opacity: 0.5;
+    filter: grayscale(100%);
+    transition: all 0.5s;
+    white-space: nowrap;
+}
+
+.tickerStrip:hover .tickerContent {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+.brandLogo {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.serif {
+    font-family: serif;
+}
+
+.sans {
+    font-family: sans-serif;
+    letter-spacing: 0.1em;
+}
+
+.mono {
+    font-family: monospace;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.tedX {
+    color: #EB1F26;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (min-width: 640px) {
+    .flexContainer {
+        justify-content: center;
+    }
+
+    .buttonGroup {
+        flex-direction: row;
+    }
+
+    .btnPrimary,
+    .btnSecondary {
+        width: auto;
+    }
+}
+
+@media (min-width: 768px) {
+    .contentWrapper {
+        padding-top: 5rem;
+        padding-bottom: 8rem;
+    }
+
+    .heading {
+        font-size: 3.75rem;
+    }
+
+    .subtext {
+        font-size: 1.25rem;
+    }
+
+    .floatingCard2 {
+        right: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .flexContainer {
+        flex-direction: row;
+        gap: 5rem;
+        text-align: left;
+    }
+
+    .leftContent {
+        width: 50%;
+        text-align: left;
+    }
+
+    .rightContent {
+        width: 50%;
+        margin-top: 0;
+    }
+
+    .subtext {
+        margin-left: 0;
+    }
+
+    .buttonGroup {
+        justify-content: flex-start;
+    }
+
+    .trustBadges {
+        justify-content: flex-start;
+    }
+
+    .socialProof {
+        justify-content: flex-start;
+    }
+
+    .heading {
+        font-size: 4.5rem;
+    }
+}

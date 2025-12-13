@@ -1,0 +1,44 @@
+.page {
+    width: 100%;
+}
+
+.hero {
+    background-color: var(--secondary);
+    color: var(--white);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.heroTitle {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.heroSubtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.cta {
+    background-color: var(--neutral-light);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.ctaTitle {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    color: var(--neutral-dark);
+}
+
+.ctaText {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    color: #666;
+}

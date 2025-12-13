@@ -1,0 +1,225 @@
+.page {
+    background-color: #ffffff;
+    color: var(--neutral-dark);
+    min-height: 100vh;
+}
+
+/* --- Hero Section --- */
+.hero {
+    padding: 10rem 0 6rem;
+    max-width: 90rem;
+    margin: 0 auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(to right, var(--secondary), var(--primary)) 1;
+    margin-bottom: 6rem;
+}
+
+.heroTitle {
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    max-width: 1000px;
+    display: inline-block;
+    /* Often needed for clip to work on block elements nicely */
+}
+
+.textRed {
+    color: var(--primary);
+}
+
+.textBlue {
+    color: var(--secondary);
+}
+
+.heroSubtitle {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    color: #525252;
+    max-width: 600px;
+    line-height: 1.6;
+    font-weight: 300;
+}
+
+/* --- Filters --- */
+.filterBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 4rem;
+}
+
+.filterBtn {
+    padding: 0.75rem 2rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 999px;
+    background: transparent;
+    color: #737373;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.filterBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.filterBtn.active {
+    background-color: var(--secondary);
+    color: #ffffff;
+    border-color: var(--secondary);
+    box-shadow: 0 4px 15px rgba(5, 79, 158, 0.3);
+}
+
+/* --- Large Cards Grid --- */
+.listContainer {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 2rem 8rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+
+@media (min-width: 768px) {
+    .listContainer {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 3rem;
+        row-gap: 6rem;
+    }
+}
+
+/* --- Project Card --- */
+.projectItem {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    /* simple Reset */
+}
+
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    /* Consistent aspect ratio for uniform cards */
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.projectItem:hover .imageWrapper {
+    border-color: var(--primary);
+}
+
+@media (min-width: 1024px) {
+    .imageWrapper {
+        aspect-ratio: 16/10;
+        /* Slightly wider on large screens or keep consistent */
+    }
+}
+
+
+.projectImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.projectItem:hover .projectImage {
+    transform: scale(1.05);
+    /* Gentle zoom */
+}
+
+/* --- Navigation Buttons --- */
+.navOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+    /* Allow clicks to pass through usually, but buttons need events */
+}
+
+.projectItem:hover .navOverlay {
+    opacity: 1;
+}
+
+.navBtn {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    pointer-events: auto;
+    /* Re-enable pointer events for buttons */
+    color: var(--secondary);
+}
+
+.navBtn:hover {
+    background: var(--primary);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.navBtn:active {
+    transform: scale(0.95);
+}
+
+.projectInfo {
+    padding-top: 0.5rem;
+}
+
+.projectCategory {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--secondary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+.projectItem:hover .projectCategory {
+    color: var(--primary);
+}
+
+.projectTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.projectItem:hover .projectTitle {
+    color: #EB1F26;
+}
+
+.projectYear {
+    font-size: 1rem;
+    color: #888;
+}

@@ -1,0 +1,29 @@
+.section {
+    padding: 80px 0;
+    width: 100%;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.white {
+    background-color: var(--white);
+}
+
+.light {
+    background-color: var(--neutral-light);
+}
+
+.dark {
+    background-color: var(--secondary);
+    color: var(--white);
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 60px 0;
+    }
+}

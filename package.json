@@ -9,9 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
+    "framer-motion": "^12.23.26",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.556.0",
     "next": "16.0.7",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "eslint": "^9",
