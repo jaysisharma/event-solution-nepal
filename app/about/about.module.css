@@ -160,24 +160,59 @@
     max-width: 600px;
 }
 
-.teamGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+/* .teamGrid removed for Marquee */
+.marqueeContainer {
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem 0;
+}
+
+.marqueeTrack {
+    display: flex;
+    gap: 2.5rem;
+    width: max-content;
+    animation: scrollTeam 50s linear infinite;
+}
+
+.marqueeTrack:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scrollTeam {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(calc(-50% - 1.25rem));
+    }
 }
 
 .teamCard {
-    group: card;
+    /* group: card; removed invalid property */
     cursor: pointer;
+    min-width: 280px;
+    max-width: 320px;
+    flex: 0 0 auto;
 }
 
 .memberImageWrapper {
     position: relative;
-    height: 450px;
+    height: 350px;
+    /* Reduced from 450px */
     width: 100%;
     margin-bottom: 1.5rem;
     overflow: hidden;
     background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.sectionSeparator {
+    border: none;
+    height: 1px;
+    background-color: #e5e5e5;
+    margin-top: 5rem;
+    width: 100%;
 }
 
 .memberImage {
@@ -274,7 +309,7 @@
 
 /* --- CTA --- */
 .ctaSection {
-    padding: 10rem 0 6rem;
+    padding: 2rem 0 2rem;
     text-align: center;
 }
 

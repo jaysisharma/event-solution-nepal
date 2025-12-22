@@ -83,8 +83,8 @@
     /* Pill shape */
     font-family: var(--font-poppins);
     font-size: 0.9rem;
-    font-weight: 500;
-    color: #666;
+    font-weight: 700;
+    color: #000;
     cursor: pointer;
     position: relative;
     transition: all 0.3s ease;
@@ -205,7 +205,7 @@
 .cardTitle {
     font-family: var(--font-poppins);
     font-size: 2rem;
-    font-weight: 700;
+    font-weight: 900;
     /* Extra bold */
     margin-bottom: 8px;
     line-height: 1.1;
@@ -388,7 +388,7 @@
 .modalTitle {
     font-family: var(--font-poppins);
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 900;
     margin-bottom: 10px;
     line-height: 1.1;
     /* color: var(--neutral-dark); */

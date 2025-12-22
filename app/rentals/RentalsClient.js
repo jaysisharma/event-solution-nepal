@@ -116,7 +116,7 @@ export default function RentalsClient() {
 
     return (
         <div className={styles.page}>
-            <Navbar />
+
 
             {/* Hero Section / Banner */}
             <section className={styles.hero}>

@@ -18,6 +18,11 @@ const AboutClient = () => {
         { name: "Bijay Sagar Pradhan", role: "Managing Director", image: "https://eventsolutionnepal.com.np/images/leaders/Bijay.jpg" },
         { name: "Nabin Bhatta", role: "Marketing Director", image: "https://eventsolutionnepal.com.np/images/leaders/Nabin.jpg" },
         { name: "Vinesh Choradia", role: "IM Director", image: "https://eventsolutionnepal.com.np/images/leaders/Vinesh.jpg" },
+        // New Members
+        { name: "Anita Sherpa", role: "Creative Lead", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1888&auto=format&fit=crop" },
+        { name: "Rajesh Thapa", role: "Logistics Manager", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1887&auto=format&fit=crop" },
+        { name: "Meera Joshi", role: "Client Relations", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop" },
+        { name: "Suresh Tamang", role: "Technical Head", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop" },
     ];
 
     const values = [
@@ -157,22 +162,26 @@ const AboutClient = () => {
                         <h2 className={styles.sectionTitle}>Meet The Team</h2>
                         <p className={styles.sectionDesc}>The creative minds and dedicated hands behind your success.</p>
                     </div>
-                    <div className={styles.teamGrid}>
-                        {team.map((member, index) => (
-                            <div key={index} className={styles.teamCard}>
-                                <div className={styles.memberImageWrapper}>
-                                    <Image
-                                        src={member.image}
-                                        alt={member.name}
-                                        fill
-                                        className={styles.memberImage}
-                                    />
+                    <div className={styles.marqueeContainer}>
+                        <div className={styles.marqueeTrack}>
+                            {/* Duplicate team list for seamless loop */}
+                            {[...team, ...team].map((member, index) => (
+                                <div key={`${member.name}-${index}`} className={styles.teamCard}>
+                                    <div className={styles.memberImageWrapper}>
+                                        <Image
+                                            src={member.image}
+                                            alt={member.name}
+                                            fill
+                                            className={styles.memberImage}
+                                        />
+                                    </div>
+                                    <h3 className={styles.memberName}>{member.name}</h3>
+                                    <p className={styles.memberRole}>{member.role}</p>
                                 </div>
-                                <h3 className={styles.memberName}>{member.name}</h3>
-                                <p className={styles.memberRole}>{member.role}</p>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
+                    <hr className={styles.sectionSeparator} />
                 </div>
             </section>
 

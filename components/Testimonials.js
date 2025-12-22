@@ -28,6 +28,38 @@ const Testimonials = () => {
             quote: "They made our dream wedding a reality. The lighting, the decor, the coordination—it was all perfect. Thank you for making our special day so magical.",
             avatar: "https://i.pravatar.cc/150?img=5",
             rating: 5
+        },
+        {
+            id: 4,
+            name: "Michael Chang",
+            role: "Director, Innovate Tech",
+            quote: "We've worked with many event planners, but Event Solution stands out. Their attention to branding and detail is exceptional.",
+            avatar: "https://i.pravatar.cc/150?img=60",
+            rating: 5
+        },
+        {
+            id: 5,
+            name: "Priya Sharma",
+            role: "Marketing Head, Zenith Corp",
+            quote: "Flawless execution! The team anticipated every need and delivered an unforgettable corporate gala. Highly professional.",
+            avatar: "https://i.pravatar.cc/150?img=49",
+            rating: 5
+        },
+        {
+            id: 6,
+            name: "Robert Fox",
+            role: "Event Coordinator",
+            quote: "Creative, reliable, and incredibly organized. Working with Event Solution was a breath of fresh air. They just get it.",
+            avatar: "https://i.pravatar.cc/150?img=33",
+            rating: 5
+        },
+        {
+            id: 7,
+            name: "Lisa Wong",
+            role: "Private Client",
+            quote: "My 50th birthday party was the talk of the town! The decor was stunning and the flow of the evening was perfect.",
+            avatar: "https://i.pravatar.cc/150?img=9",
+            rating: 5
         }
     ];
 
@@ -46,40 +78,43 @@ const Testimonials = () => {
                     </p>
                 </div>
 
-                {/* Reviews Grid */}
-                <div className={styles.grid}>
-                    {reviews.map((review) => (
-                        <div key={review.id} className={styles.card}>
-                            {/* Decorative Quote Icon */}
-                            <Quote size={40} className={styles.quoteIcon} fill="currentColor" />
+                {/* Reviews Marquee */}
+                <div className={styles.marqueeContainer}>
+                    <div className={styles.marqueeTrack}>
+                        {/* Duplicate the reviews twice to ensure seamless scrolling */}
+                        {[...reviews, ...reviews].map((review, index) => (
+                            <div key={`${review.id}-${index}`} className={styles.card}>
+                                {/* Decorative Quote Icon */}
+                                <Quote size={40} className={styles.quoteIcon} fill="currentColor" />
 
-                            {/* Stars */}
-                            <div className={styles.stars}>
-                                {[...Array(review.rating)].map((_, i) => (
-                                    <Star key={i} size={18} className={styles.star} fill="currentColor" />
-                                ))}
-                            </div>
-
-                            {/* Quote Text */}
-                            <p className={styles.quoteText}>
-                                &quot;{review.quote}&quot;
-                            </p>
-
-                            {/* User Info */}
-                            <div className={styles.userInfo}>
-                                <div className={styles.avatarWrapper}>
-                                    <img src={review.avatar} alt={review.name} className={styles.avatar} />
+                                {/* Stars */}
+                                <div className={styles.stars}>
+                                    {[...Array(review.rating)].map((_, i) => (
+                                        <Star key={i} size={18} className={styles.star} fill="currentColor" />
+                                    ))}
                                 </div>
-                                <div className={styles.userDetails}>
-                                    <h4 className={styles.userName}>{review.name}</h4>
-                                    <p className={styles.userRole}>{review.role}</p>
-                                </div>
-                            </div>
 
-                            {/* Bottom Line Decor */}
-                            <div className={styles.bottomLine}></div>
-                        </div>
-                    ))}
+                                {/* Quote Text */}
+                                <p className={styles.quoteText}>
+                                    &quot;{review.quote}&quot;
+                                </p>
+
+                                {/* User Info */}
+                                <div className={styles.userInfo}>
+                                    <div className={styles.avatarWrapper}>
+                                        <img src={review.avatar} alt={review.name} className={styles.avatar} />
+                                    </div>
+                                    <div className={styles.userDetails}>
+                                        <h4 className={styles.userName}>{review.name}</h4>
+                                        <p className={styles.userRole}>{review.role}</p>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Line Decor */}
+                                <div className={styles.bottomLine}></div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
             </div>
