@@ -19,9 +19,8 @@ import UpcomingEvents from "@/components/UpcomingEvents";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HomeClient() {
+export default function HomeClient({ initialPartners, initialEvents, partnerLogos }) {
     const container = useRef();
-
     useGSAP(() => {
         // Services Animation
         gsap.utils.toArray(".service-card").forEach((card, i) => {
@@ -80,14 +79,10 @@ export default function HomeClient() {
             );
         });
     }, { scope: container });
-
-
-
     return (
         <div ref={container} className={styles.page}>
-
             {/* New Hero Section */}
-            <Hero />
+            <Hero partners={initialPartners} partnerLogos={partnerLogos} />
 
             {/* Services Section - Glassmorphism */}
             <Expertise />
@@ -102,7 +97,7 @@ export default function HomeClient() {
             <Testimonials />
 
             {/* Upcoming Events Section */}
-            <UpcomingEvents />
+            <UpcomingEvents events={initialEvents} />
 
             {/* App Promotion Section */}
             <AppPromo />

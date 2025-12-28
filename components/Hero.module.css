@@ -456,7 +456,7 @@
 .tickerTrack {
     display: flex;
     width: fit-content;
-    animation: marquee 20s linear infinite;
+    animation: marquee 180s linear infinite;
 }
 
 .tickerTrack:hover {
@@ -470,8 +470,8 @@
     /* Space between logos */
     padding-right: 4rem;
     /* Space between sets */
-    opacity: 0.5;
-    filter: grayscale(100%);
+    /* opacity: 0.5; */
+    /* filter: grayscale(100%); */
     transition: all 0.5s;
     white-space: nowrap;
 }
@@ -479,11 +479,12 @@
 .tickerStrip:hover .tickerContent {
     filter: grayscale(0%);
     opacity: 1;
+
 }
 
 .brandLogo {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: bold;
 }
 
 .serif {
@@ -500,7 +501,7 @@
 }
 
 .italic {
-    font-style: italic;
+    /* font-style: italic; */
 }
 
 .tedX {

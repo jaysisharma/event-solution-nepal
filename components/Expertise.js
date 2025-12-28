@@ -7,44 +7,44 @@ const Expertise = () => {
     const services = [
         {
             id: 0,
-            title: "Event Management",
+            title: "Event Planning & Concept Development",
             subtitle: "Stress-Free Planning",
-            image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000&auto=format&fit=crop",
+            image: "/services/event_management.png",
             icon: Calendar,
         },
         {
             id: 1,
-            title: "Event Rentals",
+            title: "Marketing & Promotion",
             subtitle: "Premium Equipment",
-            image: "https://chiceventrentals.com/images/tile-tenting.jpg",
+            image: "/services/marketing.png",
             icon: Layers,
         },
         {
             id: 2,
-            title: "Decoration & Lighting",
+            title: "Event Organizer",
             subtitle: "Aesthetic Excellence",
-            image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop",
+            image: "/services/organizer.png",
             icon: Sparkles,
         },
         {
             id: 3,
-            title: "Corporate Events",
+            title: "Pre & Post-Event Management",
             subtitle: "Professional Impact",
-            image: "https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=1000&auto=format&fit=crop",
+            image: "/services/preandpost.png",
             icon: Briefcase,
         },
         {
             id: 4,
-            title: "Wedding Planning",
+            title: "Event Rentals",
             subtitle: "Unforgettable Moments",
-            image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+            image: "/services/event_rentals.png",
             icon: PartyPopper,
         },
         {
             id: 5,
-            title: "Sound & Stage Setup",
+            title: "Production & Execution",
             subtitle: "Technical Mastery",
-            image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop",
+            image: "/services/production.png",
             icon: Speaker,
         }
     ];
@@ -56,19 +56,15 @@ const Expertise = () => {
                 {/* Section Header */}
                 <div className={styles.header}>
                     <div className={styles.headerContent}>
-                        <span className={styles.label}>Our Expertise</span>
+                        {/* <span className={styles.label}>Our Expertise</span> */}
                         <h2 className={styles.title}>
-                            Designed for <span className={styles.highlight}>Impact</span>
+                            Our Core <span className={styles.highlight}>Services</span>
                         </h2>
                         <p className={styles.description}>
-                            Explore our comprehensive range of services crafted to elevate every occasion.
+                            Services provided by event solution that put a real impact on your event.
                         </p>
                     </div>
-                    <div className={styles.seeAll}>
-                        <a href="#" className={styles.seeAllLink}>
-                            See All Categories <ArrowRight size={16} style={{ marginLeft: '0.5rem' }} />
-                        </a>
-                    </div>
+
                 </div>
 
                 {/* Grid Layout */}
@@ -102,12 +98,12 @@ const Expertise = () => {
                                     {service.title}
                                 </h3>
 
-                                <div className={styles.explore}>
+                                {/* <div className={styles.explore}>
                                     <span>Explore Service</span>
                                     <div className={styles.arrowCircle}>
                                         <ArrowUpRight size={14} />
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     ))}

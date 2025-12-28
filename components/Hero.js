@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Play, Star, ShieldCheck, Globe, Users } from 'lucide-react';
+import Link from 'next/link';
 import styles from './Hero.module.css';
 
 const TrustBadge = ({ icon: Icon, text }) => (
@@ -10,8 +11,62 @@ const TrustBadge = ({ icon: Icon, text }) => (
     </div>
 );
 
-const Hero = () => {
+const PARTNERS = [
+    "Lalitpur Metropolitan City",
+    "Kathmandu Metropolitan City (SIP Mela)",
+    "Nepal Tourism Board",
+    "Confederation of Nepalese Industry (CNI)",
+    "Independent Power Producers Association Nepal (IPPAN)",
+    "Nepal Chamber of Commerce",
+    "Nepal German Chamber of Commerce & Industries (NGCCI)",
+    "Federation Of Nepal Cottage & Small Industries (FNCSI)",
+    "Federation of Handicraft Associations of Nepal (FHAN)",
+    "Federation of Women Entrepreneurs Association of Nepal (FWEAN)",
+    "Nepal Furniture & Furnishing Association",
+    "Footwear Manufacturers Association of Nepal (FMAN)",
+    "Plast Nepal Foundation",
+    "Australian Embassy Nepal",
+    "British Embassy Kathmandu",
+    "Swiss Embassy",
+    "German Embassy",
+    "Pakistan Embassy",
+    "Embassy of India",
+    "Hotel Association Nepal (HAN)",
+    "Pacific Asia Travel Association (PATA)",
+    "Trinity International SS & College",
+    "Uniglobe College",
+    "Southwestern State College",
+    "Herald College",
+    "Webtuned Studio",
+    "Global Reach",
+    "Hi-AIM Conference Pvt. Ltd. (India)",
+    "Eleven Eleven",
+    "AN Holding",
+    "Autism Care Nepal Society",
+    "Nepal Art Council",
+    "Cricket Association of Nepal (CAN)",
+    "NMB Bank",
+    "Yamaha (MAW Enterprises)",
+    "Bajaj",
+    "Toyota",
+    "Rotary Club",
+    "Lions Club",
+    "Ncell Axiata",
+    "Nepal Telecom",
+    "Chaudhary Group (CG)",
+    "Himalayan Bank",
+    "Siddhartha Bank",
+    "Daraz Nepal",
+    "WorldLink Communications"
+];
+
+const Hero = ({ partners, partnerLogos }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const partnerList = (partners && partners.length > 0) ? partners.map(p => p.name) : PARTNERS;
+
+    // Use logos if provided, otherwise use text
+    const hasLogos = partnerLogos && partnerLogos.length > 0;
+    const itemsToRender = hasLogos ? partnerLogos : partnerList;
 
     const helperImages = [
         {
@@ -62,33 +117,23 @@ const Hero = () => {
                         </h1>
 
                         <p className={styles.subtext}>
-                            We streamline the chaos of event planning into a seamless, unforgettable experience. From concept to applause, Event Solution is your partner in excellence.
-                        </p>
+                            Founded in <span style={{ fontWeight: 'bold', color: "black" }}> 2014 A.D</span> , Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism. </p>
 
                         <div className={styles.buttonGroup}>
-                            <button className={styles.btnPrimary}>
+                            <Link href="/quote" className={styles.btnPrimary}>
                                 Plan Your Event
                                 <ArrowRight size={18} className={styles.arrowIcon} />
-                            </button>
+                            </Link>
 
-                            <button className={styles.btnSecondary}>
+                            <Link href="/projects" className={styles.btnSecondary}>
                                 <div className={styles.playIconWrapper}>
                                     <Play size={10} className={styles.playIcon} />
                                 </div>
                                 See Our Work
-                            </button>
+                            </Link>
                         </div>
 
-                        <div className={styles.socialProof}>
-                            <div className={styles.avatars}>
-                                {[1, 2, 3, 4].map(i => (
-                                    <div key={i} className={styles.avatar}>
-                                        <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" className={styles.avatarImg} />
-                                    </div>
-                                ))}
-                            </div>
-                            <p>Trusted by <span className={styles.boldText}>Kathmandu's Top</span> companies</p>
-                        </div>
+
                     </div>
 
                     {/* Right Visuals - Organic Pill Layout */}
@@ -147,30 +192,32 @@ const Hero = () => {
             {/* Bottom ticker/strip */}
             <div className={styles.tickerStrip}>
                 <div className={styles.tickerTrack}>
-                    {/* Original Set */}
-                    <div className={styles.tickerContent}>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Ncell</span>
-                        <span className={`${styles.brandLogo} ${styles.serif}`}>Nepal Telecom</span>
-                        <span className={`${styles.brandLogo} ${styles.mono}`}>eSewa</span>
-                        <span className={`${styles.brandLogo} ${styles.italic}`}>Daraz</span>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Chaudhary Group</span>
-                    </div>
-                    {/* Duplicate Set for Loop */}
-                    <div className={styles.tickerContent}>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Ncell</span>
-                        <span className={`${styles.brandLogo} ${styles.serif}`}>Nepal Telecom</span>
-                        <span className={`${styles.brandLogo} ${styles.mono}`}>eSewa</span>
-                        <span className={`${styles.brandLogo} ${styles.italic}`}>Daraz</span>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Chaudhary Group</span>
-                    </div>
-                    {/* Triplicate Set for Loop smoothness on wide screens */}
-                    <div className={styles.tickerContent}>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Ncell</span>
-                        <span className={`${styles.brandLogo} ${styles.serif}`}>Nepal Telecom</span>
-                        <span className={`${styles.brandLogo} ${styles.mono}`}>eSewa</span>
-                        <span className={`${styles.brandLogo} ${styles.italic}`}>Daraz</span>
-                        <span className={`${styles.brandLogo} ${styles.sans}`}>Chaudhary Group</span>
-                    </div>
+                    {[0, 1].map((setIndex) => (
+                        <div key={setIndex} className={styles.tickerContent}>
+                            {itemsToRender.map((item, index) => {
+                                if (hasLogos) {
+                                    return (
+                                        <div key={`${setIndex}-${index}`} className={styles.logoWrapper} style={{ height: '60px', position: 'relative', width: '120px', margin: '0 2rem' }}>
+                                            {/* Standard img for now, could act as optimization later. using <img /> to avoid next/image setup complexity for dynamic paths if strictly needed, but let's try standard img for simplicity with local files */}
+                                            <img
+                                                src={item}
+                                                alt="Partner Logo"
+                                                style={{ height: '100%', width: '100%', objectFit: 'contain', scale: 1.8 }}
+                                                className={styles.partnerLogo}
+                                            />
+                                        </div>
+                                    )
+                                } else {
+                                    const fontStyle = [styles.sans, styles.italic][index % 4];
+                                    return (
+                                        <span key={`${setIndex}-${index}`} className={`${styles.brandLogo} ${fontStyle}`} style={{ color: "black" }}>
+                                            {item}
+                                        </span>
+                                    );
+                                }
+                            })}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

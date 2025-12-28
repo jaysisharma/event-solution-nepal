@@ -10,100 +10,17 @@ import styles from './services.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ServicesClient = () => {
+const ServicesClient = ({ initialServices }) => {
     const containerRef = useRef(null);
+    const wrapperRef = useRef(null);
+    const imagesRef = useRef(null);
     const [openFaq, setOpenFaq] = useState(null);
 
     const toggleFaq = (index) => {
         setOpenFaq(openFaq === index ? null : index);
     };
 
-    const services = [
-        {
-            id: "01",
-            title: "Budget Creation & Management",
-            desc: "Budgets, tracking and reporting. Site inspection, pre-event, on-site event management and logistics.",
-            image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Financial Planning", "Logistics", "Reporting"]
-        },
-        {
-            id: "02",
-            title: "Customized Marketing Strategy",
-            desc: "We provide personalized marketing strategies based on the objectives and requirements of the client in order to make your event successful and unforgettable.",
-            image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=2074&auto=format&fit=crop",
-            tags: ["Strategy", "Growth", "Engagement"]
-        },
-        {
-            id: "03",
-            title: "Photographs and Videographs",
-            desc: "We provide professional event photography and videography services for the corporate, commercial, convention, exhibitions, conferences and many more events.",
-            image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop",
-            tags: ["Capture", "Media", "Coverage"]
-        },
-        {
-            id: "04",
-            title: "Emcee",
-            desc: "We provide you with your favorite Emcee who is master of ceremonies, who has hosted numerous events ranging from webinars to auctions, organizing concerts and festivals.",
-            image: "https://images.unsplash.com/photo-1719437364093-82c24d719303?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Hosting", "Entertainment", "Stage"]
-        },
-        {
-            id: "05",
-            title: "PA System",
-            desc: "We provide all Public Address systems, including microphones, amplifiers, loudspeakers, and related equipment, based on the needs of the customer.",
-            image: "https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Audio", "Sound", "Equipment"]
-        },
-        {
-            id: "06",
-            title: "Digital Marketing and Planning",
-            desc: "We assist our customers in promoting their events through public relations, event planning, and social marketing tactics. We devise an effective marketing strategy.",
-            image: "https://images.unsplash.com/photo-1585404930046-661b02d11ca9?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Social Media", "PR", "Promotion"]
-        },
-        {
-            id: "07",
-            title: "Branding",
-            desc: "Theme and identity, across all marketing communications and experiential touchpoints.",
-            image: "https://images.unsplash.com/photo-1634942537034-2531766767d1?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Identity", "Design", "Visibility"]
-        },
-        {
-            id: "08",
-            title: "Zoom Conference",
-            desc: "We are a fantastic digital host who knows how to keep things moving for everyone. Your online conference/virtual event is a home run thanks to our professional presence!",
-            image: "https://images.unsplash.com/photo-1593463405365-c22accdbd09d?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Virtual", "Webinar", "Remote"]
-        },
-        {
-            id: "09",
-            title: "Online Registration & Management",
-            desc: "Save the date, invite to register, RSVPs, motivational teasers, delegate registration, expo online booking app, website and mobile app.",
-            image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop",
-            tags: ["Registration", "Apps", "Data"]
-        },
-        {
-            id: "10",
-            title: "HR Management Service",
-            desc: "Depending on the requirements of your event, we provide you HR services. Invest in safety, adhere to proper HR practices, and technology for efficiency.",
-            image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=2069&auto=format&fit=crop",
-            tags: ["Staffing", "Safety", "Coordination"]
-        },
-        {
-            id: "11",
-            title: "Artist Management",
-            desc: "If you are seeking for artists for any of your events, we provide a service where we will contact your selected artist and book them for your event.",
-            image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Talent", "Booking", "Performance"]
-        },
-        {
-            id: "12",
-            title: "Graphic Design & Printing",
-            desc: "We take your ideas and bring it to life, focusing on its core values and individual element to create visually inspiring graphic design and printing.",
-            image: "https://images.unsplash.com/photo-1619190324856-af3f6eb55601?q=80&w=2070&auto=format&fit=crop",
-            tags: ["Design", "Print", "Visuals"]
-        }
-    ];
+    const services = initialServices || [];
 
     const process = [
         { id: "01", title: "Discovery", desc: "We listen to your vision and objectives." },
@@ -128,18 +45,66 @@ const ServicesClient = () => {
             skewY: 5
         });
 
-        // Service Block Reveal
-        gsap.utils.toArray(`.${styles.serviceBlock}`).forEach((block) => {
-            gsap.from(block, {
-                opacity: 0,
-                y: 50,
-                duration: 1,
-                scrollTrigger: {
+        // GSAP Pinning Logic
+        const mm = gsap.matchMedia();
+
+        mm.add("(min-width: 1024px)", () => {
+            const serviceBlocks = gsap.utils.toArray('.service-item');
+            const imageItems = gsap.utils.toArray(`.${styles.imageContainer}`);
+
+            // Initial setup
+            // 1. Pin the Right Column explicitly logic
+            ScrollTrigger.create({
+                trigger: wrapperRef.current,
+                start: "top top", // Start pinning when the section hits top
+                end: "bottom bottom", // Stop when section ends
+                pin: imagesRef.current, // PIN THE IMAGES CONTAINER
+                pinSpacing: false, // Don't add spacing, just float it
+            });
+
+            // 2. Setup initial visible images
+            gsap.set(imageItems, { visibility: "hidden", zIndex: 1 });
+            gsap.set(imageItems[0], { visibility: "visible", zIndex: 2 });
+            gsap.set(serviceBlocks[0], { opacity: 1 });
+
+            // 3. Scroll Interactions
+            serviceBlocks.forEach((block, i) => {
+                const nextImage = imageItems[i];
+
+                // Active Text Opacity
+                ScrollTrigger.create({
                     trigger: block,
-                    start: "top 85%"
-                }
+                    start: "top center+=100",
+                    end: "bottom center+=100",
+                    onToggle: (self) => {
+                        if (self.isActive) {
+                            gsap.to(serviceBlocks, { opacity: 0.3, duration: 0.3 });
+                            gsap.to(block, { opacity: 1, duration: 0.3 });
+                        }
+                    }
+                });
+
+                if (i === 0) return;
+
+                // Curtain Reveal Transition (Wipe Up)
+                ScrollTrigger.create({
+                    trigger: block,
+                    start: "top bottom-=100",
+                    end: "top center",
+                    scrub: true,
+                    onEnter: () => {
+                        gsap.set(nextImage, { zIndex: i + 2, visibility: "visible" });
+                    },
+                    animation: gsap.fromTo(nextImage,
+                        { clipPath: "inset(100% 0 0 0)" },
+                        { clipPath: "inset(0% 0 0 0)" }
+                    )
+                });
             });
         });
+
+        // Cleanup
+        return () => mm.revert();
 
     }, { scope: containerRef });
 
@@ -160,31 +125,54 @@ const ServicesClient = () => {
                 </div>
             </section>
 
-            {/* Services List - Structural Blocks */}
+            {/* Services List - GSAP Pinning Layout */}
             <section className={styles.servicesSection}>
                 <div className={styles.container}>
-                    {services.map((service) => (
-                        <div key={service.id} className={styles.serviceBlock}>
-                            <span className={styles.serviceIndex}>({service.id})</span>
-                            <div className={styles.serviceContent}>
-                                <h2 className={styles.serviceTitle}>{service.title}</h2>
-                                <p className={styles.serviceDesc}>{service.desc}</p>
-                                <div className={styles.serviceTags}>
-                                    {service.tags.map(tag => (
-                                        <span key={tag} className={styles.tag}>{tag}</span>
-                                    ))}
+                    <div className={styles.servicesWrapper} ref={wrapperRef}>
+
+                        {/* Left: Scrolling Text Content */}
+                        <div className={styles.servicesContent}>
+                            {services.map((service, index) => (
+                                <div key={service.id} className={`${styles.serviceBlock} service-item`}>
+                                    <span className={styles.serviceIndex}>({service.id})</span>
+                                    <h2 className={styles.serviceTitle}>{service.title}</h2>
+                                    <p className={styles.serviceDesc}>{service.desc}</p>
+
+                                    {/* Mobile Only: Inline Image */}
+                                    <div className={styles.serviceBlockMobileImage}>
+                                        <Image
+                                            src={service.image}
+                                            alt={service.title}
+                                            fill
+                                            className={styles.serviceImage}
+                                        />
+                                    </div>
+
+                                    <div className={styles.serviceTags}>
+                                        {service.tags.map(tag => (
+                                            <span key={tag} className={styles.tag}>{tag}</span>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className={styles.serviceImageWrapper}>
-                                <Image
-                                    src={service.image}
-                                    alt={service.title}
-                                    fill
-                                    className={styles.serviceImage}
-                                />
-                            </div>
+                            ))}
                         </div>
-                    ))}
+
+                        {/* Right: Explicitly Pinned Image Container */}
+                        <div className={styles.servicesImages} ref={imagesRef}>
+                            {services.map((service, index) => (
+                                <div key={service.id} className={`${styles.imageContainer} image-item-${index}`}>
+                                    <Image
+                                        src={service.image}
+                                        alt={service.title}
+                                        fill
+                                        priority={index === 0}
+                                        className={styles.serviceImage}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                    </div>
                 </div>
             </section>
 

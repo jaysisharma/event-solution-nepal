@@ -2,10 +2,16 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+
+    if (pathname && pathname.startsWith('/admin')) {
+        return null;
+    }
 
     return (
         <nav className={styles.navbar}>

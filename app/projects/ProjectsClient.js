@@ -4,94 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './projects.module.css';
 
-const ProjectsClient = () => {
+const ProjectsClient = ({ initialProjects }) => {
     const [filter, setFilter] = useState("All");
 
     const categories = ["All", "Wedding", "Corporate", "Social", "Concert"];
 
-    // Normalized data with MULTIPLE images for slideshow
-    const allProjects = [
-        {
-            id: 1,
-            category: "Wedding",
-            year: "2024",
-            title: "Royal Palace Wedding",
-            images: [
-                "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 2,
-            category: "Corporate",
-            year: "2023",
-            title: "Tech Summit Nepal",
-            images: [
-                "https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1478146896981-b80fe463b330?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 3,
-            category: "Concert",
-            year: "2024",
-            title: "Summer Music Festival",
-            images: [
-                "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 4,
-            category: "Social",
-            year: "2023",
-            title: "Neon Night Party",
-            images: [
-                "https://images.unsplash.com/photo-1530103862676-de3c9a59af57?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1496337589254-7e19d01cec44?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 5,
-            category: "Wedding",
-            year: "2023",
-            title: "Lakeside Nuptials",
-            images: [
-                "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1511285560982-1351cdeb9821?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 6,
-            category: "Corporate",
-            year: "2024",
-            title: "Banking Awards Night",
-            images: [
-                "https://images.unsplash.com/photo-1478146896981-b80fe463b330?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 7,
-            category: "Social",
-            year: "2024",
-            title: "Birthday Bash",
-            images: [
-                "https://images.unsplash.com/photo-1496337589254-7e19d01cec44?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1514525253440-b393452e3383?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-        {
-            id: 8,
-            category: "Concert",
-            year: "2023",
-            title: "Rock in Kathmandu",
-            images: [
-                "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop"
-            ]
-        },
-    ];
+    const allProjects = initialProjects || [];
 
     const filteredProjects = filter === "All"
         ? allProjects

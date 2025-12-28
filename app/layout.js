@@ -2,6 +2,7 @@ import { Poppins, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Preloader from "@/components/Preloader";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.variable} ${inter.variable} ${playfair.variable}`} suppressHydrationWarning={true}>
+        <Preloader />
         <Navbar />
         <main style={{ minHeight: 'calc(100vh - 80px - 300px)' }}>
           {children}

@@ -10,20 +10,10 @@ import styles from './about.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AboutClient = () => {
+const AboutClient = ({ initialTeam }) => {
     const containerRef = useRef(null);
 
-    const team = [
-        { name: "Sunil Bhandari", role: "Chairman", image: "https://eventsolutionnepal.com.np/images/leaders/Sunil.jpg" },
-        { name: "Bijay Sagar Pradhan", role: "Managing Director", image: "https://eventsolutionnepal.com.np/images/leaders/Bijay.jpg" },
-        { name: "Nabin Bhatta", role: "Marketing Director", image: "https://eventsolutionnepal.com.np/images/leaders/Nabin.jpg" },
-        { name: "Vinesh Choradia", role: "IM Director", image: "https://eventsolutionnepal.com.np/images/leaders/Vinesh.jpg" },
-        // New Members
-        { name: "Anita Sherpa", role: "Creative Lead", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1888&auto=format&fit=crop" },
-        { name: "Rajesh Thapa", role: "Logistics Manager", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1887&auto=format&fit=crop" },
-        { name: "Meera Joshi", role: "Client Relations", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop" },
-        { name: "Suresh Tamang", role: "Technical Head", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=1887&auto=format&fit=crop" },
-    ];
+    const team = initialTeam || [];
 
     const values = [
         { id: "01", title: "Precision", desc: "We believe perfection is in the details. Every element is meticulously planned and executed.", icon: Target },
@@ -91,12 +81,12 @@ const AboutClient = () => {
                         <div>
                             <p className={styles.storyText}>
                                 Founded in 2015, Event Solution Nepal began with a singular vision: to transform the ordinary into the extraordinary.
-                                <span className={styles.highlight}> What started as a small passionate team has grown into Nepal's premier event management firm.</span>
+                                <span className={styles.highlight}> What started as a small passionate team has grown into Nepal&apos;s premier event management firm.</span>
                             </p>
                             <br />
                             <p className={styles.storyText} style={{ fontSize: '1.25rem', color: '#525252' }}>
-                                We bridge the gap between logistical precision and artistic expression. Whether it's a high-stakes corporate summit or an intimate destination wedding,
-                                we bring the same level of discipline and flair. We don't just manage events; we design experiences that linger.
+                                We bridge the gap between logistical precision and artistic expression. Whether it&apos;s a high-stakes corporate summit or an intimate destination wedding,
+                                we bring the same level of discipline and flair. We don&apos;t just manage events; we design experiences that linger.
                             </p>
                         </div>
                         <div className={styles.storyImageWrapper}>
@@ -105,6 +95,7 @@ const AboutClient = () => {
                                 alt="Our Story"
                                 fill
                                 className={styles.storyImage}
+                                sizes="(max-width: 1024px) 100vw, 50vw"
                             />
                         </div>
                     </div>
@@ -155,13 +146,15 @@ const AboutClient = () => {
                 </div>
             </section>
 
-            {/* Clean Team Grid */}
+            {/* Clean Team Grid with Marquee */}
             <section className={styles.teamSection}>
                 <div className={styles.container}>
                     <div className={styles.sectionHeader}>
                         <h2 className={styles.sectionTitle}>Meet The Team</h2>
                         <p className={styles.sectionDesc}>The creative minds and dedicated hands behind your success.</p>
                     </div>
+
+                    {/* Marquee Container */}
                     <div className={styles.marqueeContainer}>
                         <div className={styles.marqueeTrack}>
                             {/* Duplicate team list for seamless loop */}
@@ -172,7 +165,8 @@ const AboutClient = () => {
                                             src={member.image}
                                             alt={member.name}
                                             fill
-                                            className={styles.memberImage}
+                                            className={`${styles.memberImage} ${member.name.includes('Vinesh') ? styles.noZoom : ''}`}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 20vw"
                                         />
                                     </div>
                                     <h3 className={styles.memberName}>{member.name}</h3>
@@ -181,6 +175,8 @@ const AboutClient = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Visual Separator */}
                     <hr className={styles.sectionSeparator} />
                 </div>
             </section>

@@ -7,7 +7,13 @@ export const metadata = {
     description: "Visual stories from our memorable events.",
 };
 
-export default function Gallery() {
+import prisma from "@/lib/db";
+
+export default async function Gallery() {
+    const galleryItems = await prisma.galleryItem.findMany({
+        orderBy: { createdAt: 'desc' }
+    });
+
     return (
         <main className={styles.main}>
             {/* Page Header */}
@@ -24,7 +30,7 @@ export default function Gallery() {
             </div>
 
             {/* Gallery Grid */}
-            <GalleryGrid />
+            <GalleryGrid initialItems={galleryItems} />
 
             {/* CTA Section */}
             <CallToAction />

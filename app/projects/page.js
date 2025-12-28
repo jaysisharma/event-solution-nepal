@@ -5,6 +5,19 @@ export const metadata = {
     description: "Browse our projects of weddings, corporate events, parties, and concerts managed by Event Solution Nepal.",
 };
 
-export default function ProjectsPage() {
-    return <ProjectsClient />;
+import prisma from "@/lib/db";
+
+export default async function ProjectsPage() {
+    // Fetch projects from DB
+    const projectsRaw = await prisma.workProject.findMany({
+        orderBy: { createdAt: 'desc' }
+    });
+
+    // Parse JSON images
+    const projects = projectsRaw.map(p => ({
+        ...p,
+        images: JSON.parse(p.images)
+    }));
+
+    return <ProjectsClient initialProjects={projects} />;
 }

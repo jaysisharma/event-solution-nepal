@@ -1,7 +1,10 @@
+/* about.module.css */
+
 .page {
     background-color: #ffffff;
     color: #1a1a1a;
     min-height: 100vh;
+    font-family: var(--font-inter, sans-serif);
 }
 
 .container {
@@ -15,19 +18,11 @@
     padding: 12rem 0 8rem;
     position: relative;
     background-color: #fafafa;
-}
-
-.heroLabel {
-    display: block;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #EB1F26;
-    margin-bottom: 2rem;
-    font-weight: 600;
+    overflow: hidden;
 }
 
 .heroTitle {
+    font-family: var(--font-poppins, sans-serif);
     font-size: clamp(3.5rem, 8vw, 8rem);
     font-weight: 800;
     line-height: 0.95;
@@ -38,11 +33,11 @@
 }
 
 .textRed {
-    color: #EB1F26;
+    color: var(--primary, #EB1F26);
 }
 
 .textBlue {
-    color: #054F9E;
+    color: var(--secondary, #054F9E);
 }
 
 .heroSubtitle {
@@ -124,6 +119,7 @@
 }
 
 .statNumber {
+    font-family: var(--font-poppins, sans-serif);
     font-size: clamp(3rem, 5vw, 5rem);
     font-weight: 800;
     color: #1a1a1a;
@@ -137,11 +133,13 @@
     color: #737373;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
 }
 
-/* --- Team (Clean Grid) --- */
-.teamSection {
+/* --- Values (Grid Card Layout) --- */
+.valuesSection {
     padding: 10rem 0;
+    background-color: #f9f9f9;
 }
 
 .sectionHeader {
@@ -149,99 +147,17 @@
 }
 
 .sectionTitle {
+    font-family: var(--font-poppins, sans-serif);
     font-size: clamp(2.5rem, 5vw, 4rem);
     font-weight: 700;
     margin-bottom: 1rem;
+    color: #1a1a1a;
 }
 
 .sectionDesc {
     font-size: 1.125rem;
     color: #737373;
     max-width: 600px;
-}
-
-/* .teamGrid removed for Marquee */
-.marqueeContainer {
-    width: 100%;
-    overflow: hidden;
-    padding: 1rem 0;
-}
-
-.marqueeTrack {
-    display: flex;
-    gap: 2.5rem;
-    width: max-content;
-    animation: scrollTeam 50s linear infinite;
-}
-
-.marqueeTrack:hover {
-    animation-play-state: paused;
-}
-
-@keyframes scrollTeam {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(calc(-50% - 1.25rem));
-    }
-}
-
-.teamCard {
-    /* group: card; removed invalid property */
-    cursor: pointer;
-    min-width: 280px;
-    max-width: 320px;
-    flex: 0 0 auto;
-}
-
-.memberImageWrapper {
-    position: relative;
-    height: 350px;
-    /* Reduced from 450px */
-    width: 100%;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-}
-
-.sectionSeparator {
-    border: none;
-    height: 1px;
-    background-color: #e5e5e5;
-    margin-top: 5rem;
-    width: 100%;
-}
-
-.memberImage {
-    object-fit: cover;
-    transition: all 0.5s ease;
-}
-
-.teamCard:hover .memberImage {
-    transform: scale(1.05);
-}
-
-.memberName {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 0.25rem;
-}
-
-.memberRole {
-    font-size: 0.95rem;
-    color: #737373;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-/* --- Values (Grid Card Layout) --- */
-.valuesSection {
-    padding: 6rem 0;
-    background-color: #f9f9f9;
 }
 
 .valuesGrid {
@@ -265,7 +181,7 @@
 .valueItem:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: #EB1F26;
+    border-color: var(--primary, #EB1F26);
 }
 
 .iconWrapper {
@@ -282,11 +198,11 @@
 }
 
 .valueItem:hover .iconWrapper {
-    background-color: #EB1F26;
+    background-color: var(--primary, #EB1F26);
 }
 
 .valueIcon {
-    color: #EB1F26;
+    color: var(--primary, #EB1F26);
     transition: color 0.3s ease;
 }
 
@@ -295,6 +211,7 @@
 }
 
 .valueTitle {
+    font-family: var(--font-poppins, sans-serif);
     font-size: 1.5rem;
     font-weight: 700;
     color: #1a1a1a;
@@ -307,16 +224,123 @@
     line-height: 1.6;
 }
 
+/* --- Team (Marquee) --- */
+.teamSection {
+    padding: 10rem 0 0;
+    /* Removing bottom padding to connect closely with HR if needed */
+}
+
+/* Marquee Styles */
+.marqueeContainer {
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem 0;
+    /* No blur mask as requested */
+}
+
+.marqueeTrack {
+    display: flex;
+    gap: 2.5rem;
+    width: max-content;
+    animation: scrollTeam 60s linear infinite;
+    /* Increased duration for smoother scroll if list is long */
+}
+
+.marqueeTrack:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scrollTeam {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(calc(-50% - 1.25rem));
+        /* Half gap adjustment */
+    }
+}
+
+.teamCard {
+    cursor: pointer;
+    min-width: 280px;
+    max-width: 320px;
+    flex: 0 0 auto;
+}
+
+.memberImageWrapper {
+    position: relative;
+    height: 350px;
+    /* Reduced height */
+    width: 100%;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 4px solid #ffffff;
+    /* Added border as requested */
+    box-shadow: 0 0 0 2px #e5e5e5;
+    /* Outer thin border for definition */
+}
+
+.memberImage {
+    object-fit: cover;
+    transition: all 0.5s ease;
+    transform: scale(1.2);
+    margin-top: 70px;
+}
+
+.teamCard:hover .memberImage {
+    transform: scale(1.12);
+    /* Increased zoom "a bit" */
+}
+
+.memberName {
+    font-family: var(--font-poppins, sans-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.25rem;
+}
+
+.memberRole {
+    font-size: 0.95rem;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.sectionSeparator {
+    border: none;
+    height: 1px;
+    background-color: #e5e5e5;
+    margin-top: 5rem;
+    width: 100%;
+    display: block;
+}
+
 /* --- CTA --- */
 .ctaSection {
-    padding: 2rem 0 2rem;
+    padding: 6rem 0;
     text-align: center;
 }
 
 .ctaTitle {
+    font-family: var(--font-poppins, sans-serif);
     font-size: clamp(3rem, 6vw, 6rem);
     font-weight: 800;
     line-height: 1;
     margin-bottom: 3rem;
     color: #1a1a1a;
+}
+
+/* Specific override for Vinesh */
+.noZoom {
+    transform: scale(1.3) !important;
+    margin-top: 0 !important;
+}
+
+.teamCard:hover .noZoom {
+    transform: scale(1) !important;
 }

@@ -1,0 +1,68 @@
+.adminLayout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #1e293b;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.brand {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #334155;
+    text-align: center;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.navLink {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #94a3b8;
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.navLink:hover {
+    background-color: #334155;
+    color: white;
+}
+
+.logoutWrapper {
+    border-top: 1px solid #334155;
+    padding-top: 1rem;
+}
+
+.logoutBtn {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.logoutBtn:hover {
+    background-color: #dc2626;
+}
+
+.mainContent {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}

@@ -5,6 +5,12 @@ export const metadata = {
     description: "Learn about Event Solution Nepal, our history, mission, and the team behind your memorable events.",
 };
 
-export default function About() {
-    return <AboutClient />;
+import prisma from "@/lib/db";
+
+export default async function About() {
+    const team = await prisma.teamMember.findMany({
+        orderBy: { id: 'asc' }
+    });
+
+    return <AboutClient initialTeam={team} />;
 }

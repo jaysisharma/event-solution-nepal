@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String   
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        Int      @id @default(autoincrement())
+  title     String
+  date      String   
+  month     String   
+  location  String
+  time      String
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Partner {
+  id        Int      @id @default(autoincrement())
+  name      String
+  order     Int      @default(0) 
+  createdAt DateTime @default(now())
+}
+
+model WorkProject {
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String
+  year        String
+  images      String   // Stored as JSON string of array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  image       String
+  tags        String   // Stored as JSON string or comma-separated
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FAQ {
+  id          Int      @id @default(autoincrement())
+  question    String
+  answer      String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TeamMember {
+  id          Int      @id @default(autoincrement())
+  name        String
+  role        String
+  image       String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GalleryItem {
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String
+  size        String   // 'normal', 'wide', 'tall', 'large'
+  src         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

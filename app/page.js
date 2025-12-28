@@ -1,4 +1,7 @@
 import HomeClient from "./HomeClient";
+import prisma from "@/lib/db";
+import { promises as fs } from 'fs';
+import path from 'path';
 
 export const metadata = {
   title: "Event Solution Nepal | Best Event Management Company in Nepal",
@@ -20,6 +23,37 @@ export const metadata = {
   },
 };
 
-export default function Home() {
-  return <HomeClient />;
+
+
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const partners = await prisma.partner.findMany({
+    orderBy: { order: 'asc' },
+  });
+
+  const events = await prisma.event.findMany({
+    orderBy: { date: 'asc' },
+    take: 3, // Only show 3 on homepage
+  });
+
+  // Read partner logos from public/company
+  const companyDir = path.join(process.cwd(), 'public/company');
+  let partnerLogos = [];
+  try {
+    const files = await fs.readdir(companyDir);
+    partnerLogos = files
+      .filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg'))
+      .map(file => `/company/${encodeURIComponent(file)}`);
+  } catch (error) {
+    console.error("Error reading company logos:", error);
+  }
+
+  return (
+    <HomeClient
+      initialPartners={partners}
+      initialEvents={events}
+      partnerLogos={partnerLogos}
+    />
+  );
 }
