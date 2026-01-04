@@ -2,15 +2,30 @@
 
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function Template({ children }) {
     // 10 columns for a smoother waterfall effect
     const columns = 10;
     const [mounted, setMounted] = useState(false);
+    const [shouldAnimate, setShouldAnimate] = useState(false);
     const { theme } = useTheme();
 
     useEffect(() => {
         setMounted(true);
+        // Only show transition if the Preloader has already been shown/completed in this session.
+        // This prevents the waterfall from playing on top of (or underneath) the initial Preloader.
+        const preloaderShown = sessionStorage.getItem("preloaderShown");
+        if (preloaderShown) {
+            setShouldAnimate(true);
+        } else {
+            // First load: Preloader will run. We mark it as shown so next navigation animates.
+            // Note: Preloader.js also sets this, but setting it here is safe redundancy or relies on Preloader.
+            // Actually, we should WAIT for Preloader. But Preloader sets it on complete.
+            // So on first load, preloaderShown is null. setShouldAnimate(false). Correct.
+            // Next nav: preloaderShown matches.
+        }
     }, []);
 
     // Theme Logic:
@@ -55,7 +70,7 @@ export default function Template({ children }) {
 
     return (
         <>
-            {mounted && createPortal(transitionOverlay, document.body)}
+            {mounted && shouldAnimate && createPortal(transitionOverlay, document.body)}
             {children}
         </>
     );
