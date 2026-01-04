@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 import TestimonialForm from '../TestimonialForm';
 import Link from 'next/link';
