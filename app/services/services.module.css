@@ -1,6 +1,6 @@
 .page {
-    background-color: #ffffff;
-    color: var(--neutral-dark);
+    background-color: var(--background);
+    color: var(--foreground);
     min-height: 100vh;
 }
 
@@ -9,7 +9,7 @@
     padding: 12rem 0 6rem;
     position: relative;
     overflow: hidden;
-    background-color: #fafafa;
+    background-color: var(--bg-section);
 }
 
 .heroContent {
@@ -38,12 +38,13 @@
     letter-spacing: -0.03em;
     margin-bottom: 3rem;
     max-width: 1200px;
-    color: #1a1a1a;
+    color: var(--foreground);
 }
 
 .heroSubtitle {
     font-size: clamp(1.2rem, 3vw, 1.8rem);
-    color: #525252;
+    color: var(--foreground);
+    opacity: 0.8;
     max-width: 700px;
     line-height: 1.5;
     font-weight: 300;
@@ -52,7 +53,7 @@
 /* --- Services List (Minimalist Blocks - Light) --- */
 .servicesSection {
     padding: 0;
-    background-color: #ffffff;
+    background-color: var(--background);
     position: relative;
 }
 
@@ -74,7 +75,7 @@
 }
 
 .serviceBlock {
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid var(--border-color);
     padding-top: 2rem;
 }
 
@@ -117,7 +118,7 @@
     }
 
     .serviceBlock {
-        border-top: 1px solid #e5e5e5;
+        border-top: 1px solid var(--border-color);
         padding-top: 4rem;
         min-height: 70vh;
         /* Make each block tall enough */
@@ -182,12 +183,13 @@
     font-weight: 800;
     line-height: 1;
     margin-bottom: 2rem;
-    color: #1a1a1a;
+    color: var(--foreground);
 }
 
 .serviceDesc {
     font-size: 1.25rem;
-    color: #525252;
+    color: var(--foreground);
+    opacity: 0.8;
     line-height: 1.6;
     margin-bottom: 3rem;
     max-width: 550px;
@@ -201,24 +203,24 @@
 
 .tag {
     padding: 0.75rem 1.5rem;
-    border: 1px solid #e5e5e5;
+    border: 1px solid var(--border-color);
     border-radius: 999px;
     font-size: 0.875rem;
-    color: #1a1a1a;
+    color: var(--foreground);
     background-color: transparent;
     transition: all 0.3s ease;
 }
 
 .tag:hover {
-    background-color: #1a1a1a;
-    color: #fff;
-    border-color: #1a1a1a;
+    background-color: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
 }
 
 /* --- Process (Simple Steps - Light) --- */
 .processSection {
     padding: 10rem 0;
-    background-color: #f9fafb;
+    background-color: var(--bg-section);
     /* Very light grey */
 }
 
@@ -251,7 +253,7 @@
 .stepNumber {
     font-size: 5rem;
     font-weight: 800;
-    color: #e5e5e5;
+    color: var(--border-color);
     line-height: 1;
     margin-bottom: 1rem;
 }
@@ -260,19 +262,20 @@
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: #1a1a1a;
+    color: var(--foreground);
 }
 
 .stepDesc {
     font-size: 0.95rem;
-    color: #525252;
+    color: var(--foreground);
+    opacity: 0.8;
     line-height: 1.6;
 }
 
 /* --- FAQ (Minimal - Light) --- */
 .faqSection {
     padding: 8rem 0;
-    background-color: #ffffff;
+    background-color: var(--background);
 }
 
 .faqGrid {
@@ -281,7 +284,7 @@
 }
 
 .faqItem {
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .faqQuestion {
@@ -291,7 +294,8 @@
     background: none;
     border: none;
     /* A11y Fix: Darker gray for contrast */
-    color: #94a3b8;
+    color: var(--foreground);
+    opacity: 0.7;
     font-size: 1.25rem;
     font-weight: 600;
     cursor: pointer;
@@ -302,7 +306,8 @@
 
 .faqAnswer {
     padding-bottom: 2rem;
-    color: #525252;
+    color: var(--foreground);
+    opacity: 0.8;
     display: none;
     max-width: 700px;
     line-height: 1.6;
@@ -325,7 +330,7 @@
 .ctaSection {
     padding: 10rem 0 6rem;
     text-align: center;
-    background-color: #ffffff;
+    background-color: var(--background);
 }
 
 .ctaTitle {
@@ -333,5 +338,5 @@
     font-weight: 800;
     line-height: 1;
     margin-bottom: 3rem;
-    color: #1a1a1a;
+    color: var(--foreground);
 }

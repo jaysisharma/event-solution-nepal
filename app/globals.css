@@ -13,6 +13,21 @@
   --bg-card: #ffffff;
 }
 
+[data-theme='dark'] {
+  --background: #0f172a;
+  /* Slate 900 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
+  --neutral-dark: #f8fafc;
+  --neutral-light: #1e293b;
+  /* Slate 800 */
+  --nav-bg: rgba(15, 23, 42, 0.95);
+  --border-color: #334155;
+  /* Slate 700 */
+  --bg-section: #1e293b;
+  --bg-card: #1e293b;
+}
+
 
 
 * {

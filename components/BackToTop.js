@@ -6,9 +6,9 @@ import styles from './BackToTop.module.css';
 export default function BackToTop() {
     const [isVisible, setIsVisible] = useState(false);
 
-    // Show button when page is scrolled down
+    // Show button when page is scrolled down 50% of screen height
     const toggleVisibility = () => {
-        if (window.scrollY > 300) {
+        if (window.scrollY > window.innerHeight * 0.5) {
             setIsVisible(true);
         } else {
             setIsVisible(false);
@@ -30,12 +30,12 @@ export default function BackToTop() {
     }, []);
 
     return (
-        <div className={styles.scrollToTop}>
-            {isVisible && (
-                <button onClick={scrollToTop} className={styles.button} aria-label="Back to Top">
-                    <ArrowUp size={24} />
-                </button>
-            )}
-        </div>
+        <button
+            onClick={scrollToTop}
+            className={`${styles.button} ${isVisible ? styles.visible : ''}`}
+            aria-label="Back to Top"
+        >
+            <ArrowUp size={24} />
+        </button>
     );
 }
