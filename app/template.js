@@ -1,17 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Template({ children }) {
     // 10 columns for a smoother waterfall effect
     const columns = 10;
     const [mounted, setMounted] = useState(false);
+    const { theme } = useTheme();
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    // Theme Logic:
+    // Dark Mode Selected -> Transition Color = White (#ffffff)
+    // Light Mode Selected -> Transition Color = Dark Slate (#334155) - Less vibrant than Blue
+    const transitionColor = theme === 'dark' ? '#ffffff' : '#334155';
 
     const transitionOverlay = (
         <div
@@ -40,7 +45,7 @@ export default function Template({ children }) {
                     style={{
                         flex: 1,
                         height: "100%",
-                        backgroundColor: "#054F9E", // Brand Primary Blue
+                        backgroundColor: transitionColor,
                         borderRight: "1px solid rgba(0,0,0,0.05)",
                     }}
                 />
