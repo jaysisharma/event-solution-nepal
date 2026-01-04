@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import prisma from '@/lib/db';
 import styles from './admin.module.css';
 import Link from 'next/link';
