@@ -16,7 +16,6 @@ import {
 import DashboardCharts from '@/components/admin/DashboardCharts';
 import { getSystemHealth } from './system/actions';
 
-
 // Server Widget for the Side Panel
 async function ServerHealthSummary() {
     let health = null;
