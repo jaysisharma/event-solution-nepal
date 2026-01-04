@@ -10,6 +10,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import JsonLd from "@/components/JsonLd";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SettingsProvider } from "@/context/SettingsContext";
+import BackToTop from "@/components/BackToTop";
 
 
 const poppins = Poppins({
@@ -90,6 +91,7 @@ export default function RootLayout({ children }) {
             <main style={{ minHeight: 'calc(100vh - 80px - 300px)', position: 'relative', zIndex: 10, backgroundColor: 'var(--background)' }}>
               {children}
             </main>
+            <BackToTop />
             <Footer />
             {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
             <JsonLd data={{

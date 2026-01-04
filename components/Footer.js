@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { FaFacebookF, FaInstagram, FaTiktok, FaLinkedinIn, FaWhatsapp, FaViber } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaTiktok, FaLinkedinIn, FaWhatsapp, FaViber, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 import { useSettings } from '@/context/SettingsContext';
 import styles from './Footer.module.css';
 
@@ -110,9 +110,25 @@ const Footer = () => {
 
                                 <h3 className={styles.heading}>Get in Touch</h3>
                                 <ul className={styles.list}>
-                                    <li>
-                                        <a href={`https://wa.me/${whatsappNum}`} target="_blank" className={styles.link} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '10px', color: '#25D366' }}>
-                                            <FaWhatsapp /> Chat on WhatsApp
+                                    <li className={styles.contactItem}>
+                                        <FaMapMarkerAlt className={styles.contactIcon} />
+                                        <span>Jwagal, Lalitpur, Nepal</span>
+                                    </li>
+                                    <li className={styles.contactItem} style={{ alignItems: 'flex-start' }}>
+                                        <FaPhoneAlt className={styles.contactIcon} style={{ marginTop: '5px' }} />
+                                        <div className={styles.phoneGroup}>
+                                            <a href="tel:+977015260535" className={styles.link}>+977-01-5260535</a>
+                                            <a href="tel:+977015260103" className={styles.link}>+977-01-5260103</a>
+                                        </div>
+                                    </li>
+                                    <li className={styles.contactItem}>
+                                        <FaEnvelope className={styles.contactIcon} />
+                                        <a href="mailto:info@eventsolutionnepal.com.np" className={styles.link}>info@eventsolutionnepal.com.np</a>
+                                    </li>
+                                    <li className={styles.contactItem}>
+                                        <FaWhatsapp className={styles.contactIcon} style={{ color: '#25D366' }} />
+                                        <a href={`https://wa.me/${whatsappNum}`} target="_blank" className={styles.link} style={{ color: '#25D366' }}>
+                                            Chat on WhatsApp
                                         </a>
                                     </li>
                                 </ul>
