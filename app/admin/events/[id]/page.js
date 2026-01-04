@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import prisma from '@/lib/db';
 import { updateEvent } from '../actions';
 import EventForm from '../EventForm';

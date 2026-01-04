@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import prisma from '@/lib/db';
 import { addPartner, deletePartner } from './actions';
 import { Trash2, Plus } from 'lucide-react';

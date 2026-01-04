@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { addEvent } from '../actions';
 import EventForm from '../EventForm';
 

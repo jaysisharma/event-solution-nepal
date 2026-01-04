@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import RentalForm from '../RentalForm';
 import { addRental } from '../actions';
 import prisma from '@/lib/db';
