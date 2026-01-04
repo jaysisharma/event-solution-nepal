@@ -47,7 +47,7 @@ const Header = () => {
 
             {/* CTA Right */}
             <div className={styles.ctaWrapper}>
-                <Button href="/contact" variant={isScrolled ? "primary" : "outline"}>Let's Talk</Button>
+                <Button href="/contact" variant={isScrolled ? "primary" : "outline"}>Let&apos;s Talk</Button>
             </div>
 
             {/* Mobile Hamburger */}

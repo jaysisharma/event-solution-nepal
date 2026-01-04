@@ -43,7 +43,7 @@ export default function Clients() {
                 <div className={styles.testimonialGrid}>
                     {testimonials.map(t => (
                         <div key={t.id} className={styles.testimonialCard}>
-                            <p className={styles.testimonialText}>"{t.text}"</p>
+                            <p className={styles.testimonialText}>&quot;{t.text}&quot;</p>
                             <div className={styles.testimonialAuthor}>
                                 <h4 className={styles.authorName}>{t.name}</h4>
                                 <p className={styles.authorRole}>{t.role}</p>

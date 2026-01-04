@@ -1,62 +1,106 @@
 "use client";
-import React from 'react';
-import { Calendar, Layers, Sparkles, Briefcase, PartyPopper, Speaker, ArrowUpRight, ArrowRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { Calendar, Layers, Sparkles, Briefcase, PartyPopper, Speaker, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import MagneticButton from './MagneticButton';
 import styles from './Expertise.module.css';
+import { useTheme } from '@/context/ThemeContext';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Expertise = () => {
+    const { theme } = useTheme();
+    const container = useRef(null);
+    const cardsRef = useRef([]);
+
     const services = [
         {
             id: 0,
             title: "Event Planning & Concept Development",
-            subtitle: "Stress-Free Planning",
+            subtitle: "Visionary Strategy",
             image: "/services/event_management.png",
             icon: Calendar,
         },
         {
             id: 1,
             title: "Marketing & Promotion",
-            subtitle: "Premium Equipment",
+            subtitle: "Strategic Reach",
             image: "/services/marketing.png",
             icon: Layers,
         },
         {
             id: 2,
             title: "Event Organizer",
-            subtitle: "Aesthetic Excellence",
+            subtitle: "Seamless Management",
             image: "/services/organizer.png",
             icon: Sparkles,
         },
         {
             id: 3,
             title: "Pre & Post-Event Management",
-            subtitle: "Professional Impact",
+            subtitle: "Full Cycle Support",
             image: "/services/preandpost.png",
             icon: Briefcase,
         },
         {
             id: 4,
             title: "Event Rentals",
-            subtitle: "Unforgettable Moments",
+            subtitle: "Premium Inventory",
             image: "/services/event_rentals.png",
             icon: PartyPopper,
         },
         {
             id: 5,
             title: "Production & Execution",
-            subtitle: "Technical Mastery",
+            subtitle: "Technical Precision",
             image: "/services/production.png",
             icon: Speaker,
         }
     ];
 
-    return (
-        <section className={styles.section}>
-            <div className={styles.container}>
+    useGSAP(() => {
+        const cards = cardsRef.current;
+        const totalCards = cards.length;
 
+        cards.forEach((card, index) => {
+            if (!card) return;
+
+            ScrollTrigger.create({
+                trigger: card,
+                start: "top top+=120",
+                end: "bottom bottom",
+                endTrigger: container.current,
+                pin: true,
+                pinSpacing: false,
+                id: `service-card-${index}`,
+            });
+
+            if (index < totalCards - 1) {
+                const nextCard = cards[index + 1];
+                gsap.to(card, {
+                    scale: 0.95,
+                    filter: "brightness(0.5)", // Darken previous cards more for this design
+                    scrollTrigger: {
+                        trigger: nextCard,
+                        start: "top top+=200",
+                        end: "top top+=120",
+                        scrub: true,
+                    }
+                });
+            }
+        });
+
+    }, { scope: container });
+
+    return (
+        <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
+            <div className={styles.container}>
                 {/* Section Header */}
                 <div className={styles.header}>
                     <div className={styles.headerContent}>
-                        {/* <span className={styles.label}>Our Expertise</span> */}
                         <h2 className={styles.title}>
                             Our Core <span className={styles.highlight}>Services</span>
                         </h2>
@@ -64,14 +108,16 @@ const Expertise = () => {
                             Services provided by event solution that put a real impact on your event.
                         </p>
                     </div>
-
                 </div>
 
-                {/* Grid Layout */}
-                <div className={styles.grid}>
-                    {services.map((service) => (
-                        <div key={service.id} className={`${styles.card} service-card`}>
-
+                {/* Stacking Cards Wrapper (formerly grid) */}
+                <div className={styles.grid} ref={container}>
+                    {services.map((service, index) => (
+                        <div
+                            key={service.id}
+                            className={`${styles.card} service-card`}
+                            ref={el => cardsRef.current[index] = el}
+                        >
                             {/* Background Image */}
                             <img
                                 src={service.image}
@@ -82,13 +128,13 @@ const Expertise = () => {
                             {/* Overlay Gradient */}
                             <div className={styles.overlay}></div>
 
-                            {/* Floating Icon Badge */}
-                            <div className={styles.iconBadge}>
-                                <service.icon size={20} />
-                            </div>
+                            {/* Content Structure */}
+                            <div className={styles.contentBody}>
+                                {/* Floating Icon Badge */}
+                                <div className={styles.iconBadge}>
+                                    <service.icon size={20} />
+                                </div>
 
-                            {/* Content */}
-                            <div className={styles.cardContent}>
                                 <div className={styles.subtitleWrapper}>
                                     <div className={styles.line}></div>
                                     <span className={styles.subtitle}>{service.subtitle}</span>
@@ -97,22 +143,17 @@ const Expertise = () => {
                                 <h3 className={styles.cardTitle}>
                                     {service.title}
                                 </h3>
-
-                                {/* <div className={styles.explore}>
-                                    <span>Explore Service</span>
-                                    <div className={styles.arrowCircle}>
-                                        <ArrowUpRight size={14} />
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     ))}
                 </div>
 
                 <div className={styles.mobileBtn}>
-                    <button className={styles.btn}>
-                        View All Services <ArrowRight size={18} style={{ marginLeft: '0.5rem' }} />
-                    </button>
+                    <MagneticButton>
+                        <Link href="/services" className={styles.btn}>
+                            View All Services <ArrowRight size={20} style={{ marginLeft: '0.75rem' }} />
+                        </Link>
+                    </MagneticButton>
                 </div>
             </div>
         </section>

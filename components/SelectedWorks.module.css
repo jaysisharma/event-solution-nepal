@@ -1,13 +1,17 @@
 .section {
     padding: 8rem 0;
-    background-color: #f8fafc;
-    /* Soft light background */
-    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-    background-size: 20px 20px;
-    /* Dot pattern */
-    color: var(--neutral-dark);
+    /* Background removed */
+    color: var(--foreground);
     position: relative;
     overflow: hidden;
+}
+
+.dark {
+    background-color: #0f172a;
+    color: #f8fafc;
+    --foreground: #f8fafc;
+    --border-color: #334155;
+    --bg-card: #1e293b;
 }
 
 .container {
@@ -23,7 +27,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
     /* Lighter border */
     padding-bottom: 2rem;
 }
@@ -60,7 +64,8 @@
         display: block;
         max-width: 20rem;
         font-size: 0.875rem;
-        color: #64748b;
+        color: var(--foreground);
+        opacity: 0.8;
     }
 }
 
@@ -72,7 +77,7 @@
 
 .item {
     padding: 2.5rem 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
     /* Lighter border */
     display: flex;
     justify-content: space-between;
@@ -119,7 +124,8 @@
     display: flex;
     gap: 1.5rem;
     font-size: 0.875rem;
-    color: #94a3b8;
+    color: var(--foreground);
+    opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 500;
@@ -128,7 +134,7 @@
 .itemAction {
     width: 3rem;
     height: 3rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -141,9 +147,9 @@
 .item:hover .itemAction {
     opacity: 1;
     transform: translateX(0);
-    background-color: white;
-    color: black;
-    border-color: white;
+    background-color: var(--foreground);
+    color: var(--background);
+    border-color: var(--foreground);
 }
 
 /* Floating Image Reveal */
@@ -186,14 +192,14 @@
 }
 
 .viewAllBtn {
-    background-color: white;
-    color: #0f172a;
+    background-color: var(--bg-card);
+    color: var(--foreground);
     padding: 1rem 2.5rem;
     font-size: 1rem;
     font-weight: 600;
     border-radius: 9999px;
     cursor: pointer;
-    border: none;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
@@ -201,6 +207,6 @@
 }
 
 .viewAllBtn:hover {
-    background-color: #e2e8f0;
+    background-color: var(--border-color);
     transform: translateY(-2px);
 }

@@ -2,8 +2,10 @@
 import React from 'react';
 import { ShieldCheck, Lightbulb, Award } from 'lucide-react';
 import styles from './WhyChooseUs.module.css';
+import { useTheme } from '@/context/ThemeContext';
 
 const WhyChooseUs = () => {
+    const { theme } = useTheme();
     const reasons = [
         {
             id: "01",
@@ -35,7 +37,7 @@ const WhyChooseUs = () => {
     ];
 
     return (
-        <section className={styles.section}>
+        <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
 
             {/* Soft, Colorful Background Blurs */}
             <div className={styles.bgBlur1}></div>
@@ -115,38 +117,6 @@ const WhyChooseUs = () => {
                         </div>
                     ))}
                 </div>
-
-                {/* Trusted By Strip */}
-                <div className={styles.trustedStrip}>
-                    <p className={styles.trustedLabel}>Trusted by Industry Leaders</p>
-                    <div className={styles.logosTrack}>
-                        {/* Original Set */}
-                        <div className={styles.logos}>
-                            <span className={`${styles.logoText} ${styles.fontSerif}`}>Chaudhary Group</span>
-                            <span className={`${styles.logoText} ${styles.fontSans}`}>Ncell</span>
-                            <span className={`${styles.logoText} ${styles.fontMono}`}>eSewa</span>
-                            <span className={`${styles.logoText} ${styles.fontItalic}`}>Kantipur</span>
-                            <span className={styles.logoText}>Nepal <span className={styles.highlight}>Airlines</span></span>
-                        </div>
-                        {/* Duplicate Set */}
-                        <div className={styles.logos}>
-                            <span className={`${styles.logoText} ${styles.fontSerif}`}>Chaudhary Group</span>
-                            <span className={`${styles.logoText} ${styles.fontSans}`}>Ncell</span>
-                            <span className={`${styles.logoText} ${styles.fontMono}`}>eSewa</span>
-                            <span className={`${styles.logoText} ${styles.fontItalic}`}>Kantipur</span>
-                            <span className={styles.logoText}>Nepal <span className={styles.highlight}>Airlines</span></span>
-                        </div>
-                        {/* Triplicate Set */}
-                        <div className={styles.logos}>
-                            <span className={`${styles.logoText} ${styles.fontSerif}`}>Chaudhary Group</span>
-                            <span className={`${styles.logoText} ${styles.fontSans}`}>Ncell</span>
-                            <span className={`${styles.logoText} ${styles.fontMono}`}>eSewa</span>
-                            <span className={`${styles.logoText} ${styles.fontItalic}`}>Kantipur</span>
-                            <span className={styles.logoText}>Nepal <span className={styles.highlight}>Airlines</span></span>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
     );

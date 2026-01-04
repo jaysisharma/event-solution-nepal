@@ -8,19 +8,25 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { FaArrowRight } from "react-icons/fa";
 import Hero from "@/components/Hero";
 import Expertise from "@/components/Expertise";
+import BeforeAfter from "@/components/BeforeAfter";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import SelectedWorks from "@/components/SelectedWorks";
 import CallToAction from "@/components/CallToAction";
 import AppPromo from "@/components/AppPromo";
+import DraggableGallery from "@/components/DraggableGallery";
 import styles from "./page.module.css";
+
 import Button from "@/components/Button";
 import Testimonials from "@/components/Testimonials";
 import UpcomingEvents from "@/components/UpcomingEvents";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HomeClient({ initialPartners, initialEvents, partnerLogos }) {
+export default function HomeClient({ initialPartners, initialEvents, partnerLogos, initialTestimonials, heroSlides, heroSettings, initialTimeline, initialProjects }) {
     const container = useRef();
+    // ... code ...
+    // Testimonials Section
+    <Testimonials reviews={initialTestimonials} />
     useGSAP(() => {
         // Services Animation
         gsap.utils.toArray(".service-card").forEach((card, i) => {
@@ -82,25 +88,35 @@ export default function HomeClient({ initialPartners, initialEvents, partnerLogo
     return (
         <div ref={container} className={styles.page}>
             {/* New Hero Section */}
-            <Hero partners={initialPartners} partnerLogos={partnerLogos} />
+            <Hero partners={initialPartners} partnerLogos={partnerLogos} slides={heroSlides} settings={heroSettings} />
 
+            {/* Services Section - Glassmorphism */}
             {/* Services Section - Glassmorphism */}
             <Expertise />
 
+            {/* Before/After Transformation */}
+            {/* <BeforeAfter /> */}
+
+
+
             {/* Portfolio Section */}
-            <SelectedWorks />
+            <SelectedWorks projects={initialProjects} />
 
             {/* Why Choose Us Section */}
             <WhyChooseUs />
 
             {/* Testimonials Section */}
-            <Testimonials />
+            <Testimonials reviews={initialTestimonials} />
 
             {/* Upcoming Events Section */}
             <UpcomingEvents events={initialEvents} />
 
             {/* App Promotion Section */}
             <AppPromo />
+
+            {/* Draggable Gallery */}
+            <DraggableGallery memories={initialTimeline} />
+
 
             {/* CTA Section - High Impact */}
             <CallToAction />

@@ -1,0 +1,160 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic:
+    - generic:
+      - generic:
+        - img "Event Solution Nepal"
+    - generic:
+      - generic: "26"
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "Event Solution" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Event Solution" [ref=e7]
+      - generic [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /
+        - link "Services" [ref=e10] [cursor=pointer]:
+          - /url: /services
+        - link "Rentals" [ref=e11] [cursor=pointer]:
+          - /url: /rentals
+        - link "About" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Projects" [ref=e13] [cursor=pointer]:
+          - /url: /projects
+        - link "Gallery" [ref=e14] [cursor=pointer]:
+          - /url: /gallery
+        - link "Contact Us" [ref=e15] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e16]:
+        - link "Get Event Solution App" [ref=e17] [cursor=pointer]:
+          - /url: https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en
+          - img [ref=e18]
+          - text: Get
+          - text: Event Solution App
+        - link "Get a Quote" [ref=e20] [cursor=pointer]:
+          - /url: /quote
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e24]:
+        - generic [ref=e25]: Expertise
+        - heading "We Build Experiences." [level=1] [ref=e26]:
+          - text: We Build
+          - text: Experiences.
+        - paragraph [ref=e27]: A multidisciplinary event agency blending creative design, technical precision, and logistical mastery.
+      - generic [ref=e34]:
+        - generic [ref=e35]: Our Methodology
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: "01"
+            - heading "Discovery" [level=3] [ref=e39]
+            - paragraph [ref=e40]: We listen to your vision and objectives.
+          - generic [ref=e41]:
+            - generic [ref=e42]: "02"
+            - heading "Strategy" [level=3] [ref=e43]
+            - paragraph [ref=e44]: We build a comprehensive roadmap and design.
+          - generic [ref=e45]:
+            - generic [ref=e46]: "03"
+            - heading "Production" [level=3] [ref=e47]
+            - paragraph [ref=e48]: We coordinate vendors and build the infrastructure.
+          - generic [ref=e49]:
+            - generic [ref=e50]: "04"
+            - heading "Execution" [level=3] [ref=e51]
+            - paragraph [ref=e52]: We manage the live event for flawless delivery.
+      - generic [ref=e54]:
+        - generic [ref=e55]: Inquiries
+        - generic [ref=e56]:
+          - button "What is your typical lead time?" [ref=e58] [cursor=pointer]:
+            - text: What is your typical lead time?
+            - img [ref=e59]
+          - button "Do you handle travel logistics?" [ref=e61] [cursor=pointer]:
+            - text: Do you handle travel logistics?
+            - img [ref=e62]
+          - button "Can we hire you for just one service?" [ref=e64] [cursor=pointer]:
+            - text: Can we hire you for just one service?
+            - img [ref=e65]
+      - generic [ref=e67]:
+        - heading "Let's Create." [level=2] [ref=e68]
+        - link "Start Your Project" [ref=e69] [cursor=pointer]:
+          - /url: /contact
+  - contentinfo [ref=e72]:
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - link "Event Solution" [ref=e76] [cursor=pointer]:
+            - /url: /
+            - img "Event Solution" [ref=e77]
+          - paragraph [ref=e78]: Crafting unforgettable experiences since 2014. We specialize in turning your vision into reality with precision, creativity, and passion.
+          - generic [ref=e79]:
+            - link "Facebook" [ref=e80] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e81]
+            - link "Instagram" [ref=e83] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e84]
+            - link "TikTok" [ref=e86] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e87]
+            - link "LinkedIn" [ref=e89] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e90]
+        - generic [ref=e92]:
+          - heading "Explore" [level=3] [ref=e93]
+          - list [ref=e94]:
+            - listitem [ref=e95]:
+              - link "About Us" [ref=e96] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e97]:
+              - link "Our Services" [ref=e98] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e99]:
+              - link "Portfolio" [ref=e100] [cursor=pointer]:
+                - /url: /portfolio
+            - listitem [ref=e101]:
+              - link "Contact" [ref=e102] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e103]:
+          - heading "Services" [level=3] [ref=e104]
+          - list [ref=e105]:
+            - listitem [ref=e106]:
+              - link "Wedding Planning" [ref=e107] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e108]:
+              - link "Corporate Events" [ref=e109] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e110]:
+              - link "Concerts" [ref=e111] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e112]:
+              - link "Decoration" [ref=e113] [cursor=pointer]:
+                - /url: /services
+        - generic [ref=e114]:
+          - heading "Get in Touch" [level=3] [ref=e115]
+          - list [ref=e116]:
+            - listitem [ref=e117]:
+              - link "Jwagal, Lalitpur, Nepal" [ref=e118] [cursor=pointer]:
+                - /url: https://maps.google.com
+            - listitem [ref=e119]:
+              - link "+977-01-5260535 / +977-01-5260103" [ref=e120] [cursor=pointer]:
+                - /url: tel:+977015260535
+            - listitem [ref=e121]:
+              - link "info@eventsolutionnepal.com.np" [ref=e122] [cursor=pointer]:
+                - /url: mailto:info@eventsolutionnepal.com.np
+            - listitem [ref=e123]:
+              - link "Chat on WhatsApp" [ref=e124] [cursor=pointer]:
+                - /url: https://wa.me/9779800000000
+                - img [ref=e125]
+                - text: Chat on WhatsApp
+      - generic [ref=e127]:
+        - paragraph [ref=e128]: © 2025 Event Solution Nepal. All rights reserved.
+        - generic [ref=e129]:
+          - link "Privacy Policy" [ref=e130] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e131] [cursor=pointer]:
+            - /url: /terms
+  - button "Open Next.js Dev Tools" [ref=e137] [cursor=pointer]:
+    - img [ref=e138]
+  - alert [ref=e141]
+```

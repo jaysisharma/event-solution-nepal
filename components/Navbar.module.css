@@ -2,15 +2,21 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--nav-bg);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     width: 100%;
 }
 
+.dark {
+    --nav-bg: rgba(15, 23, 42, 0.95);
+    --foreground: #ffffff;
+    --border-color: #333333;
+}
+
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -46,7 +52,7 @@
 .menuLink {
     font-size: 0.95rem;
     font-weight: 500;
-    color: #334155;
+    color: var(--foreground);
     transition: color 0.2s ease;
 }
 
@@ -69,14 +75,14 @@
 .phone {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--foreground);
 }
 
 .btnQuote {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 24px;
+    padding: 13px 24px;
     background-color: var(--secondary);
     color: white;
     font-weight: 600;
@@ -89,8 +95,34 @@
     transform: translateY(-1px);
 }
 
+.btnApp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #000;
+    /* Solid black for "App Store" vibe or distinct look */
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    /* Pill shape */
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    font-size: 0.65rem;
+    letter-spacing: 0.5px;
+}
+
+.btnApp:hover {
+    background-color: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
 .mobileNav {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 @media (min-width: 1024px) {
@@ -103,8 +135,25 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: #334155;
+    color: var(--foreground);
     padding: 5px;
+}
+
+.themeToggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--foreground);
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.themeToggle:hover {
+    background-color: var(--neutral-light);
 }
 
 .mobileMenu {
@@ -113,10 +162,10 @@
     left: 0;
     width: 100%;
     height: calc(100vh - 80px);
-    background-color: white;
+    background-color: var(--background);
     z-index: 49;
     overflow-y: auto;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
 }
 
 .mobileMenuContent {
@@ -127,16 +176,91 @@
 
 .mobileLink {
     padding: 16px 0;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
     font-size: 1.1rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--foreground);
 }
 
 .mobileBtnWrapper {
     margin-top: 30px;
 }
 
+/* Switch Toggle Styles */
+.switch {
+    font-size: 17px;
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: .4s;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.switch input:checked+.slider {
+    background-color: var(--secondary);
+}
+
+.switch input:focus+.slider {
+    box-shadow: 0 0 1px var(--secondary);
+}
+
+.switch input:checked+.slider:before {
+    transform: translateX(30px);
+}
+
+.iconSun,
+.iconMoon {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.iconSun {
+    margin-left: 2px;
+}
+
+.iconMoon {
+    margin-right: 2px;
+}
+
+/* Mobile styles remain unchanged */
 .btnQuoteMobile {
     display: flex;
     align-items: center;
@@ -148,4 +272,20 @@
     font-weight: 600;
     border-radius: 8px;
     text-align: center;
+}
+
+.btnAppMobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: white;
+    font-weight: 600;
+    border-radius: 50px;
+    text-align: center;
+    margin-bottom: 12px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

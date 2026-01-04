@@ -3,12 +3,25 @@
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
+import { saveFile } from '@/lib/upload';
+
 export async function addPartner(formData) {
-    const name = formData.get('name');
-    if (!name) return;
+    let name = formData.get('name');
+    const imageFile = formData.get('image');
+
+    // If no name, use filename or default
+    if (!name && imageFile && imageFile.name) {
+        name = imageFile.name.split('.')[0]; // precise enough for auto-name
+    }
+    if (!name) name = `Partner ${Date.now()}`;
+
+    const imagePath = await saveFile(imageFile, 'partners');
 
     await prisma.partner.create({
-        data: { name },
+        data: {
+            name,
+            image: imagePath || ''
+        },
     });
 
     revalidatePath('/admin/partners');

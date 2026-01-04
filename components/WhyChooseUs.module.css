@@ -1,9 +1,17 @@
 .section {
     padding: 8rem 0;
-    background-color: #f8fafc;
+    background-color: var(--bg-section);
     /* slate-50 */
     position: relative;
     overflow: hidden;
+}
+
+.dark {
+    --bg-section: #0f172a;
+    --foreground: #f8fafc;
+    --bg-card: #1e293b;
+    --border-color: #334155;
+    --neutral-dark: #f8fafc;
 }
 
 .bgBlur1,
@@ -72,6 +80,7 @@
     font-weight: 700;
     /* color: var(--neutral-dark); */
     margin-bottom: 1.5rem;
+    color: var(--foreground);
 }
 
 @media (min-width: 768px) {
@@ -85,7 +94,8 @@
 }
 
 .description {
-    color: #475569;
+    color: var(--foreground);
+    opacity: 0.8;
     /* slate-600 */
     font-size: 1.125rem;
 }
@@ -110,10 +120,10 @@
 
 /* Common Card Styles */
 .card {
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: var(--bg-card);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--border-color);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     border-radius: 2rem;
     padding: 1.5rem;
@@ -130,13 +140,23 @@
 .centerCard {
     position: relative;
     z-index: 20;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--bg-card);
     border-radius: 2.5rem;
     padding: 2rem;
     max-width: 42rem;
     margin: 0 auto;
-    border-color: rgba(255, 255, 255, 0.5);
+    border-color: var(--border-color);
     box-shadow: 0 25px 50px -12px rgba(6, 78, 161, 0.1);
+}
+
+.dark .card {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dark .cardDescLarge,
+.dark .cardDescSmall {
+    color: #cbd5e1;
 }
 
 @media (min-width: 768px) {
@@ -172,7 +192,8 @@
 }
 
 .cardDescLarge {
-    color: #475569;
+    color: var(--foreground);
+    opacity: 0.8;
     font-size: 1.125rem;
     line-height: 1.6;
     max-width: 28rem;
@@ -214,7 +235,7 @@
 .rightCard:hover {
     transform: rotate(0) scale(1.05);
     z-index: 30;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--bg-card);
 }
 
 .rightCard {
@@ -262,7 +283,8 @@
 }
 
 .cardDescSmall {
-    color: #64748b;
+    color: var(--foreground);
+    opacity: 0.7;
     font-size: 0.875rem;
     line-height: 1.5;
     margin-bottom: 1rem;
@@ -286,12 +308,12 @@
 .statPill {
     position: absolute;
     z-index: 40;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--bg-card);
     backdrop-filter: blur(8px);
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 0.5rem;

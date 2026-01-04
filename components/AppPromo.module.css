@@ -5,6 +5,19 @@
     overflow: hidden;
 }
 
+.dark {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+.dark .title {
+    color: #f8fafc;
+}
+
+.dark .description {
+    color: #cbd5e1;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -141,4 +154,10 @@
     100% {
         transform: translateY(0px);
     }
+}
+
+/* Helper for disabled link */
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

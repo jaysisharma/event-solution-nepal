@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,10 +18,16 @@ model Event {
   id        Int      @id @default(autoincrement())
   title     String
   date      String   
-  month     String   
+  month     String
+  year      String   @default("2025")
   location  String
   time      String
   image     String
+  status    String   @default("UPCOMING") // UPCOMING, COMPLETED
+  organizer String?
+  managedBy String?
+  description String?
+  isFeatured Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,6 +35,7 @@ model Event {
 model Partner {
   id        Int      @id @default(autoincrement())
   name      String
+  image     String?
   order     Int      @default(0) 
   createdAt DateTime @default(now())
 }
@@ -39,6 +46,7 @@ model WorkProject {
   category    String
   year        String
   images      String   // Stored as JSON string of array
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -82,3 +90,92 @@ model GalleryItem {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model RentalItem {
+  id             Int      @id @default(autoincrement())
+  title          String
+  category       String
+  price          String
+  images         String   // Stored as JSON string of array
+  size           String?  // General size description like "large", "standard"
+  availableSizes String   // Stored as JSON string of array of string (Legacy/Simplified)
+  variants       String?  // Stored as JSON string of array of objects { size, image }
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String
+  quote     String
+  avatar    String?
+  rating    Int      @default(5)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroSlide {
+  id        Int      @id @default(autoincrement())
+  image     String
+  label     String
+  title     String
+  order     Int      @default(0)
+  
+  // Per-Slide Stats
+  rating        String   @default("4.9")
+  ratingLabel   String   @default("Average Rating")
+  ratingIcon    String   @default("Star") // Star, Heart, Trophy
+  capacity      String   @default("Handling events up to 10k guests.")
+  capacityLabel String   @default("Capacity")
+  capacityIcon  String   @default("Users") // Users, Globe, Building
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HeroSettings {
+  id            Int      @id @default(autoincrement())
+  rating        String   @default("4.9")
+  ratingLabel   String   @default("Average Rating")
+  capacity      String   @default("Handling events up to 10k guests.")
+  capacityLabel String   @default("Capacity")
+  
+  // Text Content
+  tagline           String @default("Be a guest at your own event")
+  headingPrefix     String @default("Events that")
+  headingHighlight1 String @default("Inspire")
+  headingHighlight2 String @default("Delight")
+  subtext           String @default("Founded in 2014 A.D , Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.")
+  
+  updatedAt     DateTime @updatedAt
+}
+
+model TimelineMemory {
+  id        Int      @id @default(autoincrement())
+  image     String
+  alt       String
+  year      String
+  size      String   @default("normal")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id             Int      @id @default(autoincrement())
+  whatsappNumber String   @default("9779851336342")
+  updatedAt      DateTime @updatedAt
+}
+
+model PageView {
+  id        String   @id @default(uuid())
+  path      String
+  ipHash    String?
+  userAgent String?
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+

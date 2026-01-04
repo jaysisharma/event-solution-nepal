@@ -21,7 +21,7 @@ export default async function Gallery() {
                 <span className={styles.subheading}>
                     Portfolio
                 </span>
-                <h1 className={styles.title}>
+                <h1 className={styles.title} style={{ color: 'var(--primary)' }}>
                     Captured <span className={styles.highlight}>Moments</span>
                 </h1>
                 <p className={styles.description}>
@@ -34,6 +34,6 @@ export default async function Gallery() {
 
             {/* CTA Section */}
             <CallToAction />
-        </main>
+        </main >
     );
 }

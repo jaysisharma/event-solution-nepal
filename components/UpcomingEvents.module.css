@@ -1,8 +1,16 @@
 .section {
     padding: 6rem 0;
-    background-color: var(--white);
+    background-color: var(--bg-section);
     position: relative;
     overflow: hidden;
+}
+
+.dark {
+    --bg-section: #0f172a;
+    --foreground: #f8fafc;
+    --bg-card: #1e293b;
+    --border-color: #334155;
+    --neutral-dark: #f8fafc;
 }
 
 .container {
@@ -60,6 +68,7 @@
     font-weight: 700;
     /* color: var(--neutral-dark); */
     margin-bottom: 1rem;
+    color: var(--foreground);
 }
 
 @media (min-width: 768px) {
@@ -73,7 +82,8 @@
 }
 
 .description {
-    color: #475569;
+    color: var(--foreground);
+    opacity: 0.8;
     /* slate-600 */
     font-size: 1.125rem;
 }
@@ -82,8 +92,8 @@
     display: none;
     align-items: center;
     padding: 0.75rem 1.5rem;
-    border: 1px solid #e2e8f0;
-    color: #475569;
+    border: 1px solid var(--border-color);
+    color: var(--foreground);
     font-weight: 700;
     border-radius: 9999px;
     transition: all 0.3s ease;
@@ -100,7 +110,7 @@
 .viewAllBtn:hover {
     border-color: var(--secondary);
     color: var(--secondary);
-    background-color: #f8fafc;
+    background-color: var(--bg-section);
 }
 
 /* Event List */
@@ -109,10 +119,20 @@
     gap: 1.5rem;
 }
 
+.dark .eventCard {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dark .dateBlock {
+    background-color: var(--bg-section);
+    border-color: var(--border-color);
+}
+
 .eventCard {
-    background-color: var(--white);
+    background-color: var(--bg-card);
     border-radius: 1rem;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color);
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -175,11 +195,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f8fafc;
+    background-color: var(--bg-section);
     width: 5rem;
     height: 5rem;
     border-radius: 0.75rem;
-    border: 1px solid #f1f5f9;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
@@ -231,7 +251,8 @@
     flex-direction: column;
     gap: 0.75rem;
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--foreground);
+    opacity: 0.7;
     /* slate-500 */
     font-weight: 500;
     justify-content: center;

@@ -1,13 +1,12 @@
-import AdminSidebar from './AdminSidebar';
-import styles from './admin.module.css';
+import AdminLayoutWrapper from './AdminLayoutWrapper';
+import { ToastProvider } from '@/components/admin/ToastContext';
 
-export default async function AdminLayout({ children }) {
+export default function AdminLayout({ children }) {
     return (
-        <div className={styles.adminLayout}>
-            <AdminSidebar />
-            <main className={styles.mainContent}>
+        <ToastProvider>
+            <AdminLayoutWrapper>
                 {children}
-            </main>
-        </div>
+            </AdminLayoutWrapper>
+        </ToastProvider>
     );
 }

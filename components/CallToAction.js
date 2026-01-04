@@ -1,13 +1,15 @@
 "use client";
-import React from 'react';
+import { useTheme } from '@/context/ThemeContext';
+import styles from './CallToAction.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import MagneticButton from './MagneticButton';
 import { FaArrowRight } from 'react-icons/fa';
-import styles from './CallToAction.module.css';
 
 const CallToAction = () => {
+    const { theme } = useTheme();
     return (
-        <section className={styles.section} style={{ borderTop: "3px solid #ccc" }}>
+        <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
 
             {/* Background Image */}
             <div className={styles.backgroundImageWrapper}>
@@ -26,17 +28,20 @@ const CallToAction = () => {
             {/* Content */}
             <div className={styles.content}>
                 <h2 className={styles.title}>
+                    {/* eslint-disable-next-line react/no-unescaped-entities */}
                     Let's Build Your Perfect Event
                 </h2>
 
-                <p className={styles.description} style={{ color: "black" }}>
+                <p className={styles.description}>
                     From weddings to corporate gatherings, our team transforms ideas into
                     extraordinary experiences tailored just for you.
                 </p>
 
-                <Link href="/contact" className={styles.buttonLink}>
-                    Plan Your Event <FaArrowRight />
-                </Link>
+                <MagneticButton>
+                    <Link href="/contact" className={styles.buttonLink}>
+                        Plan Your Event <FaArrowRight />
+                    </Link>
+                </MagneticButton>
             </div>
         </section>
     );

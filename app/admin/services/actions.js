@@ -2,35 +2,92 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { saveFile } from '@/lib/upload';
 
-export async function createService(prevState, formData) {
+export async function getServices() {
+    try {
+        const services = await prisma.service.findMany({
+            orderBy: { id: 'asc' }
+        });
+        return { success: true, data: services };
+    } catch (e) {
+        return { success: false, error: 'Failed to fetch services' };
+    }
+}
+
+export async function createService(formData) {
     const title = formData.get('title');
     const description = formData.get('description');
-    const image = formData.get('image');
+    const imageFile = formData.get('image');
     const tagsVal = formData.get('tags');
 
-    let tags = "[]";
-    if (tagsVal) {
-        tags = JSON.stringify(tagsVal.split(',').map(s => s.trim()));
-    }
-
     try {
+        const imagePath = await saveFile(imageFile, 'services');
+
+        let tags = "[]";
+        if (tagsVal) {
+            tags = JSON.stringify(tagsVal.split(',').map(s => s.trim()));
+        }
+
         await prisma.service.create({
             data: {
                 title,
                 description,
-                image,
+                image: imagePath || '',
                 tags
             }
         });
-    } catch (e) {
-        return { error: 'Failed to create service.' };
-    }
 
-    revalidatePath('/services');
-    revalidatePath('/admin/services');
-    redirect('/admin/services');
+        revalidatePath('/services');
+        revalidatePath('/admin/services');
+        return { success: true };
+    } catch (e) {
+        console.error("Create Service Error:", e);
+        return { success: false, error: 'Failed to create service.' };
+    }
+}
+
+export async function updateService(id, formData) {
+    const title = formData.get('title');
+    const description = formData.get('description');
+    const tagsVal = formData.get('tags');
+    const imageFile = formData.get('image'); // New image file (optional)
+
+    try {
+        let updateData = {
+            title,
+            description,
+        };
+
+        // Handle Tags
+        if (tagsVal) {
+            updateData.tags = JSON.stringify(tagsVal.split(',').map(s => s.trim()));
+        }
+
+        // Handle Image Update
+        if (imageFile && imageFile.size > 0) {
+            const imagePath = await saveFile(imageFile, 'services');
+            if (imagePath) {
+                updateData.image = imagePath;
+            }
+        }
+
+        // If no new image is provided, calling update will typically NOT clear the existing one 
+        // unless we explicitly set it to null, which we are not doing here.
+        // Prisma updates only fields present in 'data'.
+
+        await prisma.service.update({
+            where: { id: parseInt(id) },
+            data: updateData
+        });
+
+        revalidatePath('/services');
+        revalidatePath('/admin/services');
+        return { success: true };
+    } catch (e) {
+        console.error("Update Service Error:", e);
+        return { success: false, error: 'Failed to update service.' };
+    }
 }
 
 export async function deleteService(id) {
@@ -38,10 +95,10 @@ export async function deleteService(id) {
         await prisma.service.delete({
             where: { id: parseInt(id) }
         });
+        revalidatePath('/services');
+        revalidatePath('/admin/services');
+        return { success: true };
     } catch (e) {
-        return { error: 'Failed to delete service.' };
+        return { success: false, error: 'Failed to delete service.' };
     }
-
-    revalidatePath('/services');
-    revalidatePath('/admin/services');
 }

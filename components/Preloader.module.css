@@ -1,0 +1,80 @@
+.preloaderContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.shutterContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    z-index: 1;
+}
+
+.shutter {
+    flex: 1;
+    background-color: #111;
+    height: 100%;
+    transform-origin: top;
+}
+
+.centerContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.logoContainer {
+    position: relative;
+    width: 18rem;
+    /* Slightly larger base size */
+    height: auto;
+    opacity: 0;
+    /* JS will handle this */
+}
+
+.logo {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.counterContainer {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    /* Bottom right placement */
+    z-index: 2;
+    color: #fff;
+    font-family: var(--font-playfair), serif;
+    mix-blend-mode: difference;
+    overflow: hidden;
+}
+
+.counter {
+    font-size: 8rem;
+    /* Large and bold */
+    font-weight: 300;
+    line-height: 1;
+    display: block;
+    opacity: 0;
+    transform: translateY(100%);
+    /* Start hidden below */
+}

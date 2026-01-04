@@ -7,81 +7,24 @@ import styles from './rentals.module.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const INVENTORY = [
-    {
-        id: "01",
-        title: "German Hangers",
-        category: "HANGERS",
-        price: "From $500",
-        images: ["/rentals/german_hanger.png", "/rentals/german_hanger_inside.png", "/rentals/german_hanger_night.png"],
-        size: "large",
-        availableSizes: ["40x100 ft", "60x120 ft", "80x150 ft", "Custom Size"]
-    },
-    {
-        id: "02",
-        title: "Modular Stalls",
-        category: "STALLS",
-        price: "$100 / Unit",
-        images: ["/rentals/modular_stall.png", "/rentals/modular_stall_detail.png", "/rentals/modular_stall_side.png"],
-        size: "standard",
-        availableSizes: ["3x3 m (Standard)", "3x6 m (Double)", "Custom Config"]
-    },
-    {
-        id: "03",
-        title: "Luxury Pandals",
-        category: "PANDALS",
-        price: "Custom Quote",
-        images: ["/rentals/luxury_pandal.png", "/rentals/luxury_pandal_entry.png", "/rentals/luxury_pandal_decor.png"],
-        size: "large",
-        availableSizes: ["Wedding Setup", "Corporate Event", "Banquet Style"]
-    },
-    {
-        id: "04",
-        title: "Pro Staging",
-        category: "STAGE",
-        price: "$300 / sq.ft",
-        images: ["/rentals/stage_setup.png", "/rentals/stage_side_view.png", "/rentals/stage_concert.png"],
-        size: "standard",
-        availableSizes: ["20x30 ft", "40x30 ft", "60x40 ft", "Ramp Addition"]
-    },
-    {
-        id: "05",
-        title: "P3 LED Walls",
-        category: "LED",
-        price: "$200 / sq.ft",
-        images: ["/rentals/led_wall.png", "/rentals/led_wall_content.png", "/rentals/led_wall_stage.png"],
-        size: "standard",
-        availableSizes: ["10x8 ft", "20x12 ft", "30x15 ft", "Curved Wall"]
-    },
-    {
-        id: "06",
-        title: "Sound Systems",
-        category: "AUDIO",
-        price: "Custom Quote",
-        images: ["/rentals/sound_system.png", "/rentals/sound_system_array.png", "/rentals/sound_system_console.png"],
-        size: "standard",
-        availableSizes: ["Concert Line Array", "Conference PA", "DJ Setup"]
-    },
-    {
-        id: "07",
-        title: "VIP Seating",
-        category: "FURNITURE",
-        price: "$50 / Seat",
-        images: ["/rentals/vip_seating.png", "/rentals/vip_seating_arrangement.png", "/rentals/vip_seating_detail.png"],
-        size: "large",
-        availableSizes: ["Single Sofa", "3-Seater", "Banquet Chairs", "Coffee Tables"]
-    }
-];
+// Static inventory removed in favor of dynamic DB data
+const INVENTORY = [];
 
-const CATEGORIES = ["ALL", "HANGERS", "STALLS", "PANDALS", "STAGE", "LED", "AUDIO", "FURNITURE"];
+export default function RentalsClient({ initialItems }) {
+    // Dynamically extract categories from items
+    const dynamicCategories = ["ALL", ...Array.from(new Set(initialItems.map(item => item.category)))].sort();
 
-export default function RentalsClient() {
+    // Sort to keep ALL first, then alphabetical (ALL is usually first anyway if I unshift or explicit)
+    // Actually, simple sort puts ALL first if A is first... wait.
+    // Better:
+    const categories = ["ALL", ...Array.from(new Set(initialItems.map(item => item.category))).sort()];
+
     const [activeFilter, setActiveFilter] = useState("ALL");
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedSize, setSelectedSize] = useState("");
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-    const filteredItems = INVENTORY.filter(item =>
+    const filteredItems = initialItems.filter(item =>
         activeFilter === "ALL" || item.category === activeFilter
     );
 
@@ -109,9 +52,16 @@ export default function RentalsClient() {
 
     const handleWhatsappInquiry = () => {
         if (!selectedItem) return;
-        const phoneNumber = "9779851088888"; // Replace with actual number
-        const message = `I am interested in * ${selectedItem.title}*.% 0ASelected Option / Size: * ${selectedSize}*.% 0APlease provide availability and quote.`;
-        window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        const phoneNumber = "+9779703606342"; // Replace with actual number
+
+        const messageText = `Hello, I'm interested in renting the ${selectedItem.title}.
+        
+Selected Option / Size: ${selectedSize}
+
+Please provide availability and pricing details.`;
+
+        const encodedMessage = encodeURIComponent(messageText);
+        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     };
 
     return (
@@ -146,7 +96,7 @@ export default function RentalsClient() {
 
                     <div className={styles.filterSection}>
                         <div className={styles.filterBar}>
-                            {CATEGORIES.map((cat) => (
+                            {categories.map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setActiveFilter(cat)}
@@ -276,10 +226,14 @@ export default function RentalsClient() {
 
                                 <span className={styles.sizeLabel}>Select Option / Size</span>
                                 <div className={styles.sizeOptions}>
-                                    {selectedItem.availableSizes.map((size) => (
+                                    {selectedItem.availableSizes.map((size, index) => (
                                         <button
-                                            key={size}
-                                            onClick={() => setSelectedSize(size)}
+                                            key={size + index}
+                                            onClick={() => {
+                                                setSelectedSize(size);
+                                                setCurrentImageIndex(index);
+                                                // Assuming 1:1 mapping between size and image from the new admin flow
+                                            }}
                                             className={`${styles.sizeBtn} ${selectedSize === size ? styles.sizeBtnActive : ''}`}
                                         >
                                             {size}

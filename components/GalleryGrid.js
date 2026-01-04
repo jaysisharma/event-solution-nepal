@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import styles from './GalleryGrid.module.css';
 
 const GalleryGrid = ({ initialItems }) => {
@@ -19,8 +20,18 @@ const GalleryGrid = ({ initialItems }) => {
     const openLightbox = (index) => {
         setCurrentImageIndex(index);
         setLightboxOpen(true);
-        document.body.style.overflow = 'hidden';
     };
+
+    useEffect(() => {
+        if (lightboxOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        }
+    }, [lightboxOpen]);
 
     const closeLightbox = () => {
         setLightboxOpen(false);
@@ -73,12 +84,15 @@ const GalleryGrid = ({ initialItems }) => {
                             className={`${styles.gridItem} ${styles[item.size] || ''}`}
                             onClick={() => openLightbox(index)}
                         >
-                            <img
-                                src={item.src}
-                                alt={item.title}
-                                className={styles.image}
-                                loading="lazy"
-                            />
+                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                <Image
+                                    src={item.src}
+                                    alt={item.title}
+                                    className={styles.image}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
+                            </div>
                             <div className={styles.overlay}>
                                 <div className={styles.info}>
                                     <span className={styles.category}>{item.category}</span>
@@ -100,11 +114,14 @@ const GalleryGrid = ({ initialItems }) => {
                             <ChevronLeft size={32} />
                         </button>
 
-                        <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
-                            <img
+                        <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()} style={{ position: 'relative', width: '90vw', height: '90vh' }}>
+                            <Image
                                 src={filteredItems[currentImageIndex].src}
                                 alt={filteredItems[currentImageIndex].title}
                                 className={styles.lightboxImage}
+                                fill
+                                style={{ objectFit: 'contain' }}
+                                sizes="100vw"
                             />
                         </div>
 

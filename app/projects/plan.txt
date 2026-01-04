@@ -1,0 +1,11 @@
+'use client';
+// Plan to add Lightbox:
+// 1. Add state: selectedProject (or selectedImage)
+// 2. Add Modal UI: Overlay with close button and large image
+// 3. Add onClick handler to project cards/images
+// 4. Close handler for the modal
+
+// Current ProjectsClient.js likely iterates over projects and shows thumbnails.
+// We will wrap the image or the entire card in a clickable area or add a specific button.
+// The Modal should probably show all images for that project if it has multiple, or just the one clicked.
+// Given the user said "enlarge the image", showing the project's images in a carousel/gallery view within the modal would be ideal.

@@ -1,0 +1,424 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic:
+    - generic:
+      - generic:
+        - img "Event Solution Nepal"
+    - generic:
+      - generic: "46"
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "Event Solution" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Event Solution" [ref=e7]
+      - generic [ref=e8]:
+        - link "Home" [ref=e9] [cursor=pointer]:
+          - /url: /
+        - link "Services" [ref=e10] [cursor=pointer]:
+          - /url: /services
+        - link "Rentals" [ref=e11] [cursor=pointer]:
+          - /url: /rentals
+        - link "About" [ref=e12] [cursor=pointer]:
+          - /url: /about
+        - link "Projects" [ref=e13] [cursor=pointer]:
+          - /url: /projects
+        - link "Gallery" [ref=e14] [cursor=pointer]:
+          - /url: /gallery
+        - link "Contact Us" [ref=e15] [cursor=pointer]:
+          - /url: /contact
+      - generic [ref=e16]:
+        - link "Get Event Solution App" [ref=e17] [cursor=pointer]:
+          - /url: https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en
+          - img [ref=e18]
+          - text: Get
+          - text: Event Solution App
+        - link "Get a Quote" [ref=e20] [cursor=pointer]:
+          - /url: /quote
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: Be a guest at your own event
+            - heading "Events that Inspire & Delight" [level=1] [ref=e31]:
+              - text: Events that
+              - text: Inspire & Delight
+            - paragraph [ref=e32]: Founded in 2014 A.D , Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.
+            - generic [ref=e33]:
+              - link "Plan Your Event" [ref=e34] [cursor=pointer]:
+                - /url: /quote
+                - text: Plan Your Event
+                - img [ref=e35]
+              - link "See Our Work" [ref=e37] [cursor=pointer]:
+                - /url: /projects
+                - img [ref=e39]
+                - text: See Our Work
+          - generic [ref=e42]:
+            - generic [ref=e44]:
+              - img "ggjjhjvh" [ref=e45]
+              - generic [ref=e47]:
+                - paragraph [ref=e48]: bhhhb
+                - paragraph [ref=e49]: ggjjhjvh
+            - generic [ref=e50]:
+              - img [ref=e52]
+              - paragraph [ref=e54]: "99"
+              - paragraph [ref=e55]: Average Rating
+            - generic [ref=e56]:
+              - generic [ref=e57]:
+                - img [ref=e58]
+                - generic [ref=e63]: Capacity
+              - paragraph [ref=e64]: Handling events up to 10k guests.
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - img "Partner Logo" [ref=e71]
+            - img "Partner Logo" [ref=e73]
+            - img "Partner Logo" [ref=e75]
+            - img "Partner Logo" [ref=e77]
+            - img "Partner Logo" [ref=e79]
+            - img "Partner Logo" [ref=e81]
+            - img "Partner Logo" [ref=e83]
+            - img "Partner Logo" [ref=e85]
+            - img "Partner Logo" [ref=e87]
+            - img "Partner Logo" [ref=e89]
+            - img "Partner Logo" [ref=e91]
+            - img "Partner Logo" [ref=e93]
+            - img "Partner Logo" [ref=e95]
+            - img "Partner Logo" [ref=e97]
+            - img "Partner Logo" [ref=e99]
+            - img "Partner Logo" [ref=e101]
+            - img "Partner Logo" [ref=e103]
+            - img "Partner Logo" [ref=e105]
+            - img "Partner Logo" [ref=e107]
+            - img "Partner Logo" [ref=e109]
+            - img "Partner Logo" [ref=e111]
+            - img "Partner Logo" [ref=e113]
+            - img "Partner Logo" [ref=e115]
+            - img "Partner Logo" [ref=e117]
+            - img "Partner Logo" [ref=e119]
+            - img "Partner Logo" [ref=e121]
+            - img "Partner Logo" [ref=e123]
+            - img "Partner Logo" [ref=e125]
+            - img "Partner Logo" [ref=e127]
+            - img "Partner Logo" [ref=e129]
+            - img "Partner Logo" [ref=e131]
+            - img "Partner Logo" [ref=e133]
+            - img "Partner Logo" [ref=e135]
+            - img "Partner Logo" [ref=e137]
+            - img "Partner Logo" [ref=e139]
+            - img "Partner Logo" [ref=e141]
+            - img "Partner Logo" [ref=e143]
+            - img "Partner Logo" [ref=e145]
+            - img "Partner Logo" [ref=e147]
+          - generic [ref=e148]:
+            - img "Partner Logo" [ref=e150]
+            - img "Partner Logo" [ref=e152]
+            - img "Partner Logo" [ref=e154]
+            - img "Partner Logo" [ref=e156]
+            - img "Partner Logo" [ref=e158]
+            - img "Partner Logo" [ref=e160]
+            - img "Partner Logo" [ref=e162]
+            - img "Partner Logo" [ref=e164]
+            - img "Partner Logo" [ref=e166]
+            - img "Partner Logo" [ref=e168]
+            - img "Partner Logo" [ref=e170]
+            - img "Partner Logo" [ref=e172]
+            - img "Partner Logo" [ref=e174]
+            - img "Partner Logo" [ref=e176]
+            - img "Partner Logo" [ref=e178]
+            - img "Partner Logo" [ref=e180]
+            - img "Partner Logo" [ref=e182]
+            - img "Partner Logo" [ref=e184]
+            - img "Partner Logo" [ref=e186]
+            - img "Partner Logo" [ref=e188]
+            - img "Partner Logo" [ref=e190]
+            - img "Partner Logo" [ref=e192]
+            - img "Partner Logo" [ref=e194]
+            - img "Partner Logo" [ref=e196]
+            - img "Partner Logo" [ref=e198]
+            - img "Partner Logo" [ref=e200]
+            - img "Partner Logo" [ref=e202]
+            - img "Partner Logo" [ref=e204]
+            - img "Partner Logo" [ref=e206]
+            - img "Partner Logo" [ref=e208]
+            - img "Partner Logo" [ref=e210]
+            - img "Partner Logo" [ref=e212]
+            - img "Partner Logo" [ref=e214]
+            - img "Partner Logo" [ref=e216]
+            - img "Partner Logo" [ref=e218]
+            - img "Partner Logo" [ref=e220]
+            - img "Partner Logo" [ref=e222]
+            - img "Partner Logo" [ref=e224]
+            - img "Partner Logo" [ref=e226]
+      - generic [ref=e228]:
+        - generic [ref=e230]:
+          - heading "Our Core Services" [level=2] [ref=e231]
+          - paragraph [ref=e232]: Services provided by event solution that put a real impact on your event.
+        - generic [ref=e233]:
+          - generic [ref=e235]:
+            - img "Event Planning & Concept Development" [ref=e236]
+            - generic [ref=e238]:
+              - img [ref=e240]
+              - generic [ref=e244]: Visionary Strategy
+              - heading "Event Planning & Concept Development" [level=3] [ref=e245]
+          - generic [ref=e247]:
+            - img "Marketing & Promotion" [ref=e248]
+            - generic [ref=e250]:
+              - img [ref=e252]
+              - generic [ref=e258]: Strategic Reach
+              - heading "Marketing & Promotion" [level=3] [ref=e259]
+          - generic [ref=e261]:
+            - img "Event Organizer" [ref=e262]
+            - generic [ref=e264]:
+              - img [ref=e266]
+              - generic [ref=e271]: Seamless Management
+              - heading "Event Organizer" [level=3] [ref=e272]
+          - generic [ref=e274]:
+            - img "Pre & Post-Event Management" [ref=e275]
+            - generic [ref=e277]:
+              - img [ref=e279]
+              - generic [ref=e284]: Full Cycle Support
+              - heading "Pre & Post-Event Management" [level=3] [ref=e285]
+          - generic [ref=e287]:
+            - img "Event Rentals" [ref=e288]
+            - generic [ref=e290]:
+              - img [ref=e292]
+              - generic [ref=e300]: Premium Inventory
+              - heading "Event Rentals" [level=3] [ref=e301]
+          - generic [ref=e303]:
+            - img "Production & Execution" [ref=e304]
+            - generic [ref=e306]:
+              - img [ref=e308]
+              - generic [ref=e313]: Technical Precision
+              - heading "Production & Execution" [level=3] [ref=e314]
+        - link "View All Services" [ref=e316] [cursor=pointer]:
+          - /url: /services
+          - text: View All Services
+          - img [ref=e317]
+      - generic [ref=e320]:
+        - generic [ref=e321]:
+          - generic [ref=e322]:
+            - generic [ref=e323]: Selected Works
+            - heading "Curated Portfolio" [level=2] [ref=e324]
+          - paragraph [ref=e326]: Discover a decade of excellence. Hover over the projects to glimpse into our memorable events.
+        - generic [ref=e327]:
+          - generic [ref=e328] [cursor=pointer]:
+            - generic [ref=e329]:
+              - heading "Family & Baby Expo" [level=3] [ref=e330]
+              - generic [ref=e331]:
+                - generic [ref=e332]: Expo
+                - generic [ref=e333]: —
+                - generic [ref=e334]: "2024"
+            - img [ref=e336]
+          - generic [ref=e339] [cursor=pointer]:
+            - generic [ref=e340]:
+              - heading "Global Consumer Expo" [level=3] [ref=e341]
+              - generic [ref=e342]:
+                - generic [ref=e343]: Expo
+                - generic [ref=e344]: —
+                - generic [ref=e345]: "2024"
+            - img [ref=e347]
+          - generic [ref=e350] [cursor=pointer]:
+            - generic [ref=e351]:
+              - heading "Himalayan Hydro Expo" [level=3] [ref=e352]
+              - generic [ref=e353]:
+                - generic [ref=e354]: Expo
+                - generic [ref=e355]: —
+                - generic [ref=e356]: "2024"
+            - img [ref=e358]
+          - generic [ref=e361] [cursor=pointer]:
+            - generic [ref=e362]:
+              - heading "ColorSplash (Holi Event)" [level=3] [ref=e363]
+              - generic [ref=e364]:
+                - generic [ref=e365]: Festival
+                - generic [ref=e366]: —
+                - generic [ref=e367]: "2024"
+            - img [ref=e369]
+          - generic [ref=e372] [cursor=pointer]:
+            - generic [ref=e373]:
+              - heading "1974 AD Concert ( Rock Yatra 2)" [level=3] [ref=e374]
+              - generic [ref=e375]:
+                - generic [ref=e376]: Concert
+                - generic [ref=e377]: —
+                - generic [ref=e378]: "2024"
+            - img [ref=e380]
+        - button "View All Projects" [ref=e384] [cursor=pointer]:
+          - text: View All Projects
+          - img [ref=e385]
+      - generic [ref=e388]:
+        - generic [ref=e389]:
+          - generic [ref=e390]: Why Choose Us
+          - heading "We Deliver Excellence" [level=2] [ref=e391]
+          - paragraph [ref=e392]: Trust is earned through consistent performance. Here is how we ensure your event is a resounding success.
+        - generic [ref=e393]:
+          - generic [ref=e395]:
+            - img [ref=e397]
+            - heading "Strategic Precision" [level=3] [ref=e400]
+            - paragraph [ref=e401]: Our logistics team ensures every detail is tracked, timed, and executed to perfection, minimizing risks and maximizing impact.
+          - generic [ref=e403]:
+            - img [ref=e405]
+            - heading "Creative Innovation" [level=3] [ref=e409]
+            - paragraph [ref=e410]: We don't just follow trends; we set them. Our design team creates immersive environments that tell your brand's unique story.
+          - generic [ref=e412]:
+            - img [ref=e414]
+            - heading "Budget Optimization" [level=3] [ref=e417]
+            - paragraph [ref=e418]: Maximum value for your investment. Our industry connections allow us to negotiate the best rates without compromising quality.
+          - generic [ref=e420]:
+            - generic [ref=e421]: 10+
+            - generic [ref=e422]: Years Exp.
+          - generic [ref=e423]:
+            - generic [ref=e424]: 2.5k
+            - generic [ref=e425]: Events
+          - generic [ref=e426]:
+            - generic [ref=e427]: 100%
+            - generic [ref=e428]: Satisfaction
+      - generic [ref=e430]:
+        - generic [ref=e431]:
+          - generic [ref=e432]:
+            - generic [ref=e433]: Mark Your Calendar
+            - heading "Upcoming Events" [level=2] [ref=e434]
+            - paragraph [ref=e435]: Join us at our upcoming productions. Experience the magic firsthand.
+          - link "View All Events" [ref=e436] [cursor=pointer]:
+            - /url: /events
+            - button "View All Events" [ref=e437]:
+              - text: View All Events
+              - img [ref=e438]
+        - paragraph [ref=e442]: No upcoming events at the moment. Stay tuned!
+      - generic [ref=e444]:
+        - generic [ref=e445]:
+          - heading "Event Solution Nepal is Now on Mobile" [level=2] [ref=e446]
+          - paragraph [ref=e447]: Experience the easiest way to plan your events. Browse our extensive catalogue of rentals, manage your bookings, and get real-time updates—all from the palm of your hand.
+          - generic [ref=e448]:
+            - link "GET IT ON Google Play" [ref=e449] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e450]
+              - generic [ref=e452]:
+                - generic [ref=e453]: GET IT ON
+                - generic [ref=e454]: Google Play
+            - link "Coming Soon App Store" [ref=e455]:
+              - /url: "#"
+              - img [ref=e456]
+              - generic [ref=e458]:
+                - generic [ref=e459]: Coming Soon
+                - generic [ref=e460]: App Store
+        - img "Event Solution Nepal Mobile App" [ref=e462]
+      - generic [ref=e463]:
+        - generic [ref=e464]:
+          - heading "Our Timeline" [level=2] [ref=e465]
+          - paragraph [ref=e466]: A visual journey through our most memorable events.
+        - generic [ref=e467]:
+          - generic [ref=e468]:
+            - generic [ref=e469]:
+              - img "2024 Luxury Pandal Setup"
+              - generic: 2024 Luxury Pandal Setup
+            - generic [ref=e470]:
+              - img "Grand Concert Stage"
+              - generic: Grand Concert Stage
+            - generic [ref=e471]:
+              - img "Night Gala Event"
+              - generic: Night Gala Event
+            - generic [ref=e472]:
+              - img "LED Visuals"
+              - generic: LED Visuals
+            - generic [ref=e473]:
+              - img "VIP Experience"
+              - generic: VIP Experience
+            - generic [ref=e474]:
+              - img "Expo Stalls"
+              - generic: Expo Stalls
+            - generic [ref=e475]:
+              - img "Live Production"
+              - generic: Live Production
+            - generic [ref=e476]:
+              - img "Team Management"
+              - generic: Team Management
+          - generic: DRAG TO EXPLORE
+      - generic [ref=e477]:
+        - img "Elegant Event Background" [ref=e479]
+        - generic [ref=e481]:
+          - heading "Let's Build Your Perfect Event" [level=2] [ref=e482]
+          - paragraph [ref=e483]: From weddings to corporate gatherings, our team transforms ideas into extraordinary experiences tailored just for you.
+          - link "Plan Your Event" [ref=e484] [cursor=pointer]:
+            - /url: /contact
+            - text: Plan Your Event
+            - img [ref=e485]
+  - contentinfo [ref=e489]:
+    - generic [ref=e490]:
+      - generic [ref=e491]:
+        - generic [ref=e492]:
+          - link "Event Solution" [ref=e493] [cursor=pointer]:
+            - /url: /
+            - img "Event Solution" [ref=e494]
+          - paragraph [ref=e495]: Crafting unforgettable experiences since 2014. We specialize in turning your vision into reality with precision, creativity, and passion.
+          - generic [ref=e496]:
+            - link "Facebook" [ref=e497] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e498]
+            - link "Instagram" [ref=e500] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e501]
+            - link "TikTok" [ref=e503] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e504]
+            - link "LinkedIn" [ref=e506] [cursor=pointer]:
+              - /url: "#"
+              - img [ref=e507]
+        - generic [ref=e509]:
+          - heading "Explore" [level=3] [ref=e510]
+          - list [ref=e511]:
+            - listitem [ref=e512]:
+              - link "About Us" [ref=e513] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e514]:
+              - link "Our Services" [ref=e515] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e516]:
+              - link "Portfolio" [ref=e517] [cursor=pointer]:
+                - /url: /portfolio
+            - listitem [ref=e518]:
+              - link "Contact" [ref=e519] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e520]:
+          - heading "Services" [level=3] [ref=e521]
+          - list [ref=e522]:
+            - listitem [ref=e523]:
+              - link "Wedding Planning" [ref=e524] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e525]:
+              - link "Corporate Events" [ref=e526] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e527]:
+              - link "Concerts" [ref=e528] [cursor=pointer]:
+                - /url: /services
+            - listitem [ref=e529]:
+              - link "Decoration" [ref=e530] [cursor=pointer]:
+                - /url: /services
+        - generic [ref=e531]:
+          - heading "Get in Touch" [level=3] [ref=e532]
+          - list [ref=e533]:
+            - listitem [ref=e534]:
+              - link "Jwagal, Lalitpur, Nepal" [ref=e535] [cursor=pointer]:
+                - /url: https://maps.google.com
+            - listitem [ref=e536]:
+              - link "+977-01-5260535 / +977-01-5260103" [ref=e537] [cursor=pointer]:
+                - /url: tel:+977015260535
+            - listitem [ref=e538]:
+              - link "info@eventsolutionnepal.com.np" [ref=e539] [cursor=pointer]:
+                - /url: mailto:info@eventsolutionnepal.com.np
+            - listitem [ref=e540]:
+              - link "Chat on WhatsApp" [ref=e541] [cursor=pointer]:
+                - /url: https://wa.me/9779800000000
+                - img [ref=e542]
+                - text: Chat on WhatsApp
+      - generic [ref=e544]:
+        - paragraph [ref=e545]: © 2025 Event Solution Nepal. All rights reserved.
+        - generic [ref=e546]:
+          - link "Privacy Policy" [ref=e547] [cursor=pointer]:
+            - /url: /privacy
+          - link "Terms of Service" [ref=e548] [cursor=pointer]:
+            - /url: /terms
+  - button "Open Next.js Dev Tools" [ref=e554] [cursor=pointer]:
+    - img [ref=e555]
+  - alert [ref=e558]
+```

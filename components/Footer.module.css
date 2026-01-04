@@ -8,6 +8,11 @@
     font-family: var(--font-inter);
 }
 
+[data-theme='dark'] .footer {
+    background-color: #0b0f19;
+    /* Even darker blue/black for footer in dark mode */
+}
+
 .container {
     max-width: 1400px;
     margin: 0 auto;

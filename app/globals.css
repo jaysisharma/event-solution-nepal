@@ -7,7 +7,13 @@
 
   --background: var(--white);
   --foreground: var(--neutral-dark);
+  --nav-bg: rgba(255, 255, 255, 0.95);
+  --border-color: #e2e8f0;
+  --bg-section: #f8fafc;
+  --bg-card: #ffffff;
 }
+
+
 
 * {
   box-sizing: border-box;

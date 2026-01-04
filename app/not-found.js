@@ -38,8 +38,8 @@ export default function NotFound() {
                 marginBottom: '2.5rem',
                 lineHeight: 1.6
             }}>
-                Oops! The page you are looking for has been moved or doesn't exist.
-                Let's get you back on track.
+                Oops! The page you are looking for has been moved or doesn&apos;t exist.
+                Let&apos;s get you back on track.
             </p>
             <Link href="/" passHref>
                 <Button variant="primary" style={{ padding: '1rem 2.5rem' }}>

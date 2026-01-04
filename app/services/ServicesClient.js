@@ -116,8 +116,8 @@ const ServicesClient = ({ initialServices }) => {
                 <div className={styles.heroContent}>
                     <span className={styles.heroLabel}>Expertise</span>
                     <h1 className={styles.heroTitle}>
-                        <span style={{ color: 'var(--secondary)' }}>We Build</span> <br />
-                        <span style={{ color: 'var(--primary)' }}>Experiences.</span>
+                        <span style={{ color: 'var(--primary)' }}>We Build</span> <br />
+                        <span style={{ color: 'var(--secondary)' }}>Experiences.</span>
                     </h1>
                     <p className={styles.heroSubtitle}>
                         A multidisciplinary event agency blending creative design, technical precision, and logistical mastery.
@@ -134,7 +134,7 @@ const ServicesClient = ({ initialServices }) => {
                         <div className={styles.servicesContent}>
                             {services.map((service, index) => (
                                 <div key={service.id} className={`${styles.serviceBlock} service-item`}>
-                                    <span className={styles.serviceIndex}>({service.id})</span>
+                                    <span className={styles.serviceIndex}>{`(${index + 1})`}</span>
                                     <h2 className={styles.serviceTitle}>{service.title}</h2>
                                     <p className={styles.serviceDesc}>{service.desc}</p>
 
@@ -213,14 +213,14 @@ const ServicesClient = ({ initialServices }) => {
             </section>
 
             {/* Giant CTA */}
-            <section className={styles.ctaSection}>
+            {/* <section className={styles.ctaSection}>
                 <div className={styles.container}>
                     <h2 className={styles.ctaTitle}>Let's Create.</h2>
                     <Button href="/contact" variant="primary" style={{ padding: '1.25rem 3rem', fontSize: '1.2rem' }}>
                         Start Your Project
                     </Button>
                 </div>
-            </section>
+            </section> */}
 
         </div>
     );

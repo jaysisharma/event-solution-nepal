@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './projects.module.css';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 const ProjectsClient = ({ initialProjects }) => {
     const [filter, setFilter] = useState("All");
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const categories = ["All", "Wedding", "Corporate", "Social", "Concert"];
 
@@ -42,17 +44,100 @@ const ProjectsClient = ({ initialProjects }) => {
             {/* Large Cards Grid */}
             <div className={styles.listContainer}>
                 {filteredProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        onOpen={() => setSelectedProject(project)}
+                    />
                 ))}
             </div>
+
+            {/* Lightbox Modal */}
+            <AnimatePresence>
+                {selectedProject && (
+                    <Lightbox
+                        project={selectedProject}
+                        onClose={() => setSelectedProject(null)}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 };
 
-// Extracted Component for Individual Project Card Logic
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+// --- Lightbox Component ---
+const Lightbox = ({ project, onClose }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-const ProjectCard = ({ project }) => {
+    const handleNext = (e) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev + 1) % project.images.length);
+    };
+
+    const handlePrev = (e) => {
+        e.stopPropagation();
+        setCurrentIndex((prev) => (prev - 1 + project.images.length) % project.images.length);
+    };
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowRight') setCurrentIndex((prev) => (prev + 1) % project.images.length);
+            if (e.key === 'ArrowLeft') setCurrentIndex((prev) => (prev - 1 + project.images.length) % project.images.length);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [project.images.length, onClose]);
+
+    return (
+        <motion.div
+            className={styles.lightboxOverlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+        >
+            <button className={styles.closeBtn} onClick={onClose}>
+                <X size={32} />
+            </button>
+
+            <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.lightboxImageWrapper}>
+                    <motion.img
+                        key={currentIndex}
+                        src={project.images[currentIndex]}
+                        alt={project.title}
+                        className={styles.lightboxImage}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.3 }}
+                    />
+
+                    {project.images.length > 1 && (
+                        <>
+                            <button className={styles.lightboxNavPrev} onClick={handlePrev}>
+                                <ChevronLeft size={32} />
+                            </button>
+                            <button className={styles.lightboxNavNext} onClick={handleNext}>
+                                <ChevronRight size={32} />
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                <div className={styles.lightboxInfo}>
+                    <h3>{project.title}</h3>
+                    <p>{currentIndex + 1} / {project.images.length}</p>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+
+const ProjectCard = ({ project, onOpen }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // Ref to hold the interval ID so we can clear/reset it on manual interaction
     const intervalRef = React.useRef(null);
@@ -92,7 +177,7 @@ const ProjectCard = ({ project }) => {
     };
 
     return (
-        <div className={styles.projectItem}>
+        <div className={styles.projectItem} onClick={onOpen} style={{ cursor: 'pointer' }}>
             <div className={styles.imageWrapper}>
                 <AnimatePresence mode='popLayout'>
                     <motion.img
@@ -128,5 +213,4 @@ const ProjectCard = ({ project }) => {
 };
 
 export default ProjectsClient;
-
 

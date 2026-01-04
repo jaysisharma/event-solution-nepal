@@ -1,20 +1,25 @@
 "use client";
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import { FaGooglePlay } from 'react-icons/fa';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
 import styles from './Navbar.module.css';
+import MagneticButton from './MagneticButton';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
+    const { theme, toggleTheme } = useTheme();
 
     if (pathname && pathname.startsWith('/admin')) {
         return null;
     }
 
     return (
-        <nav className={styles.navbar}>
+        <nav className={`${styles.navbar} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
             <div className={styles.container}>
                 <div className={styles.navContent}>
                     {/* Logo */}
@@ -31,6 +36,7 @@ const Navbar = () => {
                     {/* Desktop Menu */}
                     <div className={styles.desktopMenu}>
                         {[
+                            { name: 'Home', path: '/' },
                             { name: 'Services', path: '/services' },
                             { name: 'Rentals', path: '/rentals' },
                             { name: 'About', path: '/about' },
@@ -38,18 +44,35 @@ const Navbar = () => {
                             { name: 'Gallery', path: '/gallery' },
                             { name: 'Contact Us', path: '/contact' }
                         ].map((item) => (
-                            <Link key={item.name} href={item.path} className={styles.menuLink}>
-                                {item.name}
-                            </Link>
+                            <MagneticButton key={item.name}>
+                                <Link href={item.path} className={styles.menuLink}>
+                                    {item.name}
+                                </Link>
+                            </MagneticButton>
                         ))}
                     </div>
 
                     {/* CTA Buttons */}
                     <div className={styles.ctaWrapper}>
-                        <span className={styles.phone}> +977-01-5260535</span>
-                        <Link href="/quote" className={styles.btnQuote}>
-                            Get a Quote
-                        </Link>
+                        {/* Theme Switch Toggle */}
+                        <label className={styles.switch}>
+                            <input type="checkbox" checked={theme === 'dark'} onChange={toggleTheme} />
+                            <span className={styles.slider}>
+                                <span className={styles.iconSun}><Sun size={14} color="#f59e0b" /></span>
+                                <span className={styles.iconMoon}><Moon size={14} color="#f59e0b" /></span>
+                            </span>
+                        </label>
+
+                        <MagneticButton>
+                            <Link href="https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en" target="_blank" className={styles.btnApp}>
+                                <FaGooglePlay style={{ marginRight: '8px' }} /> Get <br /> Event Solution App
+                            </Link>
+                        </MagneticButton>
+                        <MagneticButton>
+                            <Link href="/quote" className={styles.btnQuote}>
+                                Get a Quote
+                            </Link>
+                        </MagneticButton>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -65,6 +88,15 @@ const Navbar = () => {
             {isOpen && (
                 <div className={styles.mobileMenu}>
                     <div className={styles.mobileMenuContent}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                            <label className={styles.switch}>
+                                <input type="checkbox" checked={theme === 'dark'} onChange={toggleTheme} />
+                                <span className={styles.slider}>
+                                    <span className={styles.iconSun}><Sun size={14} color="#f59e0b" /></span>
+                                    <span className={styles.iconMoon}><Moon size={14} color="#f59e0b" /></span>
+                                </span>
+                            </label>
+                        </div>
                         {[
                             { name: 'Services', path: '/services' },
                             { name: 'Rentals', path: '/rentals' },
@@ -78,6 +110,9 @@ const Navbar = () => {
                             </Link>
                         ))}
                         <div className={styles.mobileBtnWrapper}>
+                            <Link href="https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en" target="_blank" className={styles.btnAppMobile} onClick={() => setIsOpen(false)}>
+                                <FaGooglePlay style={{ marginRight: '8px' }} /> Get Event Solution App
+                            </Link>
                             <Link href="/quote" className={styles.btnQuoteMobile} onClick={() => setIsOpen(false)}>
                                 Get a Quote
                             </Link>

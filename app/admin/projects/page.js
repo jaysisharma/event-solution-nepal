@@ -1,73 +1,448 @@
-import prisma from '@/lib/db';
-import { createProject, deleteProject } from './actions';
+'use client';
+import React, { useState, useEffect } from 'react';
+import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star } from 'lucide-react';
+import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject } from './actions';
 import styles from '../admin.module.css';
 
-export default async function AdminProjects() {
-    const projects = await prisma.workProject.findMany({
-        orderBy: { createdAt: 'desc' }
-    });
+
+import { compressImage } from '@/lib/compress';
+// --- Snippets ---
+const Snackbar = ({ message, type, onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(onClose, 3000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
+    const bgColor = type === 'success' ? '#10b981' : '#ef4444';
+    return (
+        <div style={{
+            position: 'fixed', bottom: '24px', right: '24px', backgroundColor: bgColor, color: 'white',
+            padding: '12px 24px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1000, animation: 'slideIn 0.3s ease-out'
+        }}>
+            {type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+            <span>{message}</span>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}><X size={16} /></button>
+        </div>
+    );
+};
+
+export default function ProjectAdminPage() {
+    const [projects, setProjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [snackbar, setSnackbar] = useState(null);
+    const [editingId, setEditingId] = useState(null);
+
+    // Form State
+    const [title, setTitle] = useState('');
+    const [year, setYear] = useState('');
+    const [category, setCategory] = useState('Wedding');
+    const [customCategory, setCustomCategory] = useState(''); // For "Other" logic
+    const [isFeatured, setIsFeatured] = useState(false); // New state
+    const [files, setFiles] = useState(null);
+    const [previews, setPreviews] = useState([]); // New: Previews for selected files
+    const [existingImagesState, setExistingImagesState] = useState([]); // For edit mode
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const fetchProjects = async () => {
+        setIsLoading(true);
+        const res = await getProjects();
+        if (res.success) setProjects(res.data);
+        setIsLoading(false);
+    };
+
+    // --- Validation ---
+    const validateYear = (val) => {
+        // Formats: 2024 or 2024-2025
+        const regex = /^\d{4}(-\d{4})?$/;
+        return regex.test(val);
+    };
+
+    const handleEdit = (project) => {
+        setEditingId(project.id);
+        setTitle(project.title);
+        setYear(project.year);
+        setIsFeatured(project.isFeatured || false);
+
+        // Category logic
+        const defaultCats = ['Wedding', 'Corporate', 'Concert', 'Social', 'Expo'];
+        if (defaultCats.includes(project.category)) {
+            setCategory(project.category);
+            setCustomCategory('');
+        } else {
+            setCategory('Other');
+            setCustomCategory(project.category);
+        }
+
+        try {
+            const imgs = JSON.parse(project.images);
+            setExistingImagesState(imgs || []);
+        } catch (e) {
+            setExistingImagesState([]);
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setTitle('');
+        setYear('');
+        setCategory('Wedding');
+        setCustomCategory('');
+        setIsFeatured(false);
+        setFiles(null);
+        setPreviews([]); // Clear previews
+        setExistingImagesState([]);
+    };
+
+    const handleRemoveImage = (index) => {
+        setExistingImagesState(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // New: Handle File Change & Generate Previews
+    const handleFileChange = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFiles(e.target.files);
+
+            // Create object URLs for previews
+            const newPreviews = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+            setPreviews(newPreviews);
+
+            // Cleanup old previews to avoid memory leaks (optional but good practice)
+            return () => newPreviews.forEach(url => URL.revokeObjectURL(url));
+        } else {
+            setFiles(null);
+            setPreviews([]);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // 1. Validate Year
+        if (!validateYear(year)) {
+            setSnackbar({ message: 'Invalid Year format. Use "2024" or "2024-2025".', type: 'error' });
+            return;
+        }
+
+        // 2. Final Category
+        const finalCategory = category === 'Other' ? customCategory.trim() : category;
+        if (!finalCategory) {
+            setSnackbar({ message: 'Please specify a category.', type: 'error' });
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('year', year);
+            formData.append('category', finalCategory);
+            formData.append('isFeatured', isFeatured);
+
+            if (files && files.length > 0) {
+                // Use 'images' for Create, 'newImages' for Update
+                const fieldName = editingId ? 'newImages' : 'images';
+                for (let i = 0; i < files.length; i++) {
+                    const compressed = await compressImage(files[i]);
+                    formData.append(fieldName, compressed);
+                }
+            }
+
+            let res;
+            if (editingId) {
+                // Pass existing images
+                formData.append('existingImages', JSON.stringify(existingImagesState));
+                res = await updateProject(editingId, formData);
+            } else {
+                res = await createProject(formData);
+            }
+
+            if (res.success) {
+                setSnackbar({ message: editingId ? 'Project updated successfully!' : 'Project created successfully!', type: 'success' });
+                // Cleanup only on success
+                handleCancelEdit();
+                fetchProjects();
+            } else {
+                setSnackbar({ message: res.error || 'Operation failed', type: 'error' });
+            }
+        } catch (error) {
+            console.error("Submission Error:", error);
+            setSnackbar({ message: 'An unexpected error occurred.', type: 'error' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
-        <div className={styles.container}>
-            <h1 className={styles.title}>Manage Projects</h1>
+        <div>
+            {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
 
-            <section className={styles.section}>
-                <h3>Add New Project</h3>
-                <form action={createProject} className={styles.form}>
+            <div className={styles.pageHeader}>
+                <div>
+                    <h1 className={styles.pageTitle}>Projects</h1>
+                    <p className={styles.pageSubtitle}>Showcase your portfolio</p>
+                </div>
+            </div>
+
+            <div className={styles.card}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h3 className={styles.cardTitle}>{editingId ? 'Edit Project' : 'Add New Project'}</h3>
+                    {editingId && (
+                        <button onClick={handleCancelEdit} style={{ fontSize: '0.85rem', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                            Cancel Edit
+                        </button>
+                    )}
+                </div>
+
+                <form onSubmit={handleSubmit} className={styles.formGrid}>
                     <div className={styles.formGroup}>
-                        <label>Title</label>
-                        <input name="title" type="text" required placeholder="e.g. Royal Palace Wedding" />
+                        <label className={styles.label}>Title</label>
+                        <input
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            type="text"
+                            required
+                            placeholder="e.g. Royal Palace Wedding"
+                            className={styles.input}
+                        />
                     </div>
+
                     <div className={styles.formGroup}>
-                        <label>Category</label>
-                        <select name="category">
-                            <option value="Wedding">Wedding</option>
-                            <option value="Corporate">Corporate</option>
-                            <option value="Concert">Concert</option>
-                            <option value="Social">Social</option>
-                        </select>
+                        <label className={styles.label}>Category</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className={styles.select}
+                                style={{ flex: 1 }}
+                            >
+                                <option value="Wedding">Wedding</option>
+                                <option value="Corporate">Corporate</option>
+                                <option value="Concert">Concert</option>
+                                <option value="Social">Social</option>
+                                <option value="Expo">Expo</option>
+                                <option value="Other">Other (Add New)</option>
+                            </select>
+                            {category === 'Other' && (
+                                <input
+                                    value={customCategory}
+                                    onChange={(e) => setCustomCategory(e.target.value)}
+                                    type="text"
+                                    placeholder="Enter Category"
+                                    className={styles.input}
+                                    style={{ flex: 1 }}
+                                    required
+                                />
+                            )}
+                        </div>
                     </div>
+
                     <div className={styles.formGroup}>
-                        <label>Year</label>
-                        <input name="year" type="text" required placeholder="e.g. 2024" />
+                        <label className={styles.label}>Year (Format: 2024 or 2024-2025)</label>
+                        <input
+                            value={year}
+                            onChange={(e) => setYear(e.target.value)}
+                            type="text"
+                            required
+                            placeholder="e.g. 2024"
+                            className={styles.input}
+                        />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label>Images (Comma separated URLs)</label>
-                        <textarea name="images" required placeholder="https://..., https://..." />
+
+                    <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.75rem', marginTop: '1.8rem' }}>
+                        <input
+                            type="checkbox"
+                            checked={isFeatured}
+                            onChange={(e) => setIsFeatured(e.target.checked)}
+                            id="isFeatured"
+                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        <label htmlFor="isFeatured" className={styles.label} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Star size={16} fill={isFeatured ? "#f59e0b" : "none"} color={isFeatured ? "#f59e0b" : "#64748b"} />
+                            Mark as Featured
+                        </label>
                     </div>
-                    <button type="submit" className={styles.submitBtn}>Add Project</button>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label className={styles.label}>
+                            {editingId ? 'Add More Images (Optional)' : 'Project Images'}
+                        </label>
+                        <input
+                            onChange={handleFileChange}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className={styles.input}
+                            style={{ paddingTop: '0.7rem' }}
+                            required={!editingId} // Required only on create
+                        />
+
+                        {/* Preview Area */}
+
+                        {/* 1. Existing Images (Edit Mode) */}
+                        {editingId && existingImagesState.length > 0 && (
+                            <div style={{ marginTop: '1rem' }}>
+                                <label className={styles.label} style={{ fontSize: '0.8rem', color: '#64748b' }}>Current Images:</label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    {existingImagesState.map((img, i) => (
+                                        <div key={i} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                                            <img src={img} alt={`Existing ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e2e8f0' }} />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(i)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: -5,
+                                                    right: -5,
+                                                    background: '#ef4444',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    cursor: 'pointer',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 2. New Selected Previews */}
+                        {previews.length > 0 && (
+                            <div style={{ marginTop: '1rem' }}>
+                                <label className={styles.label} style={{ fontSize: '0.8rem', color: '#64748b' }}>New Selection Preview:</label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                    {previews.map((src, i) => (
+                                        <div key={i} style={{ width: '80px', height: '80px' }}>
+                                            <img src={src} alt={`Preview ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid #3b82f6', boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)' }} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.fullWidth}>
+                        <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ display: 'flex', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
+                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (editingId ? <Save size={18} /> : <Plus size={18} />)}
+                            {isSubmitting ? 'Saving...' : (editingId ? 'Update Project' : 'Add Project')}
+                        </button>
+                    </div>
                 </form>
-            </section>
+            </div>
 
-            <section className={styles.section}>
-                <h3>Existing Projects</h3>
-                <div className={styles.tableWrapper}>
+            <div className={styles.tableContainer}>
+                {isLoading ? (
+                    <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading projects...</div>
+                ) : (
                     <table className={styles.table}>
                         <thead>
                             <tr>
                                 <th>Title</th>
+                                <th style={{ textAlign: 'center' }}>Featured</th>
                                 <th>Category</th>
                                 <th>Year</th>
-                                <th>Actions</th>
+                                <th style={{ textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {projects.map(project => (
                                 <tr key={project.id}>
-                                    <td>{project.title}</td>
-                                    <td>{project.category}</td>
-                                    <td>{project.year}</td>
                                     <td>
-                                        <form action={deleteProject.bind(null, project.id)}>
-                                            <button type="submit" className={styles.deleteBtn}>Delete</button>
-                                        </form>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            {(() => {
+                                                try {
+                                                    const imgs = JSON.parse(project.images);
+                                                    if (imgs && imgs.length > 0) {
+                                                        return (
+                                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                                {imgs.slice(0, 3).map((img, i) => (
+                                                                    <img key={i} src={img} alt="Thumbnail" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                                ))}
+                                                            </div>
+                                                        );
+                                                    }
+                                                } catch (e) { return null; }
+                                            })()}
+                                            <span style={{ fontWeight: 500 }}>{project.title}</span>
+                                        </div>
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <button
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                await toggleFeaturedProject(project.id);
+                                                fetchProjects();
+                                            }}
+                                            title={project.isFeatured ? "Unmark as Featured" : "Mark as Featured"}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: '4px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                transition: 'transform 0.2s'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            <Star
+                                                size={20}
+                                                fill={project.isFeatured ? "#f59e0b" : "transparent"}
+                                                color={project.isFeatured ? "#f59e0b" : "#cbd5e1"}
+                                                strokeWidth={2}
+                                            />
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <span style={{ fontSize: '0.8rem', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px' }}>
+                                            {project.category}
+                                        </span>
+                                    </td>
+                                    <td>{project.year}</td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                            <button onClick={() => handleEdit(project)} className={styles.btnIcon} title="Edit">
+                                                <Pencil size={18} />
+                                            </button>
+                                            <form action={async () => {
+                                                if (confirm('Delete this project?')) {
+                                                    await deleteProject(project.id);
+                                                    fetchProjects();
+                                                }
+                                            }}>
+                                                <button type="submit" className={`${styles.btnIcon} delete`} title="Delete">
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                </div>
-            </section>
+                )}
+                {!isLoading && projects.length === 0 && (
+                    <div className={styles.emptyState} style={{ border: 'none' }}>
+                        No projects found.
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

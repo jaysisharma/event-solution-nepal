@@ -1,0 +1,149 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    /* Default Light */
+    transition: background-color 0.3s ease;
+}
+
+.dark.wrapper {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+.dark {
+    /* Ensure explicit export if needed by tooling */
+}
+
+.gallerySection {
+    height: 90vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.gallerySection:active {
+    cursor: grabbing;
+}
+
+.board {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200vw;
+    height: 200vh;
+    background-image: radial-gradient(#ccc 1px, transparent 1px);
+    /* Default Light Grid */
+    background-size: 40px 40px;
+    will-change: transform;
+    transition: background-image 0.3s ease;
+}
+
+.dark .board {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+.header {
+    text-align: center;
+    padding: 3rem 0 1rem 0;
+    position: relative;
+    z-index: 10;
+    background-color: inherit;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #333;
+    /* Default Light */
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+.dark .title {
+    color: white;
+}
+
+.subtitle {
+    color: #666;
+    /* Default Light */
+    font-size: 1.125rem;
+    margin-top: 0.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: color 0.3s ease;
+}
+
+.dark .subtitle {
+    color: #aaa;
+}
+
+.polaroid {
+    position: absolute;
+    padding: 15px 15px 60px 15px;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.polaroid:hover {
+    scale: 1.05;
+    z-index: 100;
+}
+
+.photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    display: block;
+    background-color: #f0f0f0;
+}
+
+.caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1rem;
+    color: #333;
+    padding: 0 10px;
+    pointer-events: none;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.tips {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #333;
+    /* Default Light */
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    pointer-events: none;
+    font-size: 0.9rem;
+    z-index: 200;
+    transition: all 0.3s ease;
+}
+
+.dark .tips {
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+}
