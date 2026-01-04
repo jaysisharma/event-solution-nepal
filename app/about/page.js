@@ -17,3 +17,4 @@ export default async function About() {
 
     return <AboutClient initialTeam={team} />;
 }
+
