@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
-import ProjectsClient from "./ProjectsClient";
-import ServicesClient from './ServicesClient';
+import GalleryGrid from '@/components/GalleryGrid';
+import CallToAction from '@/components/CallToAction';
 import styles from './gallery.module.css';
 
 export const metadata = {
