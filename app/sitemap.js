@@ -4,7 +4,6 @@ import prisma from "@/lib/db";
 
 export default async function sitemap() {
     const baseUrl = 'https://eventsolutionnepal.com.np';
-
     // Static routes
     const routes = [
         '',
