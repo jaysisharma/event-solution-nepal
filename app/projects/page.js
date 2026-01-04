@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import ProjectsClient from "./ProjectsClient";
 
 export const metadata = {
