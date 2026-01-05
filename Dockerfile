@@ -30,6 +30,13 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Expose build args
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+ARG NEXTAUTH_SECRET
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+
+
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
