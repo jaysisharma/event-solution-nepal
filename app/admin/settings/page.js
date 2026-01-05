@@ -31,6 +31,7 @@ export default function SettingsPage() {
     const [admins, setAdmins] = useState([]);
     const [siteSettings, setSiteSettings] = useState({
         whatsappNumber: '',
+        websiteUrl: '',
     });
     const [isLoading, setIsLoading] = useState(true);
     const [snackbar, setSnackbar] = useState(null);
@@ -48,6 +49,7 @@ export default function SettingsPage() {
         if (settingsRes.success && settingsRes.data) {
             setSiteSettings({
                 whatsappNumber: settingsRes.data.whatsappNumber || '',
+                websiteUrl: settingsRes.data.websiteUrl || '',
             });
         }
         setIsLoading(false);
@@ -129,6 +131,19 @@ export default function SettingsPage() {
                                 className={styles.input}
                                 required
                                 placeholder="Enter number without +"
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Website URL <span style={{ fontSize: '0.8rem', color: '#666' }}>(e.g. http://example.com)</span></label>
+                            <input
+                                name="websiteUrl"
+                                value={siteSettings.websiteUrl}
+                                onChange={handleSettingsChange}
+                                type="text"
+                                className={styles.input}
+                                required
+                                placeholder="Enter website URL"
                             />
                         </div>
 

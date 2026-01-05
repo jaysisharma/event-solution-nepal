@@ -11,6 +11,7 @@ export async function getSiteSettings() {
             settings = await prisma.siteSettings.create({
                 data: {
                     whatsappNumber: '9779851336342', // Default from requirements
+                    websiteUrl: 'http://x8408o8kkw8ococggsssg0o0.72.61.248.195.sslip.io/',
                 }
             });
         }
@@ -30,13 +31,15 @@ export async function updateSiteSettings(data) {
             settings = await prisma.siteSettings.update({
                 where: { id: first.id },
                 data: {
-                    whatsappNumber: data.whatsappNumber
+                    whatsappNumber: data.whatsappNumber,
+                    websiteUrl: data.websiteUrl
                 }
             });
         } else {
             settings = await prisma.siteSettings.create({
                 data: {
-                    whatsappNumber: data.whatsappNumber
+                    whatsappNumber: data.whatsappNumber,
+                    websiteUrl: data.websiteUrl
                 }
             });
         }
