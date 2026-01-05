@@ -31,7 +31,7 @@ export async function loginAction(prevState, formData) {
 
     (await cookies()).set('session', session, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // process.env.NODE_ENV === 'production', // Temporarily false for HTTP access
         expires: expires,
         sameSite: 'strict',
         path: '/',
