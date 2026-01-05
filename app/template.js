@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { useTheme } from "@/context/ThemeContext";
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 
 export default function Template({ children }) {
     // 10 columns for a smoother waterfall effect
@@ -39,7 +38,7 @@ export default function Template({ children }) {
                 position: "fixed",
                 top: 0,
                 left: 0,
-                width: "100vw",
+                width: "100%",
                 height: "100vh",
                 display: "flex",
                 zIndex: 9999,
@@ -70,7 +69,7 @@ export default function Template({ children }) {
 
     return (
         <>
-            {mounted && shouldAnimate && createPortal(transitionOverlay, document.body)}
+            {mounted && shouldAnimate && transitionOverlay}
             {children}
         </>
     );
