@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import styles from './GalleryGrid.module.css';
+import { useTheme } from '@/context/ThemeContext';
 
 const GalleryGrid = ({ initialItems }) => {
+    const { theme } = useTheme();
     const [filter, setFilter] = useState('All');
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -61,7 +63,7 @@ const GalleryGrid = ({ initialItems }) => {
     }, [lightboxOpen]);
 
     return (
-        <section className={styles.gallerySection}>
+        <section className={`${styles.gallerySection} ${theme === 'dark' ? styles.dark : ''}`}>
             <div className={styles.container}>
                 {/* Filter Tabs */}
                 <div className={styles.filterContainer}>

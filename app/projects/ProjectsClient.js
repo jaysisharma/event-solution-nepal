@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './projects.module.css';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 const ProjectsClient = ({ initialProjects }) => {
+    const { theme } = useTheme();
     const [filter, setFilter] = useState("All");
     const [selectedProject, setSelectedProject] = useState(null);
 
@@ -18,7 +20,7 @@ const ProjectsClient = ({ initialProjects }) => {
         : allProjects.filter(p => p.category === filter);
 
     return (
-        <div className={styles.page}>
+        <div className={`${styles.page} ${theme === 'dark' ? styles.dark : ''}`}>
             <div className={styles.hero}>
                 <h1 className={styles.heroTitle}>
                     <span className={styles.textRed}>Our</span> <span className={styles.textBlue}>Work</span>

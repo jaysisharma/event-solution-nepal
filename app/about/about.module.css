@@ -261,6 +261,12 @@
     }
 }
 
+@media (max-width: 768px) {
+    .marqueeTrack {
+        animation-duration: 3s;
+    }
+}
+
 .teamCard {
     cursor: pointer;
     min-width: 280px;
@@ -281,6 +287,14 @@
     /* Added border as requested */
     box-shadow: 0 0 0 2px #e5e5e5;
     /* Outer thin border for definition */
+}
+
+@media (max-width: 768px) {
+    .memberImageWrapper {
+        border: none;
+        box-shadow: none;
+        border-radius: 4px;
+    }
 }
 
 .memberImage {
@@ -343,4 +357,95 @@
 
 .teamCard:hover .noZoom {
     transform: scale(1) !important;
+}
+
+/* --- Dark Mode Overrides --- */
+.dark.page {
+    background-color: #0f172a;
+    /* slate-900 */
+    color: #f8fafc;
+}
+
+.dark .hero {
+    background-color: #1e293b;
+    /* slate-800 */
+}
+
+.dark .heroTitle {
+    color: #f8fafc;
+}
+
+.dark .heroSubtitle {
+    color: #cbd5e1;
+}
+
+.dark .storyText {
+    color: #f8fafc;
+}
+
+.dark .highlight {
+    color: #94a3b8;
+    /* slate-400 */
+}
+
+.dark .statsSection {
+    border-color: #334155;
+    background-color: #0f172a;
+}
+
+.dark .statNumber {
+    color: #f8fafc;
+}
+
+.dark .statLabel {
+    color: #94a3b8;
+}
+
+.dark .valuesSection {
+    background-color: #0b0f19;
+    /* darker than slate-900 */
+}
+
+.dark .sectionTitle {
+    color: #f8fafc;
+}
+
+.dark .valueItem {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.dark .valueItem:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+    border-color: var(--primary);
+}
+
+.dark .valueTitle {
+    color: #f8fafc;
+}
+
+.dark .valueDesc {
+    color: #cbd5e1;
+}
+
+.dark .memberImageWrapper {
+    background-color: #1e293b;
+    border-color: #1e293b;
+    box-shadow: 0 0 0 2px #334155;
+}
+
+.dark .memberName {
+    color: #f8fafc;
+}
+
+.dark .memberRole {
+    color: #94a3b8;
+}
+
+.dark .sectionSeparator {
+    background-color: #334155;
+}
+
+.dark .ctaTitle {
+    color: #f8fafc;
 }

@@ -8,7 +8,7 @@ export const ThemeProvider = ({ children }) => {
         if (typeof window !== 'undefined') {
             const storedTheme = localStorage.getItem('theme');
             if (storedTheme) return storedTheme;
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+
         }
         return 'light';
     });

@@ -12,9 +12,7 @@
     color: #f8fafc;
 }
 
-.dark {
-    /* Ensure explicit export if needed by tooling */
-}
+
 
 .gallerySection {
     height: 90vh;
@@ -22,6 +20,13 @@
     position: relative;
     overflow: hidden;
     cursor: grab;
+    --card-scale: 1;
+}
+
+@media (max-width: 768px) {
+    .gallerySection {
+        --card-scale: 0.55;
+    }
 }
 
 .gallerySection:active {
@@ -64,6 +69,12 @@
     transition: color 0.3s ease;
 }
 
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+}
+
 .dark .title {
     color: white;
 }
@@ -77,6 +88,13 @@
     margin-left: auto;
     margin-right: auto;
     transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .subtitle {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
 }
 
 .dark .subtitle {

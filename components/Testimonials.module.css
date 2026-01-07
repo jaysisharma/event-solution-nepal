@@ -51,7 +51,7 @@
 }
 
 .title {
-    font-size: 2.25rem;
+    font-size: 2rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
     color: var(--foreground);
@@ -84,26 +84,19 @@
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
+/* .marqueeTrack animation logic removed for Draggable */
 .marqueeTrack {
     display: flex;
     gap: 2rem;
     width: max-content;
-    animation: scroll 40s linear infinite;
+    /* animation: scroll 40s linear infinite; REMOVED */
+    touch-action: pan-y;
+    /* Allow vertical scroll, but Draggable handles horizontal */
+    cursor: grab;
 }
 
-.marqueeTrack:hover {
-    animation-play-state: paused;
-}
-
-@keyframes scroll {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(calc(-50% - 1rem));
-        /* Adjust logic if gap changes */
-    }
+.marqueeTrack:active {
+    cursor: grabbing;
 }
 
 .card {
@@ -116,8 +109,8 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    min-width: 300px;
-    max-width: 400px;
+    min-width: 350px;
+    max-width: 450px;
     flex: 0 0 auto;
 }
 

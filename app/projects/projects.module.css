@@ -344,3 +344,66 @@
         background: rgba(0, 0, 0, 0.5);
     }
 }
+
+/* --- Dark Mode Overrides --- */
+.dark.page {
+    background-color: #0f172a;
+    /* slate-900 */
+    color: #f8fafc;
+}
+
+.dark .heroTitle {
+    color: #f8fafc;
+}
+
+.dark .heroSubtitle {
+    color: #cbd5e1;
+}
+
+.dark .filterBtn {
+    border-color: #475569;
+    /* slate-600 */
+    color: #94a3b8;
+}
+
+.dark .filterBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.dark .filterBtn.active {
+    background-color: var(--secondary);
+    color: #ffffff;
+    border-color: var(--secondary);
+}
+
+.dark .imageWrapper {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.dark .projectItem:hover .imageWrapper {
+    border-color: var(--primary);
+}
+
+.dark .projectCategory {
+    color: var(--secondary);
+}
+
+.dark .projectTitle {
+    color: #f8fafc;
+}
+
+.dark .projectItem:hover .projectTitle {
+    color: #EB1F26;
+}
+
+.dark .projectYear {
+    color: #94a3b8;
+}
+
+/* Lightbox is usually dark by default but we can ensure overlays match */
+.dark .lightboxContent {
+    color: white;
+    /* Always white in lightbox overlay usually */
+}

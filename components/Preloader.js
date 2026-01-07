@@ -52,7 +52,7 @@ export default function Preloader() {
             scale: 1,
             filter: "blur(0px)",
             opacity: 1,
-            duration: 1.5,
+            duration: 0.8, // Reduced from 1.5
             ease: "power3.out"
         }, 0);
 
@@ -60,30 +60,24 @@ export default function Preloader() {
         tl.to(counterRef.current, {
             yPercent: 0,
             opacity: 1,
-            duration: 0.8,
+            duration: 0.5, // Reduced from 0.8
             ease: "power2.out"
-        }, 0.5); // Start slightly after logo
+        }, 0.3);
 
         // 3. Counter Progress
         tl.to(counterObj, {
             value: 100,
-            duration: 1.5,
+            duration: 1.0, // Reduced from 1.5
             ease: "power2.out",
             onUpdate: () => {
                 if (counterRef.current) {
                     counterRef.current.textContent = Math.round(counterObj.value);
                 }
             },
-        }, 0.5);
+        }, 0.3);
 
-        // 4. Subtle "Breathing" for Logo while waiting
-        tl.to(logoRef.current, {
-            scale: 1.05,
-            duration: 1,
-            repeat: 1,
-            yoyo: true,
-            ease: "sine.inOut"
-        }, "-=0.5");
+        // 4. Subtle "Breathing" - REMOVED or drastically shortened
+        // We skip breathing to make it snappy.
 
         // 5. Build Out Animation
         // Logo zooms out quickly
@@ -91,23 +85,23 @@ export default function Preloader() {
             scale: 0.8,
             opacity: 0,
             filter: "blur(5px)",
-            duration: 0.5,
+            duration: 0.4, // Reduced from 0.5
             ease: "power2.in"
-        });
+        }, "+=0.2"); // Small pause after count
 
         // Counter drops down
         tl.to(counterRef.current, {
             yPercent: 100,
             opacity: 0,
-            duration: 0.5,
+            duration: 0.4,
             ease: "power2.in"
-        }, "<"); // Run at same time as logo exit
+        }, "<");
 
         // 6. Shutter Reveal
         tl.to(`.${styles.shutter}`, {
             height: 0,
-            duration: 1,
-            stagger: 0.1,
+            duration: 0.6, // Reduced from 1
+            stagger: 0.05, // Faster stagger
             ease: "power3.inOut",
         }, "-=0.2");
 

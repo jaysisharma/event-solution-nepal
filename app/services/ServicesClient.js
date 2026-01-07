@@ -103,6 +103,47 @@ const ServicesClient = ({ initialServices }) => {
             });
         });
 
+        mm.add("(max-width: 1023px)", () => {
+            // 1. Service Items Fade Up
+            gsap.utils.toArray('.service-item').forEach(item => {
+                gsap.from(item, {
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    }
+                });
+            });
+
+            // 2. Process Steps Stagger
+            gsap.from(`.${styles.processStep}`, {
+                y: 30,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: `.${styles.processGrid}`,
+                    start: "top 80%"
+                }
+            });
+
+            // 3. FAQ Items Fade Up
+            gsap.utils.toArray(`.${styles.faqItem}`).forEach((item, i) => {
+                gsap.from(item, {
+                    y: 20,
+                    opacity: 0,
+                    duration: 0.5,
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 90%"
+                    }
+                });
+            });
+        });
+
         // Cleanup
         return () => mm.revert();
 

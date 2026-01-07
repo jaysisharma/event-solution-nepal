@@ -5,11 +5,18 @@
 }
 
 /* --- Hero Section (Light Editorial) --- */
+/* --- Hero Section (Light Editorial) --- */
 .hero {
-    padding: 12rem 0 6rem;
+    padding: 6rem 0 3rem;
     position: relative;
     overflow: hidden;
     background-color: var(--bg-section);
+}
+
+@media (min-width: 768px) {
+    .hero {
+        padding: 12rem 0 6rem;
+    }
 }
 
 .heroContent {
@@ -32,11 +39,11 @@
 }
 
 .heroTitle {
-    font-size: clamp(4rem, 10vw, 9rem);
+    font-size: clamp(2.5rem, 8vw, 9rem);
     font-weight: 800;
     line-height: 0.9;
     letter-spacing: -0.03em;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     max-width: 1200px;
     color: var(--foreground);
 }
@@ -60,15 +67,21 @@
 .container {
     max-width: 90rem;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        padding: 0 2rem;
+    }
 }
 
 /* --- Mobile Default (Stacked) --- */
 .servicesWrapper {
     display: flex;
     flex-direction: column;
-    padding: 4rem 2rem;
-    gap: 4rem;
+    padding: 2rem 0;
+    gap: 3rem;
     width: 100%;
     max-width: 90rem;
     margin: 0 auto;
@@ -94,7 +107,24 @@
     height: 100%;
 }
 
-/* --- Desktop Pinning Layout (Min-Width 1024px) --- */
+
+
+/* Hide desktop pinned images container on mobile */
+.servicesImages {
+    display: none;
+}
+
+/* Mobile specific image */
+.serviceBlockMobileImage {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    margin: 2rem 0;
+    overflow: hidden;
+    border-radius: 4px;
+    display: block;
+}
+
 @media (min-width: 1024px) {
     .servicesWrapper {
         display: flex;
@@ -179,10 +209,10 @@
 }
 
 .serviceTitle {
-    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-size: clamp(2rem, 6vw, 5.5rem);
     font-weight: 800;
     line-height: 1;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     color: var(--foreground);
 }
 
@@ -219,9 +249,14 @@
 
 /* --- Process (Simple Steps - Light) --- */
 .processSection {
-    padding: 10rem 0;
+    padding: 4rem 0;
     background-color: var(--bg-section);
-    /* Very light grey */
+}
+
+@media (min-width: 768px) {
+    .processSection {
+        padding: 10rem 0;
+    }
 }
 
 .sectionLabel {
@@ -236,7 +271,7 @@
 .processGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 4rem;
+    gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -251,7 +286,7 @@
 }
 
 .stepNumber {
-    font-size: 5rem;
+    font-size: 3rem;
     font-weight: 800;
     color: var(--border-color);
     line-height: 1;
@@ -274,8 +309,14 @@
 
 /* --- FAQ (Minimal - Light) --- */
 .faqSection {
-    padding: 8rem 0;
+    padding: 4rem 0;
     background-color: var(--background);
+}
+
+@media (min-width: 768px) {
+    .faqSection {
+        padding: 8rem 0;
+    }
 }
 
 .faqGrid {
@@ -293,7 +334,6 @@
     padding: 2rem 0;
     background: none;
     border: none;
-    /* A11y Fix: Darker gray for contrast */
     color: var(--foreground);
     opacity: 0.7;
     font-size: 1.25rem;

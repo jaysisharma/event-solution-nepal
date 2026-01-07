@@ -245,3 +245,39 @@
     object-fit: contain;
     border-radius: 4px;
 }
+
+/* --- Dark Mode Overrides --- */
+.dark.gallerySection {
+    background-color: transparent;
+    /* Wrapper handles bg usually, or specific if needed */
+}
+
+.dark .filterBtn {
+    border-color: #475569;
+    color: #94a3b8;
+}
+
+.dark .filterBtn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.dark .filterBtn.activeFilter {
+    background-color: var(--secondary);
+    color: white;
+    border-color: var(--secondary);
+}
+
+.dark .gridItem {
+    background: #1e293b;
+}
+
+.dark .title {
+    color: #f8fafc;
+}
+
+.dark .category {
+    color: var(--secondary);
+}
+
+/* Lightbox is usually dark already, but adjust if needed */

@@ -200,3 +200,82 @@ a.infoValue:hover {
 .submitBtn:hover {
     background: #EB1F26;
 }
+
+/* --- Dark Mode Overrides --- */
+.dark.main {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+.dark .title {
+    color: #f8fafc;
+}
+
+.dark .description {
+    color: #cbd5e1;
+}
+
+.dark .infoLabel {
+    color: #94a3b8;
+}
+
+.dark .infoValue {
+    color: #f8fafc;
+}
+
+.dark .socialIcon {
+    border-color: #475569;
+    color: #cbd5e1;
+}
+
+.dark .socialIcon:hover {
+    border-color: #EB1F26;
+    background: #EB1F26;
+    color: white;
+}
+
+.dark .formColumn {
+    background: #1e293b;
+}
+
+.dark .label {
+    color: #cbd5e1;
+}
+
+.dark .input,
+.dark .textarea,
+.dark .select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+.dark .input:focus,
+.dark .textarea:focus,
+.dark .select:focus {
+    border-color: var(--primary);
+}
+
+.dark .submitBtn {
+    background: #334155;
+}
+
+.dark .submitBtn:hover {
+    background: var(--primary);
+}
+
+/* Map Section */
+.mapSection {
+    width: 100%;
+    height: 450px;
+    margin-top: 0;
+    overflow: hidden;
+    position: relative;
+    /* optional border-top if needed */
+}
+
+@media (max-width: 768px) {
+    .mapSection {
+        height: 350px;
+    }
+}

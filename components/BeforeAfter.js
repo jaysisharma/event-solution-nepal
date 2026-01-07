@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { MoveHorizontal } from 'lucide-react';
 import styles from './BeforeAfter.module.css';
 
@@ -62,10 +63,13 @@ const BeforeAfter = () => {
                 >
                     {/* Before Image (Base) */}
                     <div className={styles.imageWrapper}>
-                        <img
+                        <Image
                             src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2000&auto=format&fit=crop"
                             alt="Empty Hall"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             className={styles.image}
+                            priority
                         />
                         <span className={styles.labelBefore}>Before</span>
                     </div>
@@ -75,10 +79,13 @@ const BeforeAfter = () => {
                         className={styles.imageWrapperAfter}
                         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
                     >
-                        <img
+                        <Image
                             src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2000&auto=format&fit=crop"
                             alt="Decorated Event"
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
                             className={styles.image}
+                            priority
                         />
                         <span className={styles.labelAfter}>After</span>
                     </div>

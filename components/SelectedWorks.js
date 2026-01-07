@@ -1,14 +1,19 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import gsap from 'gsap';
 import styles from './SelectedWorks.module.css';
 import { useTheme } from '@/context/ThemeContext';
 
 const SelectedWorks = ({ projects: initialProjects }) => {
     const { theme } = useTheme();
     const [hoveredProject, setHoveredProject] = useState(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    // GSAP Refs for performance (no re-renders on mousemove)
+    const xSet = useRef(null);
+    const ySet = useRef(null);
+    const imageContainerRef = useRef(null);
     const sectionRef = useRef(null);
 
     // Parse and format dynamic projects if available
@@ -66,8 +71,21 @@ const SelectedWorks = ({ projects: initialProjects }) => {
         ];
 
     useEffect(() => {
+        // Safe check for GSAP incase it's not loaded yet or ref is empty
+        if (!imageContainerRef.current) return;
+
+        // Create quickSetters for better performance than direct style manipulation
+        xSet.current = gsap.quickSetter(imageContainerRef.current, "x", "px");
+        ySet.current = gsap.quickSetter(imageContainerRef.current, "y", "px");
+
+        // Center the image on the cursor
+        gsap.set(imageContainerRef.current, { xPercent: -50, yPercent: -50 });
+
         const handleMouseMove = (e) => {
-            setMousePos({ x: e.clientX, y: e.clientY });
+            if (xSet.current && ySet.current) {
+                xSet.current(e.clientX);
+                ySet.current(e.clientY);
+            }
         };
 
         window.addEventListener('mousemove', handleMouseMove);
@@ -133,25 +151,32 @@ const SelectedWorks = ({ projects: initialProjects }) => {
 
             {/* Floating Image Reveal - Global to Section */}
             <div
+                ref={imageContainerRef}
                 className={styles.floatingImageContainer}
                 style={{
                     opacity: hoveredProject ? 1 : 0,
-                    transform: `translate(${mousePos.x}px, ${mousePos.y}px) translate(-50%, -50%)`, // Centered on cursor
-                    top: 0,
-                    left: 0,
-                    position: 'fixed'
+                    // Transform is handled by GSAP now, initial centering logic moved to CSS or handled by quickSetter logic if needed.
+                    // But we want it to follow cursor. The quickSetter sets X/Y.
+                    // We need to ensure we offset by -50% -50% in CSS or here. 
+                    // Since gsap sets transform matrix, mixing with CSS transform might be tricky.
+                    // simpler: just set top/left to 0 in CSS and use x/y for position.
+                    // We will add xPercent: -50, yPercent: -50 via GSAP context or initial set? 
+                    // Actually, let's keep it simple: styles handle appearance. GSAP handles position.
+                    // We'll let GSAP overwrite the transform.
                 }}
             >
                 {/* Preload images or switch src dynamically */}
                 {hoveredProject && (
-                    <img
+                    <Image
                         src={hoveredProject.image}
                         alt={hoveredProject.title}
+                        fill
+                        sizes="30vw"
                         className={styles.floatingImage}
+                        priority
                     />
                 )}
             </div>
-
         </section>
     );
 };

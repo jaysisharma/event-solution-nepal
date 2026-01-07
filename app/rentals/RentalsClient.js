@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import styles from './rentals.module.css';
+import { useTheme } from '@/context/ThemeContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -11,6 +12,7 @@ import Footer from '@/components/Footer';
 const INVENTORY = [];
 
 export default function RentalsClient({ initialItems }) {
+    const { theme } = useTheme();
     // Dynamically extract categories from items
     const dynamicCategories = ["ALL", ...Array.from(new Set(initialItems.map(item => item.category)))].sort();
 
@@ -65,7 +67,7 @@ Please provide availability and pricing details.`;
     };
 
     return (
-        <div className={styles.page}>
+        <div className={`${styles.page} ${theme === 'dark' ? styles.dark : ''}`}>
 
 
             {/* Hero Section / Banner */}

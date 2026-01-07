@@ -155,9 +155,9 @@
 /* Floating Image Reveal */
 .floatingImageContainer {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    /* transform: translate(-50%, -50%); Removed: let GSAP handle centering/positioning */
     width: 30vw;
     height: 40vh;
     pointer-events: none;

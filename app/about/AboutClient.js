@@ -7,10 +7,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Button from '@/components/Button';
 import { Target, Lightbulb, Shield, Heart } from 'lucide-react';
 import styles from './about.module.css';
+import { useTheme } from '@/context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const AboutClient = ({ initialTeam }) => {
+    const { theme } = useTheme();
     const containerRef = useRef(null);
 
     const team = initialTeam || [];
@@ -44,23 +46,75 @@ const AboutClient = ({ initialTeam }) => {
             }
         });
 
+
+
+        // Story Fade Up
+        gsap.fromTo(`.${styles.storyText}`,
+            { y: 30, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: `.${styles.storySection}`,
+                    start: "top 80%"
+                }
+            }
+        );
+
+        // Stats Stagger
+        gsap.fromTo(`.${styles.statItem}`,
+            { y: 40, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.15,
+                scrollTrigger: {
+                    trigger: `.${styles.statsSection}`,
+                    start: "top 85%"
+                }
+            }
+        );
+
+        // Values Stagger
+        gsap.fromTo(`.${styles.valueItem}`,
+            { y: 50, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: `.${styles.valuesSection}`,
+                    start: "top 80%"
+                }
+            }
+        );
+
+        // Team Fade In (Modified to target marquee items if visible/needed, or keep as is)
+        // Since Marquee scrolls, maybe skip individual fade for now or keep generic
         // Team Fade In
         gsap.utils.toArray(`.${styles.teamCard}`).forEach((card, i) => {
-            gsap.from(card, {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 90%"
+            gsap.fromTo(card,
+                { y: 50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: `.${styles.teamSection}`,
+                        start: "top 75%"
+                    }
                 }
-            });
+            );
         });
 
     }, { scope: containerRef });
 
     return (
-        <div className={styles.page} ref={containerRef}>
+        <div className={`${styles.page} ${theme === 'dark' ? styles.dark : ''}`} ref={containerRef}>
 
             {/* Hero */}
             <section className={styles.hero}>
@@ -80,8 +134,7 @@ const AboutClient = ({ initialTeam }) => {
                     <div className={styles.storyGrid}>
                         <div>
                             <p className={styles.storyText}>
-                                Founded in 2015, Event Solution Nepal began with a singular vision: to transform the ordinary into the extraordinary.
-                                <span className={styles.highlight}> What started as a small passionate team has grown into Nepal&apos;s premier event management firm.</span>
+                                Founded in 2014, Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.
                             </p>
                             <br />
                             <p className={styles.storyText} style={{ fontSize: '1.25rem', color: '#525252' }}>

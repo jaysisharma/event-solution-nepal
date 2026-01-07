@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, MapPin, Clock, Ticket } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 import { useTheme } from '@/context/ThemeContext';
@@ -11,17 +12,23 @@ const UpcomingEvents = ({ events }) => {
     const [selectedEvent, setSelectedEvent] = React.useState(null);
 
     const handleTicketClick = (e, eventLink) => {
-        // e.preventDefault(); // allow default if we had a link, but here we construct one
-        // ... (existing logic if needed, simplfied for brevity or reused)
         e.preventDefault();
         const androidPackage = "com.nepatronix.eventsolutions";
+        // Direct Play Store URL is more reliable than intent:// on modern Android browsers
         const playStoreUrl = `https://play.google.com/store/apps/details?id=${androidPackage}&hl=en`;
+
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         const isAndroid = /android/i.test(userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+
         if (isAndroid) {
-            const intentUrl = `intent://#Intent;package=${androidPackage};S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
-            window.location.href = intentUrl;
+            // Opening the HTTPS link will automatically trigger the Play Store app if installed
+            window.location.href = playStoreUrl;
+        } else if (isIOS) {
+            // Placeholder for iOS until app is available
+            alert("The iOS App is coming soon! Please stay tuned.");
         } else {
+            // Desktop/Other: Open Play Store in new tab
             window.open(playStoreUrl, '_blank');
         }
     };
@@ -55,9 +62,11 @@ const UpcomingEvents = ({ events }) => {
 
                             {/* Image */}
                             <div className={styles.imageWrapper}>
-                                <img
+                                <Image
                                     src={event.image}
                                     alt={event.title}
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     className={styles.eventImage}
                                 />
                                 <div className={styles.imageOverlay}></div>
@@ -169,10 +178,12 @@ const UpcomingEvents = ({ events }) => {
                     >
                         {/* Modal Header Image */}
                         <div style={{ position: 'relative', height: 'auto', width: '100%' }}>
-                            <img
+                            <Image
                                 src={selectedEvent.image}
                                 alt={selectedEvent.title}
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                fill
+                                sizes="(max-width: 768px) 100vw, 800px"
+                                style={{ objectFit: 'cover' }}
                             />
                             <button
                                 onClick={() => setSelectedEvent(null)}

@@ -550,3 +550,117 @@
     background: white;
     transform: scale(1.2);
 }
+
+/* --- Dark Mode Overrides --- */
+.dark.page {
+    background-color: #0f172a;
+    /* slate-900 */
+    color: #f8fafc;
+    /* slate-50 */
+}
+
+.dark .hero {
+    background-color: #1e293b;
+    /* slate-800 */
+}
+
+.dark .heroTitle {
+    color: #f8fafc;
+}
+
+.dark .heroSubtitle {
+    color: #cbd5e1;
+    /* slate-300 */
+}
+
+.dark .filterBtn {
+    border-color: #475569;
+    /* slate-600 */
+    color: #f8fafc;
+}
+
+.dark .filterBtn:hover {
+    border-color: #94a3b8;
+    /* slate-400 */
+}
+
+.dark .activeFilter {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.dark .card {
+    background: #1e293b;
+    /* slate-800 */
+}
+
+.dark .cardTitle {
+    color: #ffffff;
+    /* already white, but ensuring */
+}
+
+.dark .cardPrice {
+    color: #e2e8f0;
+    /* slate-200 */
+}
+
+.dark .cardArrow {
+    background: #475569;
+    /* slate-600 */
+    color: white;
+}
+
+/* Modal Dark Mode */
+.dark .modalContent {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+.dark .modalImageWrapper {
+    background: #0f172a;
+}
+
+.dark .closeBtn {
+    background: #334155;
+    color: white;
+}
+
+.dark .modalCategory {
+    color: var(--primary);
+    /* Keep accent */
+}
+
+.dark .modalTitle {
+    color: #f8fafc;
+}
+
+.dark .sizeLabel {
+    color: #cbd5e1;
+}
+
+.dark .sizeBtn {
+    background: #334155;
+    border-color: #475569;
+    color: #cbd5e1;
+}
+
+.dark .sizeBtn:hover {
+    border-color: #94a3b8;
+}
+
+.dark .sizeBtnActive {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.dark .sliderBtnLeft,
+.dark .sliderBtnRight {
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+}
+
+.dark .sliderDots {
+    background: rgba(255, 255, 255, 0.1);
+}

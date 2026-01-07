@@ -34,40 +34,56 @@ export default async function Home() {
   const companyDir = path.join(process.cwd(), 'public/company');
 
   // Fetch all data in parallel
-  const [
-    _updateStatus,
-    partners,
-    events,
-    testimonials,
-    heroSlides,
-    heroSettingsRaw,
-    timelineMemories,
-    projects,
-    partnerLogos
-  ] = await Promise.all([
-    updateEventStatuses(),
-    prisma.partner.findMany({ orderBy: { order: 'asc' } }),
-    prisma.event.findMany({
-      where: { isFeatured: true, status: 'UPCOMING' },
-      orderBy: { createdAt: 'desc' }
-    }),
-    prisma.testimonial.findMany({ orderBy: { createdAt: 'desc' } }),
-    prisma.heroSlide.findMany({ orderBy: { order: 'asc' } }),
-    prisma.heroSettings.findFirst(),
-    prisma.timelineMemory.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
-    prisma.workProject.findMany({ where: { isFeatured: true }, orderBy: { createdAt: 'desc' }, take: 6 }),
-    (async () => {
-      try {
-        const files = await fs.readdir(companyDir);
-        return files
-          .filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg'))
-          .map(file => `/company/${encodeURIComponent(file)}`);
-      } catch (error) {
-        console.error("Error reading company logos:", error);
-        return [];
-      }
-    })()
-  ]);
+  let partners = [], events = [], testimonials = [], heroSlides = [], heroSettingsRaw = null, timelineMemories = [], projects = [], partnerLogos = [];
+
+  try {
+    const [
+      _updateStatus,
+      fetchedPartners,
+      fetchedEvents,
+      fetchedTestimonials,
+      fetchedHeroSlides,
+      fetchedHeroSettings,
+      fetchedTimeline,
+      fetchedProjects,
+      fetchedLogos
+    ] = await Promise.all([
+      updateEventStatuses().catch(e => console.error("Update statuses failed:", e)),
+      prisma.partner.findMany({ orderBy: { order: 'asc' } }),
+      prisma.event.findMany({
+        where: { isFeatured: true, status: 'UPCOMING' },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.testimonial.findMany({ orderBy: { createdAt: 'desc' } }),
+      prisma.heroSlide.findMany({ orderBy: { order: 'asc' } }),
+      prisma.heroSettings.findFirst(),
+      prisma.timelineMemory.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
+      prisma.workProject.findMany({ where: { isFeatured: true }, orderBy: { createdAt: 'desc' }, take: 6 }),
+      (async () => {
+        try {
+          const files = await fs.readdir(companyDir);
+          return files
+            .filter(file => file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg'))
+            .map(file => `/company/${encodeURIComponent(file)}`);
+        } catch (error) {
+          console.error("Error reading company logos:", error);
+          return [];
+        }
+      })()
+    ]);
+
+    partners = fetchedPartners;
+    events = fetchedEvents;
+    testimonials = fetchedTestimonials;
+    heroSlides = fetchedHeroSlides;
+    heroSettingsRaw = fetchedHeroSettings;
+    timelineMemories = fetchedTimeline;
+    projects = fetchedProjects;
+    partnerLogos = fetchedLogos;
+
+  } catch (error) {
+    console.warn("Database unreachable during build (this is expected during Docker build):", error.message);
+  }
 
   // Set defaults if heroSettings is missing
   const heroSettings = heroSettingsRaw || {

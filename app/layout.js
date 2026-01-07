@@ -11,6 +11,7 @@ import JsonLd from "@/components/JsonLd";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 import BackToTop from "@/components/BackToTop";
+import WhatsAppFloat from "@/components/WhatsAppFloat";
 
 
 const poppins = Poppins({
@@ -79,7 +80,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
       <body className={`${poppins.variable} ${inter.variable} ${playfair.variable}`} suppressHydrationWarning={true}>
         <SettingsProvider>
           <ThemeProvider>
@@ -92,6 +93,7 @@ export default function RootLayout({ children }) {
               {children}
             </main>
             <BackToTop />
+            <WhatsAppFloat />
             <Footer />
             {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
             <JsonLd data={{

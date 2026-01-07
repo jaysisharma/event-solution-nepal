@@ -41,5 +41,18 @@
     color: #525252;
     font-size: 1.125rem;
     line-height: 1.7;
-    font-weight: 300;
+}
+
+.dark .title {
+    color: #f8fafc !important;
+    /* Ensure override */
+}
+
+.dark .description {
+    color: #cbd5e1;
+}
+
+.dark .highlight {
+    color: var(--primary);
+    /* Keep brand color or adjust */
 }

@@ -165,7 +165,7 @@
 
 @media (max-width: 768px) {
     .footer {
-        padding: 60px 0 30px;
+        padding: 60px 0 0px;
     }
 
     .container {
@@ -185,5 +185,9 @@
 
     .bottomLinks {
         justify-content: center;
+    }
+
+    .socials {
+        margin-top: 1.5rem;
     }
 }

@@ -115,6 +115,7 @@
         flex-direction: column;
         gap: 2rem;
         align-items: center;
+        padding-bottom: 2rem;
     }
 }
 
@@ -231,6 +232,12 @@
     }
 }
 
+@media (min-width: 1024px) {
+    .rightCard {
+        right: -16rem;
+    }
+}
+
 .leftCard:hover,
 .rightCard:hover {
     transform: rotate(0) scale(1.05);
@@ -240,14 +247,32 @@
 
 .rightCard {
     bottom: 15rem;
-    right: -3rem;
+    /* right: -3rem; */
     transform: rotate(6deg);
     z-index: 30;
 }
 
-@media (min-width: 1024px) {
-    .rightCard {
-        right: -12rem;
+@media (max-width: 1024px) {
+
+    .sideCard,
+    .leftCard,
+    .rightCard,
+    .centerCard {
+        width: 100%;
+        max-width: 100%;
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        transform: none;
+        margin: 0;
+    }
+
+    .leftCard:hover,
+    .rightCard:hover {
+        transform: none;
+        scale: 1;
     }
 }
 
@@ -318,6 +343,12 @@
     align-items: center;
     gap: 0.5rem;
     animation: float 3s ease-in-out infinite;
+}
+
+@media (max-width: 1024px) {
+    .statPill {
+        display: none;
+    }
 }
 
 @keyframes float {

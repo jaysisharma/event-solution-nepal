@@ -23,8 +23,8 @@ const AppPromo = () => {
         const isAndroid = /android/i.test(userAgent);
 
         if (isAndroid) {
-            const intentUrl = `intent://#Intent;package=${androidPackage};S.browser_fallback_url=${encodeURIComponent(playStoreUrl)};end`;
-            window.location.href = intentUrl;
+            // Direct HTTPS link handles the intent automatically on modern Android
+            window.location.href = playStoreUrl;
         } else {
             window.open(playStoreUrl, '_blank');
         }

@@ -2,6 +2,7 @@
 import React, { useRef } from 'react';
 import { Calendar, Layers, Sparkles, Briefcase, PartyPopper, Speaker, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -62,35 +63,39 @@ const Expertise = () => {
     ];
 
     useGSAP(() => {
-        const cards = cardsRef.current;
-        const totalCards = cards.length;
+        let mm = gsap.matchMedia();
 
-        cards.forEach((card, index) => {
-            if (!card) return;
+        mm.add("(min-width: 0px)", () => {
+            const cards = cardsRef.current;
+            const totalCards = cards.length;
 
-            ScrollTrigger.create({
-                trigger: card,
-                start: "top top+=120",
-                end: "bottom bottom",
-                endTrigger: container.current,
-                pin: true,
-                pinSpacing: false,
-                id: `service-card-${index}`,
-            });
+            cards.forEach((card, index) => {
+                if (!card) return;
 
-            if (index < totalCards - 1) {
-                const nextCard = cards[index + 1];
-                gsap.to(card, {
-                    scale: 0.95,
-                    filter: "brightness(0.5)", // Darken previous cards more for this design
-                    scrollTrigger: {
-                        trigger: nextCard,
-                        start: "top top+=200",
-                        end: "top top+=120",
-                        scrub: true,
-                    }
+                ScrollTrigger.create({
+                    trigger: card,
+                    start: "top top+=120",
+                    end: "bottom bottom",
+                    endTrigger: container.current,
+                    pin: true,
+                    pinSpacing: false,
+                    id: `service-card-${index}`,
                 });
-            }
+
+                if (index < totalCards - 1) {
+                    const nextCard = cards[index + 1];
+                    gsap.to(card, {
+                        scale: 0.95,
+                        filter: "brightness(0.5)", // Darken previous cards more for this design
+                        scrollTrigger: {
+                            trigger: nextCard,
+                            start: "top top+=200",
+                            end: "top top+=120",
+                            scrub: true,
+                        }
+                    });
+                }
+            });
         });
 
     }, { scope: container });
@@ -119,10 +124,13 @@ const Expertise = () => {
                             ref={el => cardsRef.current[index] = el}
                         >
                             {/* Background Image */}
-                            <img
+                            <Image
                                 src={service.image}
                                 alt={service.title}
+                                fill
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 className={styles.bgImage}
+                                style={{ objectFit: 'cover' }}
                             />
 
                             {/* Overlay Gradient */}

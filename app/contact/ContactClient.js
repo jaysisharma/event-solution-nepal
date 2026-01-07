@@ -4,9 +4,11 @@ import styles from './contact.module.css';
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok, FaViber, FaWhatsapp } from 'react-icons/fa';
 import { useSettings } from '@/context/SettingsContext';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function ContactClient() {
     const settings = useSettings();
+    const { theme } = useTheme();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -27,7 +29,7 @@ export default function ContactClient() {
     };
 
     return (
-        <main className={styles.main}>
+        <main className={`${styles.main} ${theme === 'dark' ? styles.dark : ''}`}>
             {/* Header */}
             <section className={styles.headerSection}>
                 <span className={styles.subheading}>Get in Touch</span>
@@ -43,6 +45,21 @@ export default function ContactClient() {
             <div className={styles.container}>
                 {/* Left: Contact Info */}
                 <div className={styles.infoColumn}>
+                    {/* Address Block */}
+                    <div className={styles.infoBlock}>
+                        <span className={styles.infoLabel}>Visit Us</span>
+                        <a
+                            href="https://maps.app.goo.gl/eventsolutionnepal"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.infoValue}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
+                        >
+                            <MapPin size={22} color="#EB1F26" />
+                            Jwagal, Lalitpur, Nepal
+                        </a>
+                    </div>
+
                     <div className={styles.infoBlock}>
                         <span className={styles.infoLabel}>Chat with us</span>
                         <div className={styles.whatsappBlock} style={{ marginTop: '0.5rem' }}>
@@ -64,6 +81,41 @@ export default function ContactClient() {
                                 +{settings?.whatsappNumber || '9779851336342'}
                             </a>
                         </div>
+                    </div>
+
+
+                    <div className={styles.infoBlock}>
+                        <span className={styles.infoLabel}>Call Us</span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <a
+                                href="tel:+977015260535"
+                                className={styles.infoValue}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
+                            >
+                                <Phone size={22} color="#EB1F26" />
+                                +977-01-5260535
+                            </a>
+                            <a
+                                href="tel:+977015260103"
+                                className={styles.infoValue}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
+                            >
+                                <Phone size={22} color="#EB1F26" />
+                                +977-01-5260103
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className={styles.infoBlock}>
+                        <span className={styles.infoLabel}>Email Us</span>
+                        <a
+                            href="mailto:info@eventsolutionnepal.com.np"
+                            className={styles.infoValue}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', fontSize: '1.25rem' }}
+                        >
+                            <Mail size={22} color="#EB1F26" />
+                            info@eventsolutionnepal.com.np
+                        </a>
                     </div>
 
                     <div className={styles.infoBlock}>
@@ -124,6 +176,19 @@ export default function ContactClient() {
                     </form>
                 </div>
             </div>
-        </main>
+
+            {/* Google Map Section */}
+            <section className={styles.mapSection}>
+                <iframe
+                    src="https://maps.google.com/maps?q=Event%20Solution%20Nepal%2C%20Jwagal%2C%20Lalitpur&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: theme === 'dark' ? 'invert(90%) hue-rotate(180deg)' : 'none' }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    title="Event Solution Nepal Location"
+                ></iframe>
+            </section>
+        </main >
     );
 }

@@ -4,6 +4,7 @@ import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { FaGooglePlay } from 'react-icons/fa';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 import styles from './Navbar.module.css';
@@ -25,9 +26,12 @@ const Navbar = () => {
                     {/* Logo */}
                     <div className={styles.logoWrapper}>
                         <Link href="/" className={styles.logoLink}>
-                            <img
+                            <Image
                                 src="/logo/es_logo.png"
                                 alt="Event Solution"
+                                width={180}
+                                height={60}
+                                priority
                                 style={{ height: '60px', width: 'auto' }}
                             />
                         </Link>
