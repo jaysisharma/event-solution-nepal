@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { addTestimonial, updateTestimonial } from './actions';
-import { Loader2, Upload, MessageSquare, User, Briefcase } from 'lucide-react';
+import { Loader2, Upload, MessageSquare, User, Briefcase, Star } from 'lucide-react';
 import { useToast } from '@/components/admin/ToastContext';
 import styles from '../admin.module.css';
 
@@ -120,7 +120,7 @@ export default function TestimonialForm({ testimonial = null }) {
             </div>
 
             {/* Quote */}
-            <div className={styles.formGroup} style={{ marginBottom: '2rem' }}>
+            <div className={styles.formGroup} style={{ marginBottom: '1.5rem' }}>
                 <label className={styles.label}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <MessageSquare size={16} />
@@ -137,13 +137,40 @@ export default function TestimonialForm({ testimonial = null }) {
                 />
             </div>
 
+            {/* Rating */}
+            <div className={styles.formGroup} style={{ marginBottom: '2rem' }}>
+                <label className={styles.label}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Star size={16} />
+                        Star Rating
+                    </div>
+                </label>
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <select
+                        name="rating"
+                        defaultValue={testimonial?.rating || 5}
+                        className={styles.input}
+                        style={{ width: '120px' }}
+                    >
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Very Good</option>
+                        <option value="3">3 - Good</option>
+                        <option value="2">2 - Fair</option>
+                        <option value="1">1 - Poor</option>
+                    </select>
+                    <div style={{ display: 'flex', color: 'var(--primary)' }}>
+                        <Star size={16} fill="currentColor" />
+                    </div>
+                </div>
+            </div>
+
             {/* Submit Button */}
             <div>
                 <button
                     type="submit"
                     disabled={loading}
-                    className={styles.btnPrimary}
-                    style={{ width: '100%' }}
+
+                    style={{ width: '40%', backgroundColor: 'var(--primary)', color: 'var(--white)', padding: '0.5rem 1rem', borderRadius: 'var(--border-radius)', border: 'none', cursor: 'pointer', fontSize: '0.875rem', borderRadius: '5px' }}
                 >
                     {loading ? (
                         <>

@@ -169,24 +169,7 @@ export default async function AdminDashboard() {
                 </div>
             </div>
 
-            {/* 2. Main Dashboard Content (Charts + Health) */}
-            <div className={styles.dashboardGrid}>
-                {/* Large Chart Widget */}
-                <div className={styles.contentCard}>
-                    <div className={styles.cardHeader}>
-                        <h3 className={styles.cardTitle}>Live Server Performance</h3>
-                    </div>
-                    {/* The Chart Component */}
-                    <div className={styles.serverChartContainer}>
-                        <DashboardCharts />
-                    </div>
-                </div>
-
-                {/* Side Health Widget */}
-                <ServerHealthSummary />
-            </div>
-
-            {/* 3. Quick Actions */}
+            {/* 2. Quick Actions */}
             <h3 className={styles.cardTitle} style={{ marginBottom: '1rem' }}>Quick Management</h3>
             <div className={styles.quickActionsGrid}>
                 <Link href="/admin/events/new" className={styles.actionButton}>
@@ -221,6 +204,25 @@ export default async function AdminDashboard() {
                     </div>
                 </Link>
             </div>
+
+            {/* 3. Main Dashboard Content (Charts + Health) */}
+            <div className={styles.dashboardGrid}>
+                {/* Large Chart Widget */}
+                <div className={styles.contentCard}>
+                    <div className={styles.cardHeader}>
+                        <h3 className={styles.cardTitle}>Live Server Performance</h3>
+                    </div>
+                    {/* The Chart Component */}
+                    <div className={styles.serverChartContainer}>
+                        <DashboardCharts />
+                    </div>
+                </div>
+
+                {/* Side Health Widget */}
+                <ServerHealthSummary />
+            </div>
+
+
         </div>
     );
 }

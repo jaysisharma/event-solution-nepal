@@ -17,10 +17,11 @@ import {
     MessageSquare,
     Clock,
     Settings,
-    Activity
+    Activity,
+    X
 } from 'lucide-react';
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ isOpen, onClose }) {
     const pathname = usePathname();
 
     const navItems = [
@@ -34,12 +35,22 @@ export default function AdminSidebar() {
         { name: 'Services', path: '/admin/services', icon: Wrench },
         { name: 'Testimonials', path: '/admin/testimonials', icon: MessageSquare },
         { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
+        { name: 'Team', path: '/admin/team', icon: Users },
         { name: 'System Status', path: '/admin/system', icon: Activity },
         { name: 'Settings', path: '/admin/settings', icon: Settings },
     ];
 
     return (
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+            {/* Close Button for Mobile */}
+            <button
+                className={styles.sidebarCloseButton}
+                onClick={onClose}
+                aria-label="Close menu"
+            >
+                <X size={24} />
+            </button>
+
             {/* Brand */}
             <div className={styles.brand}>
                 <Link href="/admin">
@@ -66,19 +77,14 @@ export default function AdminSidebar() {
                                 key={item.path}
                                 href={item.path}
                                 className={`${styles.navLink} ${isActive ? styles.active : ''}`}
+                                onClick={onClose}
                             >
                                 <Icon size={20} />
                                 {item.name}
                             </Link>
                         );
                     })}
-                    <Link
-                        href="/admin/team"
-                        className={`${styles.navLink} ${pathname === '/admin/team' ? styles.active : ''}`}
-                    >
-                        <Users size={20} />
-                        Team
-                    </Link>
+
                 </div>
             </nav>
 

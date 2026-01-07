@@ -26,7 +26,7 @@ export default async function PartnersPage() {
                         <label className={styles.label} style={{ display: 'block', marginBottom: '0.5rem' }}>Logo (Required)</label>
                         <input name="image" type="file" accept="image/*" required className={styles.input} style={{ paddingTop: '0.5rem' }} />
                     </div>
-                    <button type="submit" className={styles.btnPrimary} style={{ marginBottom: '2px' }}>
+                    <button type="submit" className={styles.btnAddNew} style={{ marginBottom: '2px' }}>
                         <Plus size={18} /> Add Partner
                     </button>
                 </form>

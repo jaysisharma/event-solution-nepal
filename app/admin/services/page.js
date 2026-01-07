@@ -213,7 +213,7 @@ export default function AdminServices() {
                     </div>
 
                     <div className={styles.fullWidth}>
-                        <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ display: 'flex', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
+                        <button type="submit" disabled={isSubmitting} className={styles.btnAddNew} style={{ display: 'flex', gap: '8px', opacity: isSubmitting ? 0.7 : 1 }}>
                             {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (editingId ? <Save size={18} /> : <Plus size={18} />)}
                             {isSubmitting ? 'Saving...' : (editingId ? 'Update Service' : 'Add Service')}
                         </button>

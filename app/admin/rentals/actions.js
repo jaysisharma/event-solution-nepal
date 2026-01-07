@@ -140,6 +140,17 @@ export async function deleteRental(formData) {
         return { success: true, message: "Rental item deleted successfully" };
     } catch (error) {
         console.error("Error deleting rental:", error);
-        return { success: false, message: "Failed to delete rental item" };
+    }
+}
+
+export async function getRentals() {
+    try {
+        const rentals = await prisma.rentalItem.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+        return { success: true, data: rentals };
+    } catch (error) {
+        console.error("Error fetching rentals:", error);
+        return { success: false, error: "Failed to fetch rentals" };
     }
 }

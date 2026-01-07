@@ -1,4 +1,3 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
@@ -58,12 +57,14 @@ export default function TimelineAdminPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
     const [deleteId, setDeleteId] = useState(null);
-    const [editingId, setEditingId] = useState(null); // New: Track which item is being edited
+    const [editingId, setEditingId] = useState(null);
+
+    // Form Toggle
+    const [showForm, setShowForm] = useState(false);
 
     // Form State
     const [alt, setAlt] = useState('');
     const [year, setYear] = useState('');
-    const [size, setSize] = useState('normal');
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState('');
 
@@ -77,41 +78,55 @@ export default function TimelineAdminPage() {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line
         fetchMemories();
     }, [fetchMemories]);
+
+    // --- Handlers ---
+    const handleAddClick = () => {
+        setEditingId(null);
+        setAlt('');
+        setYear('');
+        setImage(null);
+        setPreview('');
+        setShowForm(true);
+    };
+
+    const handleEditClick = (memory) => {
+        setEditingId(memory.id);
+        setAlt(memory.alt);
+        setYear(memory.year);
+        setPreview(memory.image);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelForm = () => {
+        setShowForm(false);
+        setEditingId(null);
+        setAlt('');
+        setYear('');
+        setImage(null);
+        setPreview('');
+    };
 
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        // 1. Validation Logic
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
+        setPreview(URL.createObjectURL(file));
 
-        img.onload = async () => {
-            // 2. Compression (Validation Removed for Flexibility)
-            /* 
-               User requested "whatever size", so strict ratio warnings are removed.
-               Frontend will handle auto-height.
-            */
-
-            // 2. Compression
-            try {
-                const compressedFile = await compressImage(file);
-                setImage(compressedFile);
-                setPreview(URL.createObjectURL(compressedFile));
-            } catch (error) {
-                console.error("Compression Error:", error);
-                setSnackbar({ message: 'Compression failed', type: 'error' });
-            }
-        };
+        try {
+            const compressedFile = await compressImage(file);
+            setImage(compressedFile);
+        } catch (error) {
+            console.error("Compression Error:", error);
+            setSnackbar({ message: 'Compression failed', type: 'error' });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validation: Image is required only for CREATE, optional for UPDATE
         if (!editingId && !image) {
             setSnackbar({ message: 'Please select an image', type: 'error' });
             return;
@@ -133,37 +148,12 @@ export default function TimelineAdminPage() {
 
         if (res.success) {
             fetchMemories();
-            // Reset Form
-            setAlt('');
-            setYear('');
-            setSize('normal');
-            setImage(null);
-            setPreview('');
-            setEditingId(null); // Exit edit mode
+            handleCancelForm();
             setSnackbar({ message: editingId ? 'Memory updated!' : 'Memory added!', type: 'success' });
         } else {
             setSnackbar({ message: 'Operation failed', type: 'error' });
         }
         setIsSubmitting(false);
-    };
-
-    const handleEdit = (memory) => {
-        setEditingId(memory.id);
-        setAlt(memory.alt);
-        setYear(memory.year);
-        // If API returned size, set it, though we force 'normal' on save
-        // Set preview to existing image so user sees what they are editing
-        setPreview(memory.image);
-        // Scroll to top to see form
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleCancelEdit = () => {
-        setEditingId(null);
-        setAlt('');
-        setYear('');
-        setImage(null);
-        setPreview('');
     };
 
     const handleConfirmDelete = async () => {
@@ -179,86 +169,119 @@ export default function TimelineAdminPage() {
     };
 
     return (
-        <div>
+        <div style={{ paddingBottom: '4rem' }}>
             {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
-            <ConfirmDialog isOpen={!!deleteId} title="Delete Memory" message="Are you sure? This cannot be undone." onConfirm={handleConfirmDelete} onCancel={() => setDeleteId(null)} />
+            <ConfirmDialog isOpen={!!deleteId} title="Delete Memory" message="Are you sure?" onConfirm={handleConfirmDelete} onCancel={() => setDeleteId(null)} />
 
+            {/* Header */}
             <div className={styles.pageHeader}>
                 <div>
-                    <h1 className={styles.pageTitle}>Manage Timeline</h1>
-                    <p className={styles.pageSubtitle}>Add photos to your timeline journey</p>
+                    <h1 className={styles.pageTitle}>Timeline</h1>
                 </div>
+                {!showForm && (
+                    <button onClick={handleAddClick} className={styles.btnAddNew}>
+                        <Plus size={18} /> Add New
+                    </button>
+                )}
             </div>
 
-            <div className={styles.formGrid} style={{ gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                <div className={styles.card}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h2 className={styles.cardTitle}>{editingId ? 'Edit Memory' : 'Add New Memory'}</h2>
-                        {editingId && (
-                            <button onClick={handleCancelEdit} style={{ fontSize: '0.875rem', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                                Cancel Edit
-                            </button>
-                        )}
+            {/* Inline Form */}
+            {showForm && (
+                <div style={{
+                    marginBottom: '2rem',
+                    backgroundColor: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    padding: '1.5rem',
+                    animation: 'slideDown 0.2s ease-out'
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{editingId ? 'Edit Memory' : 'Add New Memory'}</h3>
+                        <button onClick={handleCancelForm} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                            <X size={20} />
+                        </button>
                     </div>
-                    <form onSubmit={handleSubmit} className={styles.formGroup} style={{ gap: '1.5rem' }}>
 
-                        {/* Size Selection Removed - Auto handled */}
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                        {/* Image Input */}
+                        <div style={{ width: '120px', height: '120px', flexShrink: 0, position: 'relative', border: '1px dashed #cbd5e1', borderRadius: '8px', overflow: 'hidden', background: '#f8fafc' }}>
+                            <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 10 }} />
+                            {preview ? (
+                                <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
+                                    <ImageIcon size={24} />
+                                </div>
+                            )}
+                        </div>
 
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Upload Photo</label>
-                            <div style={{ border: '2px dashed var(--border)', borderRadius: '0.5rem', padding: '1rem', textAlign: 'center', position: 'relative', cursor: 'pointer', background: 'var(--bg-secondary, #f8fafc)' }}>
-                                <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} required />
-                                {preview ? (
-                                    <img src={preview} alt="Preview" style={{ width: '100%', height: '200px', objectFit: 'contain', borderRadius: '4px' }} />
-                                ) : (
-                                    <div style={{ color: 'var(--text-muted)' }}>
-                                        <ImageIcon size={32} style={{ margin: '0 auto 0.5rem', display: 'block' }} />
-                                        <span style={{ fontSize: '0.85rem' }}>Click to upload</span>
-                                    </div>
-                                )}
+                        {/* Fields */}
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: '250px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Caption</label>
+                                    <input type="text" value={alt} onChange={(e) => setAlt(e.target.value)} required style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Event Title" />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Year</label>
+                                    <input type="text" value={year} onChange={(e) => setYear(e.target.value)} required style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="2024" />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+                                    {isSubmitting ? 'Saving...' : 'Save Memory'}
+                                </button>
+                                <button type="button" onClick={handleCancelForm} style={{ padding: '0.5rem 1rem', border: '1px solid #e2e8f0', borderRadius: '6px', background: 'white', cursor: 'pointer' }}>
+                                    Cancel
+                                </button>
                             </div>
                         </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Caption / Title</label>
-                            <input type="text" value={alt} onChange={(e) => setAlt(e.target.value)} className={styles.input} placeholder="e.g. First Big Event" required />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Year</label>
-                            <input type="text" value={year} onChange={(e) => setYear(e.target.value)} className={styles.input} placeholder="e.g. 2023" required />
-                        </div>
-
-                        <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ width: '100%', justifyContent: 'center' }}>
-                            {isSubmitting ? 'Saving...' : <>{editingId ? <Save size={18} /> : <Plus size={18} />} {editingId ? 'Update Memory' : 'Add Memory'}</>}
-                        </button>
                     </form>
                 </div>
+            )}
 
-                <div className={styles.card}>
-                    <h2 className={styles.cardTitle}>Current Timeline</h2>
-                    {isLoading ? <p>Loading...</p> : memories.length === 0 ? <div className={styles.emptyState}>No memories found.</div> : (
-                        <div className={styles.listStack}>
-                            {memories.map((m) => (
-                                <div key={m.id} className={styles.listItem}>
-                                    <div className={styles.itemContent}>
-                                        <div className={styles.itemImageWrapper} style={{ width: '60px', height: '60px', borderRadius: '4px', overflow: 'hidden' }}>
+            {/* Minimal Table */}
+            <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th style={{ width: '80px' }}>Image</th>
+                            <th>Caption</th>
+                            <th>Year</th>
+                            <th style={{ textAlign: 'right' }}>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? (
+                            <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>Loading...</td></tr>
+                        ) : memories.length === 0 ? (
+                            <tr><td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>No data found.</td></tr>
+                        ) : (
+                            memories.map((m) => (
+                                <tr key={m.id}>
+                                    <td>
+                                        <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', background: '#f1f5f9' }}>
                                             <img src={m.image} alt={m.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
-                                        <div className={styles.itemInfo}>
-                                            <p style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>{m.year} • {m.size}</p>
-                                            <h4>{m.alt}</h4>
+                                    </td>
+                                    <td style={{ fontWeight: 500 }}>{m.alt}</td>
+                                    <td style={{ color: '#64748b' }}>{m.year}</td>
+                                    <td style={{ textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                                            <button onClick={() => handleEditClick(m)} style={{ padding: '0.4rem', border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }} title="Edit">
+                                                <Pencil size={16} />
+                                            </button>
+                                            <button onClick={() => setDeleteId(m.id)} style={{ padding: '0.4rem', border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }} title="Delete">
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                        <button onClick={() => handleEdit(m)} className={`${styles.btnIcon}`} title="Edit"><Pencil size={18} /></button>
-                                        <button onClick={() => setDeleteId(m.id)} className={`${styles.btnIcon} delete`} title="Delete"><Trash2 size={18} /></button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

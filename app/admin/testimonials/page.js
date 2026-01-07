@@ -1,7 +1,6 @@
-
 import prisma from '@/lib/db';
 import Link from 'next/link';
-import { Plus, MessageSquare } from 'lucide-react';
+import { Plus, MessageSquare, Edit2, Star, User } from 'lucide-react';
 import DeleteTestimonialButton from './DeleteTestimonialButton';
 import styles from '../admin.module.css';
 
@@ -26,65 +25,65 @@ export default async function AdminTestimonialsPage() {
                 </Link>
             </div>
 
-            <div className={styles.tableContainer}>
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Role</th>
-                            <th>Quote Preview</th>
-                            <th style={{ textAlign: 'right' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {testimonials.map((testimonial) => (
-                            <tr key={testimonial.id}>
-                                <td>
-                                    <div className={styles.itemContent}>
-                                        {testimonial.avatar ? (
-                                            <img src={testimonial.avatar} alt={testimonial.name} className={styles.itemImage} style={{ width: 40, height: 40, borderRadius: '50%' }} />
-                                        ) : (
-                                            <div className={styles.itemImage} style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                                {testimonial.name.charAt(0)}
-                                            </div>
-                                        )}
-                                        <span className={styles.itemInfo} style={{ fontWeight: 500 }}>{testimonial.name}</span>
+            {testimonials.length === 0 ? (
+                <div className={styles.card} style={{ padding: '4rem 2rem' }}>
+                    <div className={styles.emptyState}>
+                        <MessageSquare size={64} style={{ margin: '0 auto 1.5rem', opacity: 0.2 }} />
+                        <h3>No testimonials found</h3>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+                            Start collecting client success stories to showcase your amazing work!
+                        </p>
+                        <Link href="/admin/testimonials/new" className={styles.btnAddNew}>
+                            <Plus size={18} /> Add Your First Testimonial
+                        </Link>
+                    </div>
+                </div>
+            ) : (
+                <div className={styles.gridList}>
+                    {testimonials.map((testimonial) => (
+                        <div key={testimonial.id} className={styles.testimonialCard}>
+                            <div className={styles.testimonialCardHeader}>
+                                {testimonial.avatar ? (
+                                    <img
+                                        src={testimonial.avatar}
+                                        alt={testimonial.name}
+                                        className={styles.testimonialAvatar}
+                                    />
+                                ) : (
+                                    <div className={styles.testimonialAvatar}>
+                                        <User size={20} />
                                     </div>
-                                </td>
-                                <td>
-                                    {testimonial.role}
-                                </td>
-                                <td>
-                                    <div style={{ maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-muted)' }}>
-                                        {testimonial.quote}
-                                    </div>
-                                </td>
-                                <td style={{ textAlign: 'right' }}>
-                                    <div className={styles.itemActions} style={{ justifyContent: 'flex-end' }}>
-                                        <Link
-                                            href={`/admin/testimonials/${testimonial.id}`}
-                                            className={`${styles.btnIcon} ${styles.btnSecondary}`}
-                                        >
-                                            Edit
-                                        </Link>
-                                        <DeleteTestimonialButton id={testimonial.id} />
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {testimonials.length === 0 && (
-                            <tr>
-                                <td colSpan="4">
-                                    <div className={styles.emptyState}>
-                                        <MessageSquare size={48} style={{ margin: '0 auto 1rem', color: 'var(--border)' }} />
-                                        <p>No testimonials found. Add your first client review!</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                )}
+                                <div className={styles.testimonialMeta}>
+                                    <h4 className={styles.testimonialName}>{testimonial.name}</h4>
+                                    <p className={styles.testimonialRole}>{testimonial.role}</p>
+                                </div>
+                            </div>
+
+                            <div className={styles.testimonialRating}>
+                                {[...Array(testimonial.rating || 5)].map((_, i) => (
+                                    <Star key={i} size={14} fill="currentColor" />
+                                ))}
+                            </div>
+
+                            <blockquote className={styles.testimonialQuote}>
+                                "{testimonial.quote}"
+                            </blockquote>
+
+                            <div className={styles.testimonialActions}>
+                                <Link
+                                    href={`/admin/testimonials/${testimonial.id}`}
+                                    className={`${styles.btnIcon} ${styles.btnSecondary}`}
+                                    title="Edit Testimonial"
+                                >
+                                    <Edit2 size={16} />
+                                </Link>
+                                <DeleteTestimonialButton id={testimonial.id} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

@@ -2,8 +2,7 @@
 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { saveFile } from "@/lib/upload";
 
 const prisma = new PrismaClient();
 
@@ -11,9 +10,12 @@ export async function getTimelineMemories() {
     try {
         const memories = await prisma.timelineMemory.findMany({
             orderBy: {
-                createdAt: 'desc',
+                year: 'desc', // Order by Year logically, or createdAt if preferred
             },
         });
+        // Secondary sort by createdAt if years are same? 
+        // Or just let Prisma handle it. For now keeping simple.
+        // Actually user might want manual order, but let's stick to year desc for timeline nature.
         return { success: true, data: memories };
     } catch (error) {
         console.error("Failed to fetch timeline memories:", error);
@@ -31,19 +33,9 @@ export async function createTimelineMemory(formData) {
     }
 
     try {
-        // Handle Image Upload
-        const bytes = await image.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        // Ensure directory exists
-        const uploadDir = join(process.cwd(), 'public', 'uploads', 'timeline');
-        await mkdir(uploadDir, { recursive: true });
-
-        const filename = `${Date.now()}-${image.name.replace(/\s+/g, '-')}`;
-        const filepath = join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-
-        const imagePath = `/uploads/timeline/${filename}`;
+        // Upload to Cloudinary (or local fallback)
+        const imagePath = await saveFile(image, "timeline");
+        if (!imagePath) throw new Error("Image upload failed");
 
         const newMemory = await prisma.timelineMemory.create({
             data: {
@@ -55,6 +47,7 @@ export async function createTimelineMemory(formData) {
         });
         revalidatePath("/");
         revalidatePath("/admin/timeline");
+        revalidatePath("/about"); // Assuming it might be shown there or user expects global update
         return { success: true, data: newMemory };
     } catch (error) {
         console.error("Failed to create timeline memory:", error);
@@ -73,18 +66,8 @@ export async function updateTimelineMemory(id, formData) {
 
         // Only process image if a new one is uploaded
         if (image && image.size > 0) {
-            const bytes = await image.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            // Ensure directory exists
-            const uploadDir = join(process.cwd(), 'public', 'uploads', 'timeline');
-            await mkdir(uploadDir, { recursive: true });
-
-            const filename = `${Date.now()}-${image.name.replace(/\s+/g, '-')}`;
-            const filepath = join(uploadDir, filename);
-            await writeFile(filepath, buffer);
-
-            imageData.image = `/uploads/timeline/${filename}`;
+            const imagePath = await saveFile(image, "timeline");
+            if (imagePath) imageData.image = imagePath;
         }
 
         const updatedMemory = await prisma.timelineMemory.update({
@@ -99,6 +82,7 @@ export async function updateTimelineMemory(id, formData) {
 
         revalidatePath("/");
         revalidatePath("/admin/timeline");
+        revalidatePath("/about");
         return { success: true, data: updatedMemory };
     } catch (error) {
         console.error("Failed to update timeline memory:", error);

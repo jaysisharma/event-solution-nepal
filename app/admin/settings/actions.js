@@ -65,3 +65,21 @@ export async function deleteAdminUser(id) {
         return { error: 'Failed to delete admin' };
     }
 }
+
+export async function updateAdminPassword(id, newPassword) {
+    if (!newPassword || newPassword.length < 4) {
+        return { error: 'Password must be at least 4 characters' };
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await prisma.adminUser.update({
+            where: { id },
+            data: { password: hashedPassword }
+        });
+        return { success: 'Password updated successfully' };
+    } catch (error) {
+        console.error('Failed to update password:', error);
+        return { error: 'Failed to update password' };
+    }
+}

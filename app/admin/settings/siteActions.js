@@ -11,7 +11,8 @@ export async function getSiteSettings() {
             settings = await prisma.siteSettings.create({
                 data: {
                     whatsappNumber: '9779851336342', // Default from requirements
-                    websiteUrl: 'http://x8408o8kkw8ococggsssg0o0.72.61.248.195.sslip.io/',
+                    contactEmail: 'info@eventsolutionnepal.com.np',
+                    contactAddress: 'Jwagal, Lalitpur, Nepal',
                 }
             });
         }
@@ -32,14 +33,16 @@ export async function updateSiteSettings(data) {
                 where: { id: first.id },
                 data: {
                     whatsappNumber: data.whatsappNumber,
-                    websiteUrl: data.websiteUrl
+                    contactEmail: data.contactEmail,
+                    contactAddress: data.contactAddress
                 }
             });
         } else {
             settings = await prisma.siteSettings.create({
                 data: {
                     whatsappNumber: data.whatsappNumber,
-                    websiteUrl: data.websiteUrl
+                    contactEmail: data.contactEmail,
+                    contactAddress: data.contactAddress
                 }
             });
         }

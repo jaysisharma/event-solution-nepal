@@ -10,7 +10,7 @@ import { useToast } from '@/components/admin/ToastContext';
 // Default categories to bootstrap
 const DEFAULT_CATEGORIES = ["HANGERS", "STALLS", "PANDALS", "STAGE", "LED", "AUDIO", "FURNITURE"];
 
-export default function RentalForm({ initialData, action, mode = 'create', existingCategories = [] }) {
+export default function RentalForm({ initialData, action, mode = 'create', existingCategories = [], isInline = false }) {
     const { showToast } = useToast();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +35,21 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
         return [{ size: '', image: null, file: null, preview: null }];
     };
 
-    const [variants, setVariants] = useState(parseInitialVariants());
+    const [variants, setVariants] = useState(parseInitialVariants);
+
+    // Update variants if initialData changes (for inline switching)
+    useEffect(() => {
+        if (initialData) {
+            setVariants(parseInitialVariants());
+        } else if (mode === 'create') {
+            // Reset if switching to create mode
+            // Actually, this might cause loop if not careful. 
+            // Best to let parent key change trigger remount or use a strict check.
+            // For now, assume parent handles key reset or we don't strictly need this if component remounts.
+        }
+    }, [initialData, mode]);
+
+
     // We treat 'image' property in variant as the SERVER path (string).
     // For new uploads, we store 'file' (File object) and 'preview' (blob url).
 
@@ -140,8 +154,14 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             const result = await action(formData);
             if (result && result.success) {
                 showToast(result.message, "success");
-                router.push('/admin/rentals');
-                router.refresh();
+
+                if (isInline) {
+                    router.refresh();
+                    // Inline mode assumes parent handles state refresh via callback or router
+                } else {
+                    router.push('/admin/rentals');
+                    router.refresh();
+                }
             } else {
                 showToast(result?.message || "Something went wrong", "error");
             }
@@ -161,14 +181,16 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
 
     return (
         <div>
-            <div className={styles.pageHeader}>
-                <div>
-                    <Link href="/admin/rentals" className={styles.btnSecondary} style={{ marginBottom: '1rem', display: 'inline-flex' }}>
-                        <ArrowLeft size={16} /> Back to Rentals
-                    </Link>
-                    <h1 className={styles.pageTitle}>{mode === 'create' ? 'Add Rental Item' : 'Edit Rental Item'}</h1>
+            {!isInline && (
+                <div className={styles.pageHeader}>
+                    <div>
+                        <Link href="/admin/rentals" className={styles.btnSecondary} style={{ marginBottom: '1rem', display: 'inline-flex' }}>
+                            <ArrowLeft size={16} /> Back to Rentals
+                        </Link>
+                        <h1 className={styles.pageTitle}>{mode === 'create' ? 'Add Rental Item' : 'Edit Rental Item'}</h1>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className={styles.card}>
                 <form onSubmit={handleSubmit} className={styles.formGrid}>

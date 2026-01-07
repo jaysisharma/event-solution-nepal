@@ -9,7 +9,7 @@ export async function addTestimonial(formData) {
     const role = formData.get('role');
     const quote = formData.get('quote');
     const imageFile = formData.get('image');
-    // Rating is optional, default to 5 in schema, but we can pass it if we add a field later
+    const rating = parseInt(formData.get('rating') || '5');
 
     let imagePath = null;
     if (imageFile && imageFile.size > 0) {
@@ -23,6 +23,7 @@ export async function addTestimonial(formData) {
                 role,
                 quote,
                 avatar: imagePath,
+                rating,
             },
         });
         revalidatePath('/admin/testimonials');
@@ -54,11 +55,13 @@ export async function updateTestimonial(formData) {
     const role = formData.get('role');
     const quote = formData.get('quote');
     const imageFile = formData.get('image');
+    const rating = parseInt(formData.get('rating') || '5');
 
     const data = {
         name,
         role,
         quote,
+        rating,
     };
 
     if (imageFile && imageFile.size > 0) {

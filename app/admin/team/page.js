@@ -30,7 +30,7 @@ export default function AdminTeam() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
-    const [editingId, setEditingId] = useState(null);
+    const [showForm, setShowForm] = useState(false);
 
     // Form inputs
     const [name, setName] = useState('');
@@ -50,6 +50,17 @@ export default function AdminTeam() {
         setIsLoading(false);
     };
 
+    const handleAddNew = () => {
+        setEditingId(null);
+        setName('');
+        setRole('');
+        setFile(null);
+        setPreview(null);
+        setExistingImage(null);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleEdit = (member) => {
         setEditingId(member.id);
         setName(member.name);
@@ -57,10 +68,12 @@ export default function AdminTeam() {
         setExistingImage(member.image);
         setFile(null);
         setPreview(null);
+        setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleCancelEdit = () => {
+        setShowForm(false);
         setEditingId(null);
         setName('');
         setRole('');
@@ -138,71 +151,78 @@ export default function AdminTeam() {
                     <h1 className={styles.pageTitle}>Team</h1>
                     <p className={styles.pageSubtitle}>Manage your team members</p>
                 </div>
+                {!showForm && (
+                    <button onClick={handleAddNew} className={styles.btnAddNew}>
+                        <Plus size={18} /> Add New Member
+                    </button>
+                )}
             </div>
 
-            <div className={styles.card}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h3 className={styles.cardTitle}>{editingId ? 'Edit Member' : 'Add Team Member'}</h3>
-                    {editingId && (
-                        <button onClick={handleCancelEdit} style={{ fontSize: '0.85rem', color: '#64748b', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                            Cancel Edit
-                        </button>
-                    )}
-                </div>
-
-                <form onSubmit={handleSubmit} className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Name</label>
-                        <input
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            type="text"
-                            required
-                            placeholder="Full Name"
-                            className={styles.input}
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Role</label>
-                        <input
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            type="text"
-                            required
-                            placeholder="e.g. CEO, Event Manager"
-                            className={styles.input}
-                        />
-                    </div>
-                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                        <label className={styles.label}>Profile Image</label>
-                        <input
-                            onChange={handleFileChange}
-                            type="file"
-                            accept="image/*"
-                            className={styles.input}
-                            style={{ paddingTop: '0.7rem' }}
-                        />
-                        <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            {preview ? (
-                                <img src={preview} alt="New Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #3b82f6' }} />
-                            ) : (
-                                editingId && existingImage && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Current:</span>
-                                        <img src={existingImage} alt="Current" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%', border: '1px solid #e2e8f0' }} />
-                                    </div>
-                                )
-                            )}
+            {showForm && (
+                <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
+                    <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
+                            <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>{editingId ? 'Edit Member' : 'Add Team Member'}</h3>
+                            <button onClick={handleCancelEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                                <X size={20} />
+                            </button>
                         </div>
+
+                        <form onSubmit={handleSubmit} className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Name</label>
+                                <input
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    type="text"
+                                    required
+                                    placeholder="Full Name"
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Role</label>
+                                <input
+                                    value={role}
+                                    onChange={(e) => setRole(e.target.value)}
+                                    type="text"
+                                    required
+                                    placeholder="e.g. CEO, Event Manager"
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                                <label className={styles.label}>Profile Image</label>
+                                <input
+                                    onChange={handleFileChange}
+                                    type="file"
+                                    accept="image/*"
+                                    className={styles.input}
+                                    style={{ paddingTop: '0.7rem' }}
+                                />
+                                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    {preview ? (
+                                        <img src={preview} alt="New Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #3b82f6' }} />
+                                    ) : (
+                                        editingId && existingImage && (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Current:</span>
+                                                <img src={existingImage} alt="Current" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%', border: '1px solid #e2e8f0' }} />
+                                            </div>
+                                        )
+                                    )}
+                                </div>
+                            </div>
+                            <div className={styles.fullWidth}>
+                                <button type="submit" disabled={isSubmitting} className={styles.btnAddNew} style={{ opacity: isSubmitting ? 0.7 : 1, display: 'flex', gap: '8px' }}>
+                                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (editingId ? <Save size={18} /> : <Plus size={18} />)}
+                                    {isSubmitting ? 'Saving...' : (editingId ? 'Update Member' : 'Add Member')}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div className={styles.fullWidth}>
-                        <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ opacity: isSubmitting ? 0.7 : 1, display: 'flex', gap: '8px' }}>
-                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (editingId ? <Save size={18} /> : <Plus size={18} />)}
-                            {isSubmitting ? 'Saving...' : (editingId ? 'Update Member' : 'Add Member')}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            )}
 
             <div className={styles.tableContainer}>
                 {isLoading ? (

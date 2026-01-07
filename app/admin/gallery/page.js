@@ -38,6 +38,8 @@ export default function AdminGallery() {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
 
+    const [showForm, setShowForm] = useState(false);
+
     useEffect(() => {
         fetchGallery();
     }, []);
@@ -47,6 +49,21 @@ export default function AdminGallery() {
         const res = await getGalleryItems();
         if (res.success) setGalleryItems(res.data);
         setIsLoading(false);
+    };
+
+    const handleAddNew = () => {
+        // Reset form
+        setTitle('');
+        setCategory('Wedding');
+        setSize('normal');
+        setFile(null);
+        setPreview(null);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancel = () => {
+        setShowForm(false);
     };
 
     const handleFileChange = async (e) => {
@@ -86,6 +103,7 @@ export default function AdminGallery() {
                 setSize('normal');
                 setFile(null);
                 setPreview(null);
+                setShowForm(false); // Close form
                 fetchGallery();
             } else {
                 setSnackbar({ message: res.error || 'Failed to add image', type: 'error' });
@@ -118,65 +136,79 @@ export default function AdminGallery() {
                     <h1 className={styles.pageTitle}>Gallery</h1>
                     <p className={styles.pageSubtitle}>Manage your image gallery</p>
                 </div>
+                {!showForm && (
+                    <button onClick={handleAddNew} className={styles.btnAddNew}>
+                        <Plus size={18} /> Add New Image
+                    </button>
+                )}
             </div>
 
-            <div className={styles.card}>
-                <h3 className={styles.cardTitle}>Add Gallery Item</h3>
-                <form onSubmit={handleSubmit} className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Title</label>
-                        <input
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            type="text"
-                            required
-                            placeholder="Image Title"
-                            className={styles.input}
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Category</label>
-                        <select value={category} onChange={(e) => setCategory(e.target.value)} className={styles.select}>
-                            <option value="Wedding">Wedding</option>
-                            <option value="Corporate">Corporate</option>
-                            <option value="Concert">Concert</option>
-                            <option value="Party">Party</option>
-                            <option value="Decoration">Decoration</option>
-                        </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Size</label>
-                        <select value={size} onChange={(e) => setSize(e.target.value)} className={styles.select}>
-                            <option value="normal">Normal</option>
-                            <option value="wide">Wide</option>
-                            <option value="tall">Tall</option>
-                            <option value="large">Large</option>
-                        </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Gallery Image</label>
-                        <input
-                            onChange={handleFileChange}
-                            type="file"
-                            accept="image/*"
-                            className={styles.input}
-                            style={{ paddingTop: '0.7rem' }}
-                            required
-                        />
-                        {preview && (
-                            <div style={{ marginTop: '0.5rem' }}>
-                                <img src={preview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #3b82f6' }} />
+            {showForm && (
+                <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
+                    <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
+                            <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>Add Gallery Item</h3>
+                            <button onClick={handleCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleSubmit} className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Title</label>
+                                <input
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    type="text"
+                                    required
+                                    placeholder="Image Title"
+                                    className={styles.input}
+                                />
                             </div>
-                        )}
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Category</label>
+                                <select value={category} onChange={(e) => setCategory(e.target.value)} className={styles.select}>
+                                    <option value="Wedding">Wedding</option>
+                                    <option value="Corporate">Corporate</option>
+                                    <option value="Concert">Concert</option>
+                                    <option value="Party">Party</option>
+                                    <option value="Decoration">Decoration</option>
+                                </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Size</label>
+                                <select value={size} onChange={(e) => setSize(e.target.value)} className={styles.select}>
+                                    <option value="normal">Normal</option>
+                                    <option value="wide">Wide</option>
+                                    <option value="tall">Tall</option>
+                                    <option value="large">Large</option>
+                                </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Gallery Image</label>
+                                <input
+                                    onChange={handleFileChange}
+                                    type="file"
+                                    accept="image/*"
+                                    className={styles.input}
+                                    style={{ paddingTop: '0.7rem' }}
+                                    required
+                                />
+                                {preview && (
+                                    <div style={{ marginTop: '0.5rem' }}>
+                                        <img src={preview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #3b82f6' }} />
+                                    </div>
+                                )}
+                            </div>
+                            <div className={styles.fullWidth}>
+                                <button type="submit" disabled={isSubmitting} className={styles.btnAddNew} style={{ opacity: isSubmitting ? 0.7 : 1, display: 'flex', gap: '8px' }}>
+                                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
+                                    {isSubmitting ? 'Uploading...' : 'Add Item'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div className={styles.fullWidth}>
-                        <button type="submit" disabled={isSubmitting} className={styles.btnPrimary} style={{ opacity: isSubmitting ? 0.7 : 1, display: 'flex', gap: '8px' }}>
-                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                            {isSubmitting ? 'Uploading...' : 'Add Item'}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+            )}
 
             <div className={styles.tableContainer}>
                 {isLoading ? (

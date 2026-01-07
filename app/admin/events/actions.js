@@ -152,6 +152,17 @@ export async function toggleFeatured(id, currentStatus) {
         return { success: true, message: "Featured status updated" };
     } catch (error) {
         console.error("Error toggling featured:", error);
-        return { success: false, message: "Failed to update featured status" };
+    }
+}
+
+export async function getEvents() {
+    try {
+        const events = await prisma.event.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+        return { success: true, data: events };
+    } catch (error) {
+        console.error("Error fetching events:", error);
+        return { success: false, error: "Failed to fetch events" };
     }
 }

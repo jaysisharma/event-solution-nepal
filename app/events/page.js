@@ -1,26 +1,33 @@
 import prisma from "@/lib/db";
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import UpcomingEvents from "@/components/UpcomingEvents";
+import EventsListClient from "@/components/EventsListClient";
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-    title: "Upcoming Events | Event Solution Nepal",
-    description: "Stay updated with our latest and upcoming events. From concerts to corporate gatherings, see what Event Solution Nepal is planning next.",
+    title: "Events | Event Solution Nepal",
+    description: "Stay updated with our latest and upcoming events. Browse through our upcoming productions and past event highlights.",
 };
 
 export default async function EventsPage() {
     const events = await prisma.event.findMany({
         where: {
-            status: 'UPCOMING'
+            OR: [
+                { status: 'UPCOMING' },
+                { status: 'COMPLETED' }
+            ]
         },
-        orderBy: { date: 'asc' },
+        orderBy: [
+            { year: 'desc' },
+            { month: 'desc' },
+            { date: 'desc' }
+        ],
     });
 
     return (
         <div style={{ paddingTop: '2rem' }}>
-            <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem 2rem' }}>
+            <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1rem 1rem' }}>
                 <Link href="/" style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -32,10 +39,16 @@ export default async function EventsPage() {
                 }}>
                     <ArrowLeft size={20} /> Back to Home
                 </Link>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--foreground)', marginBottom: '0.5rem' }}>
+                    All <span style={{ color: 'var(--secondary)' }}>Events</span>
+                </h1>
+                <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '2rem', maxWidth: '40rem' }}>
+                    Explore our journey through spectacular events, from upcoming productions to celebrated memories.
+                </p>
             </div>
 
-            {/* Reuse the component but pass ALL events */}
-            <UpcomingEvents events={events} showViewAll={false} />
+            <EventsListClient events={events} />
+
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{

@@ -165,7 +165,8 @@ model TimelineMemory {
 model SiteSettings {
   id             Int      @id @default(autoincrement())
   whatsappNumber String   @default("9779851336342")
-  websiteUrl     String   @default("http://x8408o8kkw8ococggsssg0o0.72.61.248.195.sslip.io/")
+  contactEmail   String   @default("info@eventsolutionnepal.com.np")
+  contactAddress String   @default("Jwagal, Lalitpur, Nepal")
   updatedAt      DateTime @updatedAt
 }
 

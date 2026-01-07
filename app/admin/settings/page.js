@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings } from 'lucide-react';
-import { getAdminUsers, createAdminUser, deleteAdminUser } from './actions';
+import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff } from 'lucide-react';
+import { getAdminUsers, createAdminUser, deleteAdminUser, updateAdminPassword } from './actions';
 import { getSiteSettings, updateSiteSettings } from './siteActions';
 import styles from '../admin.module.css';
 
@@ -19,10 +18,75 @@ const Snackbar = ({ message, type, onClose }) => {
         <div style={{
             position: 'fixed', bottom: '24px', right: '24px', backgroundColor: bgColor, color: 'white',
             padding: '12px 24px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1000, animation: 'slideIn 0.3s ease-out'
+            display: 'flex', alignItems: 'center', gap: '12px', zIndex: 1100, animation: 'slideIn 0.3s ease-out'
         }}>
             {type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
             <span>{message}</span>
+        </div>
+    );
+};
+
+const PasswordModal = ({ admin, onClose, onSuccess }) => {
+    const [newPassword, setNewPassword] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+    const [showPass, setShowPass] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        const res = await updateAdminPassword(admin.id, newPassword);
+        setIsSaving(false);
+        if (res.success) {
+            onSuccess(res.success);
+            onClose();
+        } else {
+            alert(res.error);
+        }
+    };
+
+    return (
+        <div style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)'
+        }}>
+            <div style={{
+                background: 'white', padding: '2rem', borderRadius: '12px',
+                width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+            }}>
+                <h3 style={{ margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Lock size={20} color="var(--primary)" /> Change Password for <b>{admin.username}</b>
+                </h3>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>New Password</label>
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                type={showPass ? 'text' : 'password'}
+                                className={styles.input}
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                required
+                                placeholder="Enter new password"
+                                autoFocus
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPass(!showPass)}
+                                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}
+                            >
+                                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <button type="button" onClick={onClose} className={styles.btnSecondary} style={{ flex: 1 }}>Cancel</button>
+                        <button type="submit" disabled={isSaving} className={styles.btnAddNew} style={{ flex: 1 }}>
+                            {isSaving ? 'Updating...' : 'Update Password'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };
@@ -31,12 +95,14 @@ export default function SettingsPage() {
     const [admins, setAdmins] = useState([]);
     const [siteSettings, setSiteSettings] = useState({
         whatsappNumber: '',
-        websiteUrl: '',
+        contactEmail: '',
+        contactAddress: '',
     });
     const [isLoading, setIsLoading] = useState(true);
     const [snackbar, setSnackbar] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSavingSettings, setIsSavingSettings] = useState(false);
+    const [selectedAdmin, setSelectedAdmin] = useState(null); // For password change modal
 
     async function loadData() {
         setIsLoading(true);
@@ -49,7 +115,8 @@ export default function SettingsPage() {
         if (settingsRes.success && settingsRes.data) {
             setSiteSettings({
                 whatsappNumber: settingsRes.data.whatsappNumber || '',
-                websiteUrl: settingsRes.data.websiteUrl || '',
+                contactEmail: settingsRes.data.contactEmail || '',
+                contactAddress: settingsRes.data.contactAddress || '',
             });
         }
         setIsLoading(false);
@@ -135,15 +202,28 @@ export default function SettingsPage() {
                         </div>
 
                         <div className={styles.formGroup}>
-                            <label className={styles.label}>Website URL <span style={{ fontSize: '0.8rem', color: '#666' }}>(e.g. http://example.com)</span></label>
+                            <label className={styles.label}>Contact Email <span style={{ fontSize: '0.8rem', color: '#666' }}>(e.g. info@example.com)</span></label>
                             <input
-                                name="websiteUrl"
-                                value={siteSettings.websiteUrl}
+                                name="contactEmail"
+                                value={siteSettings.contactEmail}
+                                onChange={handleSettingsChange}
+                                type="email"
+                                className={styles.input}
+                                required
+                                placeholder="Enter system email"
+                            />
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Office Address <span style={{ fontSize: '0.8rem', color: '#666' }}>(e.g. Jwagal, Lalitpur)</span></label>
+                            <input
+                                name="contactAddress"
+                                value={siteSettings.contactAddress}
                                 onChange={handleSettingsChange}
                                 type="text"
                                 className={styles.input}
                                 required
-                                placeholder="Enter website URL"
+                                placeholder="Enter office address"
                             />
                         </div>
 
@@ -194,14 +274,24 @@ export default function SettingsPage() {
                                             Created: {new Date(admin.createdAt).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={() => handleDelete(admin.id)}
-                                        className={styles.btnIcon}
-                                        style={{ color: '#ef4444', background: '#fee2e2' }}
-                                        title="Delete Admin"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                            onClick={() => setSelectedAdmin(admin)}
+                                            className={styles.btnIcon}
+                                            style={{ color: '#6366f1', background: '#eef2ff' }}
+                                            title="Change Password"
+                                        >
+                                            <Lock size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(admin.id)}
+                                            className={styles.btnIcon}
+                                            style={{ color: '#ef4444', background: '#fee2e2' }}
+                                            title="Delete Admin"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                             {admins.length === 0 && <p>No admins found.</p>}
@@ -209,6 +299,14 @@ export default function SettingsPage() {
                     )}
                 </div>
             </div>
+
+            {selectedAdmin && (
+                <PasswordModal
+                    admin={selectedAdmin}
+                    onClose={() => setSelectedAdmin(null)}
+                    onSuccess={(msg) => setSnackbar({ message: msg, type: 'success' })}
+                />
+            )}
         </div>
     );
 }
