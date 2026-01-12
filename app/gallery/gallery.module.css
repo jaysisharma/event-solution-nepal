@@ -2,6 +2,12 @@
 .main {
     background-color: #ffffff;
     min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+.main.dark {
+    background-color: #0f172a;
+    /* Slate 900 or var(--background) */
 }
 
 .header {
@@ -10,6 +16,11 @@
     background: #ffffff;
     max-width: 90rem;
     margin: 0 auto;
+    transition: background-color 0.3s ease;
+}
+
+.dark .header {
+    background-color: transparent;
 }
 
 .subheading {

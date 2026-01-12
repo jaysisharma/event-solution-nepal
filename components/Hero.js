@@ -63,7 +63,8 @@ const Hero = ({ partners, partnerLogos, slides }) => {
         ratingIcon: s.ratingIcon || "Star",
         capacity: s.capacity || "Handling events up to 10k guests.",
         capacityLabel: s.capacityLabel || "Capacity",
-        capacityIcon: s.capacityIcon || "Users"
+        capacityIcon: s.capacityIcon || "Users",
+        showStats: s.showStats
     })) : defaultImages;
 
     const activeSlide = heroContent[currentIndex];
@@ -163,27 +164,31 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                             </div>
 
                             {/* Floating Elements */}
-                            <div className={styles.floatingCard1}>
-                                <div className={styles.starIconWrapper}>
-                                    {(() => {
-                                        const IconComponent = ICON_MAP[activeSlide.ratingIcon] || Star;
-                                        return <IconComponent className={styles.highlightBlue} size={20} fill="#064EA1" />;
-                                    })()}
-                                </div>
-                                <p className={styles.ratingNumber}>{activeSlide.rating}</p>
-                                <p className={styles.ratingLabel}>{activeSlide.ratingLabel}</p>
-                            </div>
+                            {activeSlide.showStats !== false && (
+                                <>
+                                    <div className={styles.floatingCard1}>
+                                        <div className={styles.starIconWrapper}>
+                                            {(() => {
+                                                const IconComponent = ICON_MAP[activeSlide.ratingIcon] || Star;
+                                                return <IconComponent className={styles.highlightBlue} size={20} fill="#064EA1" />;
+                                            })()}
+                                        </div>
+                                        <p className={styles.ratingNumber}>{activeSlide.rating}</p>
+                                        <p className={styles.ratingLabel}>{activeSlide.ratingLabel}</p>
+                                    </div>
 
-                            <div className={styles.floatingCard2}>
-                                <div className={styles.cardHeader}>
-                                    {(() => {
-                                        const IconComponent = ICON_MAP[activeSlide.capacityIcon] || Users;
-                                        return <IconComponent size={20} color="white" style={{ opacity: 0.8 }} />;
-                                    })()}
-                                    <span className={styles.cardLabel}>{activeSlide.capacityLabel}</span>
-                                </div>
-                                <p className={styles.cardText}>{activeSlide.capacity}</p>
-                            </div>
+                                    <div className={styles.floatingCard2}>
+                                        <div className={styles.cardHeader}>
+                                            {(() => {
+                                                const IconComponent = ICON_MAP[activeSlide.capacityIcon] || Users;
+                                                return <IconComponent size={20} color="white" style={{ opacity: 0.8 }} />;
+                                            })()}
+                                            <span className={styles.cardLabel}>{activeSlide.capacityLabel}</span>
+                                        </div>
+                                        <p className={styles.cardText}>{activeSlide.capacity}</p>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         {/* Decorative Circle Behind */}
                         <div className={styles.decorativeCircle1}></div>

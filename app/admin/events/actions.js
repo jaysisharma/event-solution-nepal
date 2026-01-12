@@ -34,17 +34,39 @@ export async function addEvent(formData) {
     const location = formData.get('location');
     const time = formData.get('time');
     const imageFile = formData.get('image');
+    const ticketTemplateFile = formData.get('ticketTemplate');
+    const ticketConfig = formData.get('ticketConfig');
     // const status = formData.get('status') || 'UPCOMING'; // Removed manual status
 
     // Resolve logic
     const { organizer, managedBy } = resolveEntityFields(formData);
 
-    const description = formData.get('description'); // Catch description here too if needed for validation on server side, though client side handles it.
+    const description = formData.get('description');
 
-    if (!title || !date || !month) return { success: false, message: "Missing required fields" };
+    if (!title || !date || !month || !year || !location || !time) {
+        return { success: false, message: "Missing required fields (Title, Date, Month, Year, Location, Time)" };
+    }
+
+    // Validation
+    const currentYear = new Date().getFullYear();
+    if (isNaN(year) || year < 2000 || year > currentYear + 10) {
+        return { success: false, message: "Invalid year. Please enter a valid 4-digit year." };
+    }
+
+    if (isNaN(date) || date < 1 || date > 31) {
+        return { success: false, message: "Invalid date. Please enter a day between 1 and 31." };
+    }
+
+    // Check if month is valid (simple check)
+    const validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+    if (!validMonths.includes(month.toUpperCase())) {
+        return { success: false, message: "Invalid month. Please use standard full name or 3-letter abbreviation." };
+    }
 
     try {
         const imagePath = await saveFile(imageFile, 'events');
+        const ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
 
         await prisma.event.create({
             data: {
@@ -55,6 +77,8 @@ export async function addEvent(formData) {
                 location: location || '',
                 time: time || '',
                 image: imagePath || '',
+                ticketTemplate: ticketTemplatePath || '',
+                ticketConfig: ticketConfig || null,
                 status: isEventCompleted(month, date, year) ? 'COMPLETED' : 'UPCOMING',
                 organizer,
                 managedBy,
@@ -101,6 +125,8 @@ export async function updateEvent(formData) {
     // const status = formData.get('status'); // Auto-calculated
     const description = formData.get('description');
     const imageFile = formData.get('image');
+    const ticketTemplateFile = formData.get('ticketTemplate');
+    const ticketConfig = formData.get('ticketConfig');
 
     // Resolve logic
     const { organizer, managedBy } = resolveEntityFields(formData);
@@ -125,6 +151,15 @@ export async function updateEvent(formData) {
         const imagePath = await saveFile(imageFile, 'events');
         if (imagePath) {
             data.image = imagePath;
+        }
+
+        const ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
+        if (ticketTemplatePath) {
+            data.ticketTemplate = ticketTemplatePath;
+        }
+
+        if (ticketConfig) {
+            data.ticketConfig = ticketConfig;
         }
 
         await prisma.event.update({

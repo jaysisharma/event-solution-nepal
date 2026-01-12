@@ -1,0 +1,251 @@
+/* Modern Minimal Design - Polished */
+
+.container {
+    padding: 24px 40px;
+    /* max-width: 1400px; */
+    /* margin: 0 auto; */
+    margin-left: -250px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+/* Table Container */
+.card {
+    /* No background/shadow on the container itself for ultra-minimal, 
+       OR a very subtle border to frame the data. */
+    background: transparent;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+    /* Negative margin to pull the table flush if needed, but better to control padding */
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    /* Let columns adapt */
+}
+
+.th {
+    padding: 12px 0 12px 0;
+    /* Remove horizontal padding to align with header */
+    padding-right: 24px;
+    /* Space between columns */
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    /* Light gray for headers */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Add padding back to the first column if we want indentation, 
+   but for "aligned" look, keep it 0 or match container */
+.th:first-child,
+.td:first-child {
+    padding-left: 0;
+}
+
+.th:last-child,
+.td:last-child {
+    padding-right: 0;
+}
+
+.tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s ease;
+}
+
+.tr:last-child {
+    border-bottom: none;
+}
+
+.tr:hover {
+    background-color: transparent;
+    /* Clean minimalist often has no hover or very subtle */
+}
+
+.tr:hover .td {
+    color: #111827;
+}
+
+.td {
+    padding: 24px 0;
+    /* More vertical space */
+    padding-right: 24px;
+    font-size: 0.9rem;
+    color: #4b5563;
+    vertical-align: top;
+}
+
+/* Data Typography */
+.date {
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.time {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.detailItem {
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.detailLabel {
+    /* Optional icon style */
+}
+
+/* Specific Columns */
+.eventName {
+    font-weight: 500;
+    color: #111827;
+    font-size: 0.9rem;
+}
+
+.organization {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Links */
+.contactLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    transition: color 0.2s;
+}
+
+.contactLink:hover {
+    color: #2563eb;
+}
+
+.websiteLink {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.websiteLink:hover {
+    color: #2563eb;
+}
+
+/* Badges - clean pill shape */
+.statusBadge {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+}
+
+.statusPending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.statusContacted {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.statusResolved {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.actionBtn {
+    border: 1px solid transparent;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: transparent;
+    color: #9ca3af;
+    transition: all 0.2s;
+}
+
+.actionBtn:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+.btnContacted:hover {
+    color: #2563eb;
+    background-color: #eff6ff;
+    border-color: #dbeafe;
+}
+
+.btnResolved:hover {
+    color: #059669;
+    background-color: #ecfdf5;
+    border-color: #d1fae5;
+}
+
+.btnDelete:hover {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-color: #fee2e2;
+}
+
+.loading,
+.empty {
+    padding: 80px 0;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.95rem;
+}

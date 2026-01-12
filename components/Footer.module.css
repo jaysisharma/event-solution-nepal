@@ -190,4 +190,25 @@
     .socials {
         margin-top: 1.5rem;
     }
+
+    .footerWrapper {
+        position: relative !important;
+        z-index: auto !important;
+        bottom: auto !important;
+    }
+
+    .spacer {
+        display: none !important;
+    }
+}
+
+.footerWrapper {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 0;
+}
+
+.spacer {
+    display: block;
 }

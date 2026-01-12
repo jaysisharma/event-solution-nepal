@@ -316,7 +316,7 @@
 .floatingCard1 {
     position: absolute;
     top: 5%;
-    right: -1rem;
+    right: -3rem;
     width: 10rem;
     height: 10rem;
     background-color: var(--bg-card);
@@ -359,7 +359,7 @@
 .floatingCard2 {
     position: absolute;
     bottom: 5%;
-    right: -0.5rem;
+    right: -2rem;
     width: 12rem;
     background-color: #EB1F26;
     color: white;
@@ -559,7 +559,7 @@
     }
 
     .floatingCard2 {
-        right: 2rem;
+        right: -1rem;
     }
 }
 

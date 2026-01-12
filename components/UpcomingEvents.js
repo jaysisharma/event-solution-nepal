@@ -5,33 +5,40 @@ import Image from 'next/image';
 import { ArrowRight, MapPin, Clock, Ticket } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 import { useTheme } from '@/context/ThemeContext';
+import TicketRequestForm from './TicketRequestForm';
 
 const UpcomingEvents = ({ events }) => {
     const { theme } = useTheme();
     const eventList = events || [];
     const [selectedEvent, setSelectedEvent] = React.useState(null);
+    const [showTicketForm, setShowTicketForm] = React.useState(false);
 
-    const handleTicketClick = (e, eventLink) => {
-        e.preventDefault();
-        const androidPackage = "com.nepatronix.eventsolutions";
-        // Direct Play Store URL is more reliable than intent:// on modern Android browsers
-        const playStoreUrl = `https://play.google.com/store/apps/details?id=${androidPackage}&hl=en`;
-
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        const isAndroid = /android/i.test(userAgent);
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-
-        if (isAndroid) {
-            // Opening the HTTPS link will automatically trigger the Play Store app if installed
-            window.location.href = playStoreUrl;
-        } else if (isIOS) {
-            // Placeholder for iOS until app is available
-            alert("The iOS App is coming soon! Please stay tuned.");
-        } else {
-            // Desktop/Other: Open Play Store in new tab
-            window.open(playStoreUrl, '_blank');
-        }
+    // Reset ticket form state when modal closes
+    const closeEventModal = () => {
+        setSelectedEvent(null);
+        setShowTicketForm(false);
     };
+
+    const handleTicketClick = (e, event) => {
+        if (e) e.preventDefault();
+        if (event) setSelectedEvent(event);
+        setShowTicketForm(true);
+    };
+
+    // Lock body scroll and pause Lenis when modal is open
+    React.useEffect(() => {
+        if (selectedEvent) {
+            document.body.style.overflow = 'hidden';
+            if (window.lenis) window.lenis.stop();
+        } else {
+            document.body.style.overflow = 'unset';
+            if (window.lenis) window.lenis.start();
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+            if (window.lenis) window.lenis.start();
+        };
+    }, [selectedEvent]);
 
     return (
         <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
@@ -115,15 +122,14 @@ const UpcomingEvents = ({ events }) => {
                                 >
                                     View Details
                                 </button>
-                                <a
-                                    href="#"
-                                    onClick={(e) => handleTicketClick(e)}
+                                <button
+                                    onClick={(e) => handleTicketClick(e, event)}
                                     className={styles.ticketBtn}
-                                    style={{ flex: 1 }}
+                                    style={{ flex: 1, cursor: 'pointer', border: 'none' }}
                                 >
                                     <Ticket size={18} />
                                     Tickets
-                                </a>
+                                </button>
                             </div>
 
                         </div>
@@ -161,7 +167,7 @@ const UpcomingEvents = ({ events }) => {
                         justifyContent: 'center',
                         padding: '1rem'
                     }}
-                    onClick={() => setSelectedEvent(null)}
+                    onClick={closeEventModal}
                 >
                     <div
                         style={{
@@ -172,121 +178,126 @@ const UpcomingEvents = ({ events }) => {
                             maxHeight: '90vh',
                             overflowY: 'auto',
                             position: 'relative',
-                            animation: 'scaleIn 0.3s ease'
+                            animation: 'scaleIn 0.3s ease',
+                            WebkitOverflowScrolling: 'touch',
+                            overscrollBehavior: 'contain'
                         }}
                         onClick={e => e.stopPropagation()}
                     >
-                        {/* Modal Header Image */}
-                        <div style={{ position: 'relative', height: 'auto', width: '100%' }}>
-                            <Image
-                                src={selectedEvent.image}
-                                alt={selectedEvent.title}
-                                fill
-                                sizes="(max-width: 768px) 100vw, 800px"
-                                style={{ objectFit: 'cover' }}
-                            />
-                            <button
-                                onClick={() => setSelectedEvent(null)}
-                                style={{
-                                    position: 'absolute',
-                                    top: '10px',
-                                    right: '10px',
-                                    background: 'white',
-                                    border: 'none',
-                                    borderRadius: '50%',
-                                    width: '32px',
-                                    height: '32px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
+                        <button
+                            onClick={closeEventModal}
+                            style={{
+                                position: 'absolute',
+                                top: '16px',
+                                right: '16px',
+                                background: '#f1f5f9',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '32px',
+                                height: '32px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                zIndex: 10,
+                                color: '#64748b',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            ✕
+                        </button>
 
                         {/* Modal Content */}
-                        <div style={{ padding: '24px' }}>
-                            <span style={{
-                                display: 'inline-block',
-                                padding: '4px 12px',
-                                backgroundColor: '#EFF6FF',
-                                color: '#2563EB',
-                                borderRadius: '100px',
-                                fontSize: '0.8rem',
-                                fontWeight: 600,
-                                marginBottom: '12px'
-                            }}>
-                                {selectedEvent.month} {selectedEvent.date}
-                            </span>
-
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', color: '#1E293B' }}>
-                                {selectedEvent.title}
-                            </h2>
-
-                            <div style={{ display: 'flex', gap: '16px', color: '#64748B', fontSize: '0.9rem', marginBottom: '24px' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <MapPin size={16} /> {selectedEvent.location}
+                        {showTicketForm ? (
+                            <TicketRequestForm
+                                eventName={selectedEvent.title}
+                                onCancel={() => setShowTicketForm(false)}
+                                onSubmit={(data) => {
+                                    console.log("Ticket Request Submitted:", data);
+                                    // Here you would typically send the data to an API
+                                }}
+                            />
+                        ) : (
+                            <div style={{ padding: '24px' }}>
+                                <span style={{
+                                    display: 'inline-block',
+                                    padding: '4px 12px',
+                                    backgroundColor: '#EFF6FF',
+                                    color: '#2563EB',
+                                    borderRadius: '100px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    marginBottom: '12px'
+                                }}>
+                                    {selectedEvent.month} {selectedEvent.date}
                                 </span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                    <Clock size={16} /> {selectedEvent.time}
-                                </span>
-                            </div>
 
-                            <div style={{
-                                backgroundColor: '#F8FAFC',
-                                padding: '16px',
-                                borderRadius: '8px',
-                                marginBottom: '24px',
-                                border: '1px solid #E2E8F0'
-                            }}>
-                                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                    Organization Details
-                                </h4>
-                                {selectedEvent.organizer && (
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem' }}>
-                                        <span style={{ color: '#64748B' }}>Organized By:</span>
-                                        <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.organizer}</span>
-                                    </div>
-                                )}
-                                {selectedEvent.managedBy && (
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
-                                        <span style={{ color: '#64748B' }}>Managed By:</span>
-                                        <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.managedBy}</span>
-                                    </div>
-                                )}
-                            </div>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', color: '#1E293B' }}>
+                                    {selectedEvent.title}
+                                </h2>
 
-                            <div>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '12px', color: '#1E293B' }}>About Event</h4>
-                                <p style={{ lineHeight: '1.6', color: '#475569', whiteSpace: 'pre-wrap' }}>
-                                    {selectedEvent.description || "No description available for this event."}
-                                </p>
-                            </div>
+                                <div style={{ display: 'flex', gap: '16px', color: '#64748B', fontSize: '0.9rem', marginBottom: '24px' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <MapPin size={16} /> {selectedEvent.location}
+                                    </span>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                        <Clock size={16} /> {selectedEvent.time}
+                                    </span>
+                                </div>
 
-                            <div style={{ marginTop: '32px' }}>
-                                <a
-                                    href="#"
-                                    onClick={handleTicketClick}
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        backgroundColor: '#2563EB',
-                                        color: 'white',
-                                        textAlign: 'center',
-                                        padding: '14px',
-                                        borderRadius: '8px',
-                                        fontWeight: 600,
-                                        textDecoration: 'none',
-                                        transition: 'opacity 0.2s'
-                                    }}
-                                >
-                                    Get Tickets via App
-                                </a>
+                                <div style={{
+                                    backgroundColor: '#F8FAFC',
+                                    padding: '16px',
+                                    borderRadius: '8px',
+                                    marginBottom: '24px',
+                                    border: '1px solid #E2E8F0'
+                                }}>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        Organization Details
+                                    </h4>
+                                    {selectedEvent.organizer && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem' }}>
+                                            <span style={{ color: '#64748B' }}>Organized By:</span>
+                                            <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.organizer}</span>
+                                        </div>
+                                    )}
+                                    {selectedEvent.managedBy && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
+                                            <span style={{ color: '#64748B' }}>Managed By:</span>
+                                            <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.managedBy}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <h4 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '12px', color: '#1E293B' }}>About Event</h4>
+                                    <p style={{ lineHeight: '1.6', color: '#475569', whiteSpace: 'pre-wrap' }}>
+                                        {selectedEvent.description || "No description available for this event."}
+                                    </p>
+                                </div>
+
+                                <div style={{ marginTop: '32px' }}>
+                                    <button
+                                        onClick={() => setShowTicketForm(true)}
+                                        style={{
+                                            display: 'block',
+                                            width: '100%',
+                                            backgroundColor: '#2563EB',
+                                            color: 'white',
+                                            textAlign: 'center',
+                                            padding: '14px',
+                                            borderRadius: '8px',
+                                            fontWeight: 600,
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            transition: 'opacity 0.2s'
+                                        }}
+                                    >
+                                        Get Tickets
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                     <style jsx global>{`
                         @keyframes scaleIn {

@@ -6,10 +6,15 @@ import { useSettings } from '@/context/SettingsContext';
 import Image from 'next/image';
 
 
+import { usePathname } from 'next/navigation';
+
 const WhatsAppFloat = () => {
+    const pathname = usePathname();
     const settings = useSettings();
     const phoneNumber = settings?.whatsappNumber || '9779851336342';
     const [isOpen, setIsOpen] = useState(false);
+
+    if (pathname.startsWith('/admin')) return null;
 
     const toggleChat = () => {
         setIsOpen(!isOpen);

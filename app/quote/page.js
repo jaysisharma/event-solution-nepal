@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import styles from './quote.module.css';
 import MagneticButton from '@/components/MagneticButton';
-import { useSettings } from '@/context/SettingsContext';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function Quote() {
-    const settings = useSettings();
+    const { theme } = useTheme();
     const [formData, setFormData] = useState({
         name: '',
         company: '',
@@ -75,13 +75,13 @@ Budget: ${formData.budget}
 ${formData.details}`;
 
 
-        const phoneNumber = settings?.whatsappNumber || "9779851336342";
+        const phoneNumber = "9779703606340";
         const encodedMessage = encodeURIComponent(message);
         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     };
 
     return (
-        <main className={styles.main}>
+        <main className={`${styles.main} ${theme === 'dark' ? styles.dark : ''}`}>
             {/* Header */}
             <section className={styles.headerSection}>
                 <span className={styles.subheading}>Request a Proposal</span>

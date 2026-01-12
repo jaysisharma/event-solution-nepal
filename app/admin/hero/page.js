@@ -115,6 +115,7 @@ export default function HeroAdminPage() {
     const [capacity, setCapacity] = useState('Handling events up to 10k guests.');
     const [capacityLabel, setCapacityLabel] = useState('Capacity');
     const [capacityIcon, setCapacityIcon] = useState('Users');
+    const [showStats, setShowStats] = useState(true);
 
     const fetchSlides = React.useCallback(async () => {
         setIsLoading(true);
@@ -150,6 +151,7 @@ export default function HeroAdminPage() {
         setCapacity(slide.capacity || 'Handling events up to 10k guests.');
         setCapacityLabel(slide.capacityLabel || 'Capacity');
         setCapacityIcon(slide.capacityIcon || 'Users');
+        setShowStats(slide.showStats !== false); // Default true if undefined
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -166,6 +168,7 @@ export default function HeroAdminPage() {
         setCapacity('Handling events up to 10k guests.');
         setCapacityLabel('Capacity');
         setCapacityIcon('Users');
+        setShowStats(true);
     };
 
     const handleSubmit = async (e) => {
@@ -190,6 +193,7 @@ export default function HeroAdminPage() {
         formData.append('capacity', capacity);
         formData.append('capacityLabel', capacityLabel);
         formData.append('capacityIcon', capacityIcon);
+        formData.append('showStats', showStats);
 
         let res;
         if (editingId) {
@@ -336,10 +340,21 @@ export default function HeroAdminPage() {
                                 </div>
 
                                 <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-soft)' }}>
-                                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        Slide Stats
-                                    </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            Slide Stats
+                                        </h3>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={showStats}
+                                                onChange={(e) => setShowStats(e.target.checked)}
+                                            />
+                                            Show Stats Cards
+                                        </label>
+                                    </div>
+
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', opacity: showStats ? 1 : 0.5, pointerEvents: showStats ? 'auto' : 'none', transition: 'opacity 0.2s' }}>
                                         <div className={styles.formGroup}>
                                             <label className={styles.label}>Rating Value</label>
                                             <input type="text" value={rating} onChange={(e) => setRating(e.target.value)} className={styles.input} />

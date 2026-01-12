@@ -44,17 +44,12 @@ const Footer = () => {
     return (
         <>
             {/* Spacer to push content up */}
-            <div style={{ height: footerHeight }} />
+            <div className={styles.spacer} style={{ height: footerHeight }} />
 
             {/* Fixed Footer */}
             <div
                 ref={footerRef}
-                style={{
-                    position: 'fixed',
-                    bottom: 0,
-                    width: '100%',
-                    zIndex: 0
-                }}
+                className={styles.footerWrapper}
             >
                 <footer className={styles.footer}>
                     <div className={styles.container}>

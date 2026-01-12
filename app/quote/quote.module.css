@@ -190,3 +190,60 @@
 .submitBtn:hover {
     background: #EB1F26;
 }
+
+/* --- Dark Mode Overrides --- */
+.main.dark {
+    background-color: #0f172a;
+    /* Dark slate */
+    color: #f8fafc;
+}
+
+.main.dark .title {
+    color: #f8fafc;
+}
+
+.main.dark .description {
+    color: #cbd5e1;
+    /* Lighter gray for secondary text */
+}
+
+.main.dark .highlight {
+    color: var(--primary);
+}
+
+.main.dark .formContainer {
+    background: #1e293b;
+    /* Slightly lighter than bg */
+    border: 1px solid #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.main.dark .sectionTitle {
+    color: #f8fafc;
+}
+
+.main.dark .label {
+    color: #cbd5e1;
+}
+
+.main.dark .input,
+.main.dark .textarea,
+.main.dark .select {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+.main.dark .input:focus,
+.main.dark .textarea:focus,
+.main.dark .select:focus {
+    border-color: var(--primary);
+}
+
+.main.dark .checkboxLabel {
+    color: #cbd5e1;
+}
+
+.main.dark .formSection {
+    border-bottom-color: #334155;
+}

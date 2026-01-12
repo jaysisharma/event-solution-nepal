@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from '../admin.module.css';
 import { Plus, Save, ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import TicketCanvas from '@/components/admin/TicketCanvas';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/admin/ToastContext';
 import { useEffect } from 'react';
@@ -25,6 +26,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
     const [manageType, setManageType] = useState(getInitialType);
     const [compressedFile, setCompressedFile] = useState(null);
+    const [ticketConfig, setTicketConfig] = useState(initialData?.ticketConfig ? JSON.parse(initialData.ticketConfig) : null);
 
     // Update state when initialData changes (for inline editing)
     useEffect(() => {
@@ -236,6 +238,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                     {initialData && <input type="hidden" name="id" value={initialData.id} />}
                     {/* Pass the type so server knows how to handle it if needed */}
                     <input type="hidden" name="manageType" value={manageType} />
+                    <input type="hidden" name="ticketConfig" value={JSON.stringify(ticketConfig)} />
 
                     {/* --- Common Fields --- */}
                     <div className={styles.formGroup}>
@@ -397,6 +400,47 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                                     }}
                                 />
                             </div>
+                        )}
+                    </div>
+
+                    <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                        <label className={styles.label}>Ticket Template (Optional)</label>
+                        <input
+                            name="ticketTemplate"
+                            type="file"
+                            accept="image/*"
+                            className={styles.input}
+                            style={{ paddingTop: '0.7rem' }}
+                        />
+                        <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.5rem' }}>
+                            Upload a blank ticket image. We will overlay user details on top of this.
+                        </p>
+                        {mode === 'edit' && initialData?.ticketTemplate && (
+                            <div style={{ marginTop: '0.8rem' }}>
+                                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>Current Template:</p>
+                                <img
+                                    src={initialData.ticketTemplate}
+                                    alt="Current Ticket Template"
+                                    style={{
+                                        width: '100%',
+                                        maxWidth: '300px',
+                                        borderRadius: '0.5rem',
+                                        border: '1px solid #e2e8f0',
+                                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+                                    }}
+                                />
+                            </div>
+                        )}
+
+                        {/* Ticket Editor */}
+                        {(mode === 'edit' && initialData?.ticketTemplate) ? (
+                            <TicketCanvas
+                                templateImage={initialData.ticketTemplate}
+                                initialConfig={ticketConfig}
+                                onChange={(json) => setTicketConfig(JSON.parse(json))}
+                            />
+                        ) : (
+                            mode === 'edit' && <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '8px' }}>Upload and save a template first to enable the layout editor.</p>
                         )}
                     </div>
 

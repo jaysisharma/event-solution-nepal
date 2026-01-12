@@ -28,6 +28,8 @@ model Event {
   managedBy String?
   description String?
   isFeatured Boolean @default(false)
+  ticketTemplate String?  // URL to clean ticket image
+  ticketConfig   String?  // JSON string for field positions/styles
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -129,6 +131,7 @@ model HeroSlide {
   capacity      String   @default("Handling events up to 10k guests.")
   capacityLabel String   @default("Capacity")
   capacityIcon  String   @default("Users") // Users, Globe, Building
+  showStats     Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -181,3 +184,18 @@ model PageView {
   @@index([createdAt])
 }
 
+
+model TicketRequest {
+  id           Int      @id @default(autoincrement())
+  name         String
+  number       String
+  email        String
+  address      String?
+  title        String?
+  organization String?
+  website      String?
+  eventName    String
+  status       String   @default("PENDING") // PENDING, CONTACTED, RESOLVED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

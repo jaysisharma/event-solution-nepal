@@ -18,6 +18,7 @@ import {
     Clock,
     Settings,
     Activity,
+    Ticket,
     X
 } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
 
     const navItems = [
         { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+        { name: 'Requests', path: '/admin/requests', icon: Ticket },
         { name: 'Hero Slides', path: '/admin/hero', icon: ImageIcon },
         { name: 'Timeline', path: '/admin/timeline', icon: Clock },
         { name: 'Events', path: '/admin/events', icon: Calendar },

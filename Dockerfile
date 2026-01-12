@@ -77,4 +77,4 @@ ENV HOSTNAME "0.0.0.0"
 
 # Run Prisma DB Push (to resolve migrations) and then start server
 # Note: In a true prod env, you might want these separate, but for Coolify single-deploy this is easiest.
-CMD npx prisma@6.19.1 db push && node server.js
+CMD npx prisma@6.19.1 db push --accept-data-loss && node server.js

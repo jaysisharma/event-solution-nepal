@@ -33,6 +33,7 @@ export async function createHeroSlide(formData) {
 
         const ratingIcon = formData.get('ratingIcon') || "Star";
         const capacityIcon = formData.get('capacityIcon') || "Users";
+        const showStats = formData.get('showStats') === 'true';
 
         if (!image || !label || !title) {
             return { success: false, error: 'Missing required fields' };
@@ -69,7 +70,8 @@ export async function createHeroSlide(formData) {
                 ratingIcon,
                 capacity,
                 capacityLabel,
-                capacityIcon
+                capacityIcon,
+                showStats
             }
         });
 
@@ -108,6 +110,7 @@ export async function updateHeroSlide(id, formData) {
         const capacity = formData.get('capacity');
         const capacityLabel = formData.get('capacityLabel');
         const capacityIcon = formData.get('capacityIcon');
+        const showStats = formData.get('showStats') === 'true';
 
         const dataToUpdate = {
             label,
@@ -117,7 +120,8 @@ export async function updateHeroSlide(id, formData) {
             ratingIcon,
             capacity,
             capacityLabel,
-            capacityIcon
+            capacityIcon,
+            showStats
         };
 
         if (image && image.size > 0) {

@@ -218,6 +218,12 @@
     /* blue-50 */
 }
 
+.dark .eventCard:hover .dateBlock {
+    background-color: #1e293b;
+    /* Keep dark background in dark mode */
+    border-color: var(--primary);
+}
+
 .month {
     color: var(--primary);
     font-weight: 700;
