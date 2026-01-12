@@ -19,5 +19,6 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd event-solution-nepal
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
             docker compose up -d --build --force-recreate
