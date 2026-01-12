@@ -31,6 +31,7 @@ export default function AdminTeam() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     // Form inputs
     const [name, setName] = useState('');

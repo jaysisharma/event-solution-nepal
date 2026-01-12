@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from '../admin.module.css';
 import { Plus, Save, ArrowLeft, Loader2, X, Upload } from 'lucide-react';
 import Link from 'next/link';
