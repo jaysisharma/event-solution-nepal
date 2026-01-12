@@ -2,8 +2,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { saveFile } from '@/lib/upload';
 
 const prisma = new PrismaClient();
 
@@ -40,18 +39,10 @@ export async function createHeroSlide(formData) {
         }
 
         // Handle Image Upload
-        const bytes = await image.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        // Ensure directory exists
-        const uploadDir = join(process.cwd(), 'public', 'uploads', 'hero');
-        await mkdir(uploadDir, { recursive: true });
-
-        const filename = `${Date.now()}-${image.name.replace(/\s+/g, '-')}`;
-        const filepath = join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-
-        const imagePath = `/uploads/hero/${filename}`;
+        const imagePath = await saveFile(image, 'hero');
+        if (!imagePath) {
+            return { success: false, error: 'Failed to upload image' };
+        }
 
         // Get max order to append to end
         const maxOrder = await prisma.heroSlide.aggregate({
@@ -126,18 +117,10 @@ export async function updateHeroSlide(id, formData) {
 
         if (image && image.size > 0) {
             // New image provided
-            const bytes = await image.arrayBuffer();
-            const buffer = Buffer.from(bytes);
-
-            // Ensure directory exists
-            const uploadDir = join(process.cwd(), 'public', 'uploads', 'hero');
-            await mkdir(uploadDir, { recursive: true });
-
-            const filename = `${Date.now()}-${image.name.replace(/\s+/g, '-')}`;
-            const filepath = join(uploadDir, filename);
-            await writeFile(filepath, buffer);
-
-            dataToUpdate.image = `/uploads/hero/${filename}`;
+            const imagePath = await saveFile(image, 'hero');
+            if (imagePath) {
+                dataToUpdate.image = imagePath;
+            }
         }
 
         await prisma.heroSlide.update({
