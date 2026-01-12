@@ -163,8 +163,6 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                                 ))}
                             </div>
 
-
-
                             {/* Floating Elements */}
                             {activeSlide.showStats !== false && (
                                 <>
