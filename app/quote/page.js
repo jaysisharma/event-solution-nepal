@@ -81,6 +81,8 @@ ${formData.details}`;
         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     };
 
+
+
     return (
         <main className={`${styles.main} ${theme === 'dark' ? styles.dark : ''}`}>
             {/* Header */}
