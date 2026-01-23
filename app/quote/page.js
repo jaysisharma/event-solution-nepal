@@ -120,6 +120,7 @@ ${formData.details}`;
                         </div>
                     </div>
 
+
                     {/* Section 2: Event Details */}
                     <div className={styles.formSection}>
                         <h2 className={styles.sectionTitle}>Event Specifics</h2>

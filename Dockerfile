@@ -1,9 +1,13 @@
 FROM node:20-alpine AS base
+# Install system dependencies for canvas (cairo, pango, etc.) in base so available in all stages
+RUN apk add --no-cache libc6-compat cairo pango jpeg giflib librsvg
 
 # Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat python3 make g++ build-base cairo-dev pango-dev jpeg-dev giflib-dev librsvg-dev
+
+
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -53,7 +57,7 @@ ENV NODE_ENV production
 # ENV NEXT_TELEMETRY_DISABLED 1
 
 # Install runtime dependencies for canvas
-RUN apk add --no-cache cairo pango jpeg giflib librsvg
+# Runtime deps already in base
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
