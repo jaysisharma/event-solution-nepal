@@ -2,8 +2,9 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
     const searchParams = useSearchParams();
     const id = searchParams.get('id');
 
@@ -39,5 +40,13 @@ export default function PaymentSuccessPage() {
                 </Link>
             </div>
         </div>
+    );
+}
+
+export default function PaymentSuccessPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <PaymentSuccessContent />
+        </Suspense>
     );
 }
