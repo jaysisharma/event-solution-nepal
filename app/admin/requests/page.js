@@ -61,155 +61,153 @@ export default function TicketRequestsPage() {
     };
 
     return (
-        <AdminLayoutWrapper>
-            <div className={styles.container}>
-                <div className={styles.header}>
-                    <h1 className={styles.title}>Ticket Requests</h1>
-                    <button
-                        onClick={fetchRequests}
-                        style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b' }}
-                    >
-                        Refresh
-                    </button>
-                </div>
-
-                {loading ? (
-                    <div className={styles.loading}>Loading requests...</div>
-                ) : requests.length === 0 ? (
-                    <div className={styles.empty}>
-                        No ticket requests found.
-                    </div>
-                ) : (
-                    <div className={styles.card}>
-                        <div className={styles.tableWrapper}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th className={styles.th}>Date & Time</th>
-                                        <th className={styles.th}>User Details</th>
-                                        <th className={styles.th}>Event & Tickets</th>
-                                        <th className={styles.th}>Contact Info</th>
-                                        <th className={styles.th}>Professional Info</th>
-                                        <th className={styles.th}>Status</th>
-                                        <th className={styles.th}>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {requests.map((request) => (
-                                        <tr key={request.id} className={styles.tr}>
-                                            <td className={styles.td}>
-                                                <div className={styles.date}>{new Date(request.createdAt).toLocaleDateString()}</div>
-                                                <div className={styles.time}>{new Date(request.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                            </td>
-                                            <td className={styles.td}>
-                                                <div className={styles.name}>{request.name}</div>
-                                                {request.address && (
-                                                    <div className={styles.detailItem} style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                        <MapPin size={12} className={styles.detailLabel} /> {request.address}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className={styles.td}>
-                                                <div className={styles.eventName}>{request.eventName}</div>
-                                                <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
-                                                    {request.amount > 0 ? (
-                                                        <span style={{ fontWeight: 600, color: '#10b981' }}>
-                                                            Rs. {request.amount / 100}
-                                                        </span>
-                                                    ) : (
-                                                        <span style={{ color: '#94a3b8' }}>Free</span>
-                                                    )}
-                                                </div>
-                                                {request.ticketDetails && (
-                                                    <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '2px', fontStyle: 'italic' }}>
-                                                        {(() => {
-                                                            try {
-                                                                const details = JSON.parse(request.ticketDetails);
-                                                                if (details.ticketType) {
-                                                                    return `${details.quantity || 1}x ${details.ticketType}`;
-                                                                }
-                                                                return request.ticketDetails;
-                                                            } catch (e) {
-                                                                return request.ticketDetails;
-                                                            }
-                                                        })()}
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className={styles.td}>
-                                                <a href={`tel:${request.number}`} className={styles.contactLink}>
-                                                    <Phone size={14} /> {request.number}
-                                                </a>
-                                                <a href={`mailto:${request.email}`} className={styles.contactLink}>
-                                                    <Mail size={14} /> {request.email}
-                                                </a>
-                                            </td>
-                                            <td className={styles.td}>
-                                                {request.organization ? (
-                                                    <>
-                                                        <div className={styles.organization}>🏢 {request.organization}</div>
-                                                        {request.title && <div className={styles.detailItem}>{request.title}</div>}
-                                                    </>
-                                                ) : (
-                                                    <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>N/A</span>
-                                                )}
-                                                {request.website && (
-                                                    <div style={{ marginTop: '4px' }}>
-                                                        <a href={request.website} target="_blank" className={styles.websiteLink}>
-                                                            <Globe size={12} /> Website <ExternalLink size={10} />
-                                                        </a>
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className={styles.td}>
-                                                {getStatusBadge(request.status)}
-                                            </td>
-                                            <td className={styles.td}>
-                                                <div className={styles.actions}>
-                                                    {request.status !== 'RESOLVED' && (
-                                                        <button
-                                                            onClick={() => handleStatusChange(request.id, 'RESOLVED')}
-                                                            title="Mark as Resolved"
-                                                            className={`${styles.actionBtn} ${styles.btnResolved}`}
-                                                        >
-                                                            <CheckCircle size={16} />
-                                                        </button>
-                                                    )}
-                                                    {request.status === 'PENDING' && (
-                                                        <button
-                                                            onClick={() => handleStatusChange(request.id, 'CONTACTED')}
-                                                            title="Mark as Contacted"
-                                                            className={`${styles.actionBtn} ${styles.btnContacted}`}
-                                                        >
-                                                            <Phone size={16} />
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        onClick={() => handleDelete(request.id)}
-                                                        title="Delete Request"
-                                                        className={`${styles.actionBtn} ${styles.btnDelete}`}
-                                                        disabled={deletingId === request.id}
-                                                        style={{
-                                                            cursor: deletingId === request.id ? 'not-allowed' : 'pointer',
-                                                            opacity: deletingId === request.id ? 0.7 : 1
-                                                        }}
-                                                    >
-                                                        {deletingId === request.id ? (
-                                                            <Loader2 size={16} className="animate-spin" />
-                                                        ) : (
-                                                            <Trash2 size={16} />
-                                                        )}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <h1 className={styles.title}>Ticket Requests</h1>
+                <button
+                    onClick={fetchRequests}
+                    style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b' }}
+                >
+                    Refresh
+                </button>
             </div>
-        </AdminLayoutWrapper>
+
+            {loading ? (
+                <div className={styles.loading}>Loading requests...</div>
+            ) : requests.length === 0 ? (
+                <div className={styles.empty}>
+                    No ticket requests found.
+                </div>
+            ) : (
+                <div className={styles.card}>
+                    <div className={styles.tableWrapper}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th className={styles.th}>Date & Time</th>
+                                    <th className={styles.th}>User Details</th>
+                                    <th className={styles.th}>Event & Tickets</th>
+                                    <th className={styles.th}>Contact Info</th>
+                                    <th className={styles.th}>Professional Info</th>
+                                    <th className={styles.th}>Status</th>
+                                    <th className={styles.th}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {requests.map((request) => (
+                                    <tr key={request.id} className={styles.tr}>
+                                        <td className={styles.td}>
+                                            <div className={styles.date}>{new Date(request.createdAt).toLocaleDateString()}</div>
+                                            <div className={styles.time}>{new Date(request.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                        </td>
+                                        <td className={styles.td}>
+                                            <div className={styles.name}>{request.name}</div>
+                                            {request.address && (
+                                                <div className={styles.detailItem} style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <MapPin size={12} className={styles.detailLabel} /> {request.address}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className={styles.td}>
+                                            <div className={styles.eventName}>{request.eventName}</div>
+                                            <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
+                                                {request.amount > 0 ? (
+                                                    <span style={{ fontWeight: 600, color: '#10b981' }}>
+                                                        Rs. {request.amount / 100}
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ color: '#94a3b8' }}>Free</span>
+                                                )}
+                                            </div>
+                                            {request.ticketDetails && (
+                                                <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '2px', fontStyle: 'italic' }}>
+                                                    {(() => {
+                                                        try {
+                                                            const details = JSON.parse(request.ticketDetails);
+                                                            if (details.ticketType) {
+                                                                return `${details.quantity || 1}x ${details.ticketType}`;
+                                                            }
+                                                            return request.ticketDetails;
+                                                        } catch (e) {
+                                                            return request.ticketDetails;
+                                                        }
+                                                    })()}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className={styles.td}>
+                                            <a href={`tel:${request.number}`} className={styles.contactLink}>
+                                                <Phone size={14} /> {request.number}
+                                            </a>
+                                            <a href={`mailto:${request.email}`} className={styles.contactLink}>
+                                                <Mail size={14} /> {request.email}
+                                            </a>
+                                        </td>
+                                        <td className={styles.td}>
+                                            {request.organization ? (
+                                                <>
+                                                    <div className={styles.organization}>🏢 {request.organization}</div>
+                                                    {request.title && <div className={styles.detailItem}>{request.title}</div>}
+                                                </>
+                                            ) : (
+                                                <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>N/A</span>
+                                            )}
+                                            {request.website && (
+                                                <div style={{ marginTop: '4px' }}>
+                                                    <a href={request.website} target="_blank" className={styles.websiteLink}>
+                                                        <Globe size={12} /> Website <ExternalLink size={10} />
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className={styles.td}>
+                                            {getStatusBadge(request.status)}
+                                        </td>
+                                        <td className={styles.td}>
+                                            <div className={styles.actions}>
+                                                {request.status !== 'RESOLVED' && (
+                                                    <button
+                                                        onClick={() => handleStatusChange(request.id, 'RESOLVED')}
+                                                        title="Mark as Resolved"
+                                                        className={`${styles.actionBtn} ${styles.btnResolved}`}
+                                                    >
+                                                        <CheckCircle size={16} />
+                                                    </button>
+                                                )}
+                                                {request.status === 'PENDING' && (
+                                                    <button
+                                                        onClick={() => handleStatusChange(request.id, 'CONTACTED')}
+                                                        title="Mark as Contacted"
+                                                        className={`${styles.actionBtn} ${styles.btnContacted}`}
+                                                    >
+                                                        <Phone size={16} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleDelete(request.id)}
+                                                    title="Delete Request"
+                                                    className={`${styles.actionBtn} ${styles.btnDelete}`}
+                                                    disabled={deletingId === request.id}
+                                                    style={{
+                                                        cursor: deletingId === request.id ? 'not-allowed' : 'pointer',
+                                                        opacity: deletingId === request.id ? 0.7 : 1
+                                                    }}
+                                                >
+                                                    {deletingId === request.id ? (
+                                                        <Loader2 size={16} className="animate-spin" />
+                                                    ) : (
+                                                        <Trash2 size={16} />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

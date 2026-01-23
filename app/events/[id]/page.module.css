@@ -6,6 +6,12 @@
     padding-bottom: 5rem;
 }
 
+/* Dark Mode Support */
+:global(.dark) .main {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
 /* --- Container --- */
 .container {
     max-width: 1000px;
@@ -176,11 +182,44 @@
     }
 }
 
-@media (min-width: 1024px) {
-    .contentGrid {
-        grid-template-columns: 1.6fr 1fr;
-        /* 60/40 approx */
-        gap: 5rem;
-        align-items: start;
-    }
+
+
+/* Dark Mode Support */
+:global(.dark) .main {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+:global(.dark) .heroImageWrapper {
+    background-color: #1e293b;
+}
+
+:global(.dark) .eventTitle,
+:global(.dark) .sectionTitle,
+:global(.dark) .organizerName,
+:global(.dark) .ticketTitle {
+    color: #f8fafc;
+}
+
+:global(.dark) .backLink,
+:global(.dark) .eventMeta,
+:global(.dark) .description,
+:global(.dark) .organizerLabel,
+:global(.dark) .ticketSubtitle {
+    color: #cbd5e1;
+}
+
+:global(.dark) .backLink:hover {
+    color: #ffffff;
+}
+
+:global(.dark) .dateBadge {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+:global(.dark) .ticketCard {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: none;
 }

@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { MapPin, Clock, Ticket } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 import { useTheme } from '@/context/ThemeContext';
@@ -119,7 +120,7 @@ const EventsListClient = ({ events }) => {
                                 <button
                                     onClick={() => setSelectedEvent(event)}
                                     className={styles.ticketBtn}
-                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155' }}
+                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: 'none' }}
                                 >
                                     Details
                                 </button>
@@ -163,7 +164,12 @@ const EventsListClient = ({ events }) => {
                             <p style={{ lineHeight: '1.6', color: '#475569', whiteSpace: 'pre-wrap' }}>{selectedEvent.description || "No description available for this event."}</p>
                             {selectedEvent.status === 'UPCOMING' && (
                                 <div style={{ marginTop: '32px' }}>
-                                    <a href="#" onClick={handleTicketClick} style={{ display: 'block', width: '100%', backgroundColor: '#2563EB', color: 'white', textAlign: 'center', padding: '14px', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}>Get Tickets via App</a>
+                                    <Link
+                                        href={`/events/${selectedEvent.id}`}
+                                        style={{ display: 'block', width: '100%', backgroundColor: '#2563EB', color: 'white', textAlign: 'center', padding: '14px', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}
+                                    >
+                                        Get Tickets
+                                    </Link>
                                 </div>
                             )}
                         </div>

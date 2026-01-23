@@ -8,12 +8,13 @@ import { useTheme } from '@/context/ThemeContext';
 
 const ProjectsClient = ({ initialProjects }) => {
     const { theme } = useTheme();
+    const allProjects = initialProjects || [];
     const [filter, setFilter] = useState("All");
     const [selectedProject, setSelectedProject] = useState(null);
 
-    const categories = ["All", "Wedding", "Corporate", "Social", "Concert"];
-
-    const allProjects = initialProjects || [];
+    // Dynamic Categories: Derive unique categories from projects data
+    const uniqueCategories = [...new Set(allProjects.map(p => p.category).filter(Boolean))];
+    const categories = ["All", ...uniqueCategories.sort()];
 
     const filteredProjects = filter === "All"
         ? allProjects

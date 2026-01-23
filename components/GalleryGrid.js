@@ -13,7 +13,8 @@ const GalleryGrid = ({ initialItems }) => {
 
     const galleryItems = initialItems || [];
 
-    const categories = ['All', 'Wedding', 'Corporate', 'Concert', 'Party', 'Decoration'];
+    const uniqueCategories = [...new Set(galleryItems.map(item => item.category).filter(Boolean))];
+    const categories = ['All', ...uniqueCategories.sort()];
 
     const filteredItems = filter === 'All'
         ? galleryItems

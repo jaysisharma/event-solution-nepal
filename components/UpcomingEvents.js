@@ -1,14 +1,29 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, MapPin, Clock, Ticket } from 'lucide-react';
+import { ArrowRight, MapPin, Clock, Ticket, X } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 import { useTheme } from '@/context/ThemeContext';
 
 const UpcomingEvents = ({ events }) => {
     const { theme } = useTheme();
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const eventList = events || [];
+
+    React.useEffect(() => {
+        if (selectedEvent) {
+            document.body.style.overflow = 'hidden';
+            if (window.lenis) window.lenis.stop();
+        } else {
+            document.body.style.overflow = 'unset';
+            if (window.lenis) window.lenis.start();
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+            if (window.lenis) window.lenis.start();
+        };
+    }, [selectedEvent]);
 
     return (
         <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
@@ -85,13 +100,13 @@ const UpcomingEvents = ({ events }) => {
 
                             {/* Buttons */}
                             <div className={styles.ticketBtnWrapper} style={{ display: 'flex', gap: '10px' }}>
-                                <Link
-                                    href={`/events/${event.id}`}
+                                <button
+                                    onClick={() => setSelectedEvent(event)}
                                     className={styles.ticketBtn}
-                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155', textDecoration: 'none' }}
+                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: 'none' }}
                                 >
                                     View Details
-                                </Link>
+                                </button>
                                 <Link
                                     href={`/events/${event.id}`}
                                     className={styles.ticketBtn}
@@ -120,6 +135,56 @@ const UpcomingEvents = ({ events }) => {
                 </div>
 
             </div>
+
+            {/* Modal */}
+            {selectedEvent && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setSelectedEvent(null)}>
+                    <div style={{
+                        backgroundColor: 'white',
+                        borderRadius: '12px',
+                        maxWidth: '600px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        position: 'relative',
+                        overflow: 'hidden' // Important for inner scrolling
+                    }} onClick={e => e.stopPropagation()}>
+
+                        <div style={{ position: 'relative', height: '300px', width: '100%', flexShrink: 0 }}>
+                            <Image src={selectedEvent.image} alt={selectedEvent.title} fill style={{ objectFit: 'cover' }} />
+                            <button onClick={() => setSelectedEvent(null)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'white', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+                                <X size={18} color="#000" />
+                            </button>
+                        </div>
+
+                        <div style={{ padding: '24px', overflowY: 'auto' }}>
+                            <span style={{ display: 'inline-block', padding: '4px 12px', backgroundColor: '#EFF6FF', color: '#2563EB', borderRadius: '100px', fontSize: '0.8rem', fontWeight: 600, marginBottom: '12px' }}>{selectedEvent.month} {selectedEvent.date}, {selectedEvent.year}</span>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', color: '#1E293B' }}>{selectedEvent.title}</h2>
+                            <div style={{ display: 'flex', gap: '16px', color: '#64748B', fontSize: '0.9rem', marginBottom: '24px' }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={16} /> {selectedEvent.location}</span>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={16} /> {selectedEvent.time}</span>
+                            </div>
+                            <div style={{ backgroundColor: '#F8FAFC', padding: '16px', borderRadius: '8px', marginBottom: '24px', border: '1px solid #E2E8F0' }}>
+                                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Organization Details</h4>
+                                {selectedEvent.organizer && <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem' }}><span style={{ color: '#64748B' }}>Organized By:</span><span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.organizer}</span></div>}
+                                {selectedEvent.managedBy && <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}><span style={{ color: '#64748B' }}>Managed By:</span><span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.managedBy}</span></div>}
+                            </div>
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '12px', color: '#1E293B' }}>About Event</h4>
+                            <p style={{ lineHeight: '1.6', color: '#475569', whiteSpace: 'pre-wrap' }}>{selectedEvent.description || "No description available for this event."}</p>
+
+                            <div style={{ marginTop: '32px' }}>
+                                <Link
+                                    href={`/events/${selectedEvent.id}`}
+                                    style={{ display: 'block', width: '100%', backgroundColor: '#2563EB', color: 'white', textAlign: 'center', padding: '14px', borderRadius: '8px', fontWeight: 600, textDecoration: 'none' }}
+                                >
+                                    Get Tickets
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </section >
     );

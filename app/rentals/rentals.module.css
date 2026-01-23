@@ -119,10 +119,8 @@
 /* --- Mosaic / Bento Grid --- */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    grid-auto-rows: 400px;
-    /* Fixed row height */
-    gap: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 20px;
     padding-bottom: 120px;
 }
 
@@ -136,6 +134,7 @@
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     display: flex;
     flex-direction: column;
+    aspect-ratio: 16 / 9;
 }
 
 /* Mobile responsive check happens in media query */
@@ -292,8 +291,8 @@
 
     .grid {
         grid-template-columns: 1fr;
-        grid-auto-rows: 350px;
-        /* Slightly shorter on mobile */
+        /* grid-auto-rows removed to respect aspect-ratio */
+        gap: 20px;
     }
 
     .cardLarge {
@@ -324,11 +323,11 @@
 .modalContent {
     background: white;
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px;
     border-radius: 20px;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 1.5fr 1fr;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     position: relative;
     max-height: 90vh;
@@ -337,7 +336,7 @@
 .modalImageWrapper {
     background: #f0f0f0;
     position: relative;
-    min-height: 300px;
+    min-height: 500px;
 }
 
 .modalImage {
