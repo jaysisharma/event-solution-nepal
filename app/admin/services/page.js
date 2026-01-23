@@ -33,6 +33,7 @@ export default function AdminServices() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
     const [editingId, setEditingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     // Form State
     const [title, setTitle] = useState('');
@@ -40,6 +41,7 @@ export default function AdminServices() {
     const [tags, setTags] = useState('');
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [uploadTime, setUploadTime] = useState(null);
     const [existingImage, setExistingImage] = useState(null);
 
     useEffect(() => {
@@ -69,6 +71,7 @@ export default function AdminServices() {
         setExistingImage(service.image);
         setPreview(null); // Clear any new upload preview
         setFile(null);
+        setUploadTime(null); // Clear upload time on edit
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -80,18 +83,43 @@ export default function AdminServices() {
         setFile(null);
         setPreview(null);
         setExistingImage(null);
+        setUploadTime(null);
     };
 
     const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const f = e.target.files[0];
-            setFile(f);
-            const objectUrl = URL.createObjectURL(f);
-            setPreview(objectUrl);
-            return () => URL.revokeObjectURL(objectUrl);
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreview(URL.createObjectURL(selectedFile));
+
+            // Calculate estimated upload time
+            const sizeInMB = selectedFile.size / (1024 * 1024);
+            const estTime = Math.ceil(sizeInMB * 2); // Assuming 0.5 MB/s upload speed, so 2 seconds per MB
+            setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
         } else {
             setFile(null);
             setPreview(null);
+            setUploadTime(null);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this service?')) return;
+
+        setDeletingId(id);
+        try {
+            const res = await deleteService(id);
+            if (res.success) {
+                setSnackbar({ message: 'Service deleted successfully', type: 'success' });
+                fetchServices();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to delete service', type: 'error' });
+            }
+        } catch (error) {
+            console.error("Delete Error:", error);
+            setSnackbar({ message: 'An unexpected error occurred.', type: 'error' });
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -102,7 +130,6 @@ export default function AdminServices() {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
-            formData.append('tags', tags);
             formData.append('tags', tags);
             if (file) {
                 const compressed = await compressImage(file);
@@ -173,19 +200,27 @@ export default function AdminServices() {
                             accept="image/*"
                             className={styles.input}
                             style={{ paddingTop: '0.7rem' }}
-                            required={!editingId && !file} // Required only on create if no file (Wait, logic: required on create)
+                            required={!editingId && !file && !existingImage} // Required only on create if no file and no existing image
                         />
                         {/* Preview Logic */}
                         <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            {preview ? (
-                                <img src={preview} alt="New Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '2px solid #3b82f6' }} />
-                            ) : (
-                                editingId && existingImage && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Current:</span>
-                                        <img src={existingImage} alt="Current" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                            {preview && (
+                                <div style={{ position: 'relative' }}>
+                                    <div style={{ width: '100px', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+                                        <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
-                                )
+                                    {uploadTime && (
+                                        <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', textAlign: 'center' }}>
+                                            Est. Upload: {uploadTime}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            {editingId && existingImage && !preview && ( // Show existing image only if editing and no new preview
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Current:</span>
+                                    <img src={existingImage} alt="Current" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                                </div>
                             )}
                         </div>
                     </div>
@@ -249,19 +284,30 @@ export default function AdminServices() {
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEdit(service)} className={styles.btnIcon} title="Edit">
+                                            <button
+                                                onClick={() => handleEdit(service)}
+                                                className={styles.btnIcon}
+                                                title="Edit"
+                                                disabled={deletingId === service.id}
+                                            >
                                                 <Pencil size={18} />
                                             </button>
-                                            <form action={async () => {
-                                                if (confirm('Delete this service?')) {
-                                                    await deleteService(service.id);
-                                                    fetchServices();
-                                                }
-                                            }}>
-                                                <button type="submit" className={`${styles.btnIcon} delete`} title="Delete">
+                                            <button
+                                                onClick={() => handleDelete(service.id)}
+                                                className={`${styles.btnIcon} delete`}
+                                                title="Delete"
+                                                disabled={deletingId === service.id}
+                                                style={{
+                                                    cursor: deletingId === service.id ? 'not-allowed' : 'pointer',
+                                                    opacity: deletingId === service.id ? 0.7 : 1
+                                                }}
+                                            >
+                                                {deletingId === service.id ? (
+                                                    <Loader2 size={18} className="animate-spin" />
+                                                ) : (
                                                     <Trash2 size={18} />
-                                                </button>
-                                            </form>
+                                                )}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

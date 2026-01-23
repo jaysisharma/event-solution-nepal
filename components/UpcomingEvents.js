@@ -5,40 +5,10 @@ import Image from 'next/image';
 import { ArrowRight, MapPin, Clock, Ticket } from 'lucide-react';
 import styles from './UpcomingEvents.module.css';
 import { useTheme } from '@/context/ThemeContext';
-import TicketRequestForm from './TicketRequestForm';
 
 const UpcomingEvents = ({ events }) => {
     const { theme } = useTheme();
     const eventList = events || [];
-    const [selectedEvent, setSelectedEvent] = React.useState(null);
-    const [showTicketForm, setShowTicketForm] = React.useState(false);
-
-    // Reset ticket form state when modal closes
-    const closeEventModal = () => {
-        setSelectedEvent(null);
-        setShowTicketForm(false);
-    };
-
-    const handleTicketClick = (e, event) => {
-        if (e) e.preventDefault();
-        if (event) setSelectedEvent(event);
-        setShowTicketForm(true);
-    };
-
-    // Lock body scroll and pause Lenis when modal is open
-    React.useEffect(() => {
-        if (selectedEvent) {
-            document.body.style.overflow = 'hidden';
-            if (window.lenis) window.lenis.stop();
-        } else {
-            document.body.style.overflow = 'unset';
-            if (window.lenis) window.lenis.start();
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-            if (window.lenis) window.lenis.start();
-        };
-    }, [selectedEvent]);
 
     return (
         <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} suppressHydrationWarning>
@@ -115,21 +85,21 @@ const UpcomingEvents = ({ events }) => {
 
                             {/* Buttons */}
                             <div className={styles.ticketBtnWrapper} style={{ display: 'flex', gap: '10px' }}>
-                                <button
-                                    onClick={() => setSelectedEvent(event)}
+                                <Link
+                                    href={`/events/${event.id}`}
                                     className={styles.ticketBtn}
-                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155' }}
+                                    style={{ flex: 1, backgroundColor: '#f1f5f9', color: '#334155', textDecoration: 'none' }}
                                 >
                                     View Details
-                                </button>
-                                <button
-                                    onClick={(e) => handleTicketClick(e, event)}
+                                </Link>
+                                <Link
+                                    href={`/events/${event.id}`}
                                     className={styles.ticketBtn}
-                                    style={{ flex: 1, cursor: 'pointer', border: 'none' }}
+                                    style={{ flex: 1, textDecoration: 'none' }}
                                 >
                                     <Ticket size={18} />
                                     Tickets
-                                </button>
+                                </Link>
                             </div>
 
                         </div>
@@ -151,163 +121,7 @@ const UpcomingEvents = ({ events }) => {
 
             </div>
 
-            {/* Modal */}
-            {selectedEvent && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        zIndex: 9999,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '1rem'
-                    }}
-                    onClick={closeEventModal}
-                >
-                    <div
-                        style={{
-                            backgroundColor: 'white',
-                            borderRadius: '12px',
-                            maxWidth: '600px',
-                            width: '100%',
-                            maxHeight: '90vh',
-                            overflowY: 'auto',
-                            position: 'relative',
-                            animation: 'scaleIn 0.3s ease',
-                            WebkitOverflowScrolling: 'touch',
-                            overscrollBehavior: 'contain'
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={closeEventModal}
-                            style={{
-                                position: 'absolute',
-                                top: '16px',
-                                right: '16px',
-                                background: '#f1f5f9',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                zIndex: 10,
-                                color: '#64748b',
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            ✕
-                        </button>
-
-                        {/* Modal Content */}
-                        {showTicketForm ? (
-                            <TicketRequestForm
-                                eventName={selectedEvent.title}
-                                onCancel={() => setShowTicketForm(false)}
-                                onSubmit={(data) => {
-                                    console.log("Ticket Request Submitted:", data);
-                                    // Here you would typically send the data to an API
-                                }}
-                            />
-                        ) : (
-                            <div style={{ padding: '24px' }}>
-                                <span style={{
-                                    display: 'inline-block',
-                                    padding: '4px 12px',
-                                    backgroundColor: '#EFF6FF',
-                                    color: '#2563EB',
-                                    borderRadius: '100px',
-                                    fontSize: '0.8rem',
-                                    fontWeight: 600,
-                                    marginBottom: '12px'
-                                }}>
-                                    {selectedEvent.month} {selectedEvent.date}
-                                </span>
-
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '8px', color: '#1E293B' }}>
-                                    {selectedEvent.title}
-                                </h2>
-
-                                <div style={{ display: 'flex', gap: '16px', color: '#64748B', fontSize: '0.9rem', marginBottom: '24px' }}>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <MapPin size={16} /> {selectedEvent.location}
-                                    </span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <Clock size={16} /> {selectedEvent.time}
-                                    </span>
-                                </div>
-
-                                <div style={{
-                                    backgroundColor: '#F8FAFC',
-                                    padding: '16px',
-                                    borderRadius: '8px',
-                                    marginBottom: '24px',
-                                    border: '1px solid #E2E8F0'
-                                }}>
-                                    <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#475569', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                        Organization Details
-                                    </h4>
-                                    {selectedEvent.organizer && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.95rem' }}>
-                                            <span style={{ color: '#64748B' }}>Organized By:</span>
-                                            <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.organizer}</span>
-                                        </div>
-                                    )}
-                                    {selectedEvent.managedBy && (
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem' }}>
-                                            <span style={{ color: '#64748B' }}>Managed By:</span>
-                                            <span style={{ fontWeight: 500, color: '#1E293B' }}>{selectedEvent.managedBy}</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <h4 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '12px', color: '#1E293B' }}>About Event</h4>
-                                    <p style={{ lineHeight: '1.6', color: '#475569', whiteSpace: 'pre-wrap' }}>
-                                        {selectedEvent.description || "No description available for this event."}
-                                    </p>
-                                </div>
-
-                                <div style={{ marginTop: '32px' }}>
-                                    <button
-                                        onClick={() => setShowTicketForm(true)}
-                                        style={{
-                                            display: 'block',
-                                            width: '100%',
-                                            backgroundColor: '#2563EB',
-                                            color: 'white',
-                                            textAlign: 'center',
-                                            padding: '14px',
-                                            borderRadius: '8px',
-                                            fontWeight: 600,
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            transition: 'opacity 0.2s'
-                                        }}
-                                    >
-                                        Get Tickets
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    <style jsx global>{`
-                        @keyframes scaleIn {
-                            from { transform: scale(0.95); opacity: 0; }
-                            to { transform: scale(1); opacity: 1; }
-                        }
-                    `}</style>
-                </div>
-            )}
-        </section>
+        </section >
     );
 };
 

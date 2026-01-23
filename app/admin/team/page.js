@@ -32,12 +32,14 @@ export default function AdminTeam() {
     const [snackbar, setSnackbar] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     // Form inputs
     const [name, setName] = useState('');
     const [role, setRole] = useState('');
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [uploadTime, setUploadTime] = useState(null);
     const [existingImage, setExistingImage] = useState(null);
 
     useEffect(() => {
@@ -134,13 +136,17 @@ export default function AdminTeam() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this member?')) return;
+
+        setDeletingId(id);
         const res = await deleteTeamMember(id);
+
         if (res.success) {
             setSnackbar({ message: 'Member deleted', type: 'success' });
             fetchTeam();
         } else {
             setSnackbar({ message: res.error || 'Failed to delete', type: 'error' });
         }
+        setDeletingId(null);
     };
 
     return (
@@ -162,7 +168,7 @@ export default function AdminTeam() {
             {showForm && (
                 <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
                     <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
                             <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>{editingId ? 'Edit Member' : 'Add Team Member'}</h3>
                             <button onClick={handleCancelEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
                                 <X size={20} />
@@ -203,7 +209,16 @@ export default function AdminTeam() {
                                 />
                                 <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                     {preview ? (
-                                        <img src={preview} alt="New Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #3b82f6' }} />
+                                        <div style={{ position: 'relative' }}>
+                                            <div style={{ width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', border: '2px solid #3b82f6' }}>
+                                                <img src={preview} alt="New Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            </div>
+                                            {uploadTime && (
+                                                <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '2px', textAlign: 'center' }}>
+                                                    Est: {uploadTime}
+                                                </div>
+                                            )}
+                                        </div>
                                     ) : (
                                         editingId && existingImage && (
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -255,11 +270,29 @@ export default function AdminTeam() {
                                     </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEdit(member)} className={styles.btnIcon} title="Edit">
+                                            <button
+                                                onClick={() => handleEdit(member)}
+                                                className={styles.btnIcon}
+                                                title="Edit"
+                                                disabled={deletingId === member.id}
+                                            >
                                                 <Pencil size={18} />
                                             </button>
-                                            <button onClick={() => handleDelete(member.id)} className={`${styles.btnIcon} delete`} title="Delete">
-                                                <Trash2 size={18} />
+                                            <button
+                                                onClick={() => handleDelete(member.id)}
+                                                className={`${styles.btnIcon} delete`}
+                                                title="Delete"
+                                                disabled={deletingId === member.id}
+                                                style={{
+                                                    cursor: deletingId === member.id ? 'not-allowed' : 'pointer',
+                                                    opacity: deletingId === member.id ? 0.7 : 1
+                                                }}
+                                            >
+                                                {deletingId === member.id ? (
+                                                    <Loader2 size={18} className="animate-spin" />
+                                                ) : (
+                                                    <Trash2 size={18} />
+                                                )}
                                             </button>
                                         </div>
                                     </td>

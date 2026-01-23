@@ -13,6 +13,7 @@ export default function TestimonialForm({ testimonial = null }) {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState(testimonial?.avatar || null);
+    const [uploadTime, setUploadTime] = useState(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -22,6 +23,13 @@ export default function TestimonialForm({ testimonial = null }) {
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
+
+            // Calc time
+            const sizeInMB = file.size / (1024 * 1024);
+            const estTime = Math.ceil(sizeInMB * 2);
+            setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
+        } else {
+            setUploadTime(null);
         }
     };
 
@@ -79,6 +87,9 @@ export default function TestimonialForm({ testimonial = null }) {
                             Upload Photo
                         </label>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Recommend square 1:1 image</p>
+                        {uploadTime && (
+                            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>Est. Upload: {uploadTime}</p>
+                        )}
                     </div>
                 </div>
             </div>

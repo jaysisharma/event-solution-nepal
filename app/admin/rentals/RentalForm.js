@@ -6,6 +6,7 @@ import { Plus, Save, ArrowLeft, Loader2, X, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/admin/ToastContext';
+import imageCompression from 'browser-image-compression';
 
 // Default categories to bootstrap
 const DEFAULT_CATEGORIES = ["HANGERS", "STALLS", "PANDALS", "STAGE", "LED", "AUDIO", "FURNITURE"];
@@ -14,6 +15,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
     const { showToast } = useToast();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [compressingIndex, setCompressingIndex] = useState(null);
 
     // Parse initial variants or default to one empty row
     const parseInitialVariants = () => {
@@ -85,6 +87,8 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             return;
         }
 
+        setCompressingIndex(index);
+
         // Validation
         const validResolutions = [
             { w: 1920, h: 1080 },
@@ -99,33 +103,57 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             await new Promise(r => img.onload = r);
             const isValid = validResolutions.some(res => res.w === img.naturalWidth && res.h === img.naturalHeight);
 
-            if (!isValid) {
-                showToast(`Image invalid! Use 1920x1080 or 1280x720.`, "error");
-                e.target.value = ''; // Clear the file input
-                URL.revokeObjectURL(objectUrl); // Clean up the object URL
-                return;
-            }
+            // Compress image
+            const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+            };
+
+            const compressedFile = await imageCompression(file, options);
+            console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`); // Optional logging
 
             const newVariants = [...variants];
             // Clean up previous preview URL if it exists
             if (newVariants[index].preview) {
                 URL.revokeObjectURL(newVariants[index].preview);
             }
-            newVariants[index].file = file;
-            newVariants[index].preview = objectUrl; // For immediate preview
+            newVariants[index].file = compressedFile;
+            newVariants[index].preview = URL.createObjectURL(compressedFile); // For immediate preview
             setVariants(newVariants);
 
         } catch (err) {
             console.error(err);
-            showToast("Error processing image.", "error");
+            showToast("Error processing/compressing image.", "error");
             e.target.value = ''; // Clear the file input
             URL.revokeObjectURL(objectUrl); // Clean up the object URL
+        } finally {
+            setCompressingIndex(null);
         }
     };
+
+    const [remainingTime, setRemainingTime] = useState(null);
 
     async function handleSubmit(e) {
         e.preventDefault();
         setIsSubmitting(true);
+        setRemainingTime(null);
+
+        // Calculate total size
+        let totalBytes = 0;
+        variants.forEach(v => {
+            if (v.file) {
+                totalBytes += v.file.size;
+            }
+        });
+
+        // Estimate time: Assume 500KB/s (approx 0.5 MB/s) + 2s base latency
+        const uploadSpeed = 500 * 1024;
+        const estimatedSeconds = Math.ceil(totalBytes / uploadSpeed) + 2;
+
+        if (totalBytes > 0) {
+            setRemainingTime(estimatedSeconds);
+        }
 
         const formData = new FormData(e.currentTarget);
 
@@ -150,6 +178,14 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
         // Price defaults to Custom Quote (hidden)
         if (!formData.get('price')) formData.set('price', "Custom Quote");
 
+        // Start countdown
+        const timer = setInterval(() => {
+            setRemainingTime(prev => {
+                if (prev === null || prev <= 1) return 0;
+                return prev - 1;
+            });
+        }, 1000);
+
         try {
             const result = await action(formData);
             if (result && result.success) {
@@ -169,6 +205,8 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             showToast("An unexpected error occurred", "error");
             console.error(error);
         } finally {
+            clearInterval(timer);
+            setRemainingTime(null);
             // Clean up all object URLs created for previews
             variants.forEach(v => {
                 if (v.preview) {
@@ -178,6 +216,17 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             setIsSubmitting(false);
         }
     }
+
+    // Helper text for button
+    const getButtonText = () => {
+        if (!isSubmitting) {
+            return mode === 'create' ? ' Add Rental' : ' Save Changes';
+        }
+        if (remainingTime !== null) {
+            return remainingTime > 0 ? ` Uploading... (~${remainingTime}s)` : ' Finishing up...';
+        }
+        return mode === 'create' ? ' Adding...' : ' Saving...';
+    };
 
     return (
         <div>
@@ -227,7 +276,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             {variants.map((variant, index) => (
-                                <div key={index} className={styles.card} style={{ padding: '15px', display: 'flex', gap: '20px', alignItems: 'flex-start', background: '#f8f9fa', border: '1px solid #e9ecef' }}>
+                                <div key={index} className={styles.rentalVariantRow}>
 
                                     {/* Size Input */}
                                     <div style={{ flex: 1 }}>
@@ -251,11 +300,18 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
                                                     <img
                                                         src={variant.preview || variant.image}
                                                         alt="Preview"
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', opacity: compressingIndex === index ? 0.5 : 1 }}
                                                     />
+                                                    {compressingIndex === index && (
+                                                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <Loader2 className="animate-spin" size={16} color="#3b82f6" />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             ) : (
-                                                <div style={{ width: '60px', height: '40px', background: '#eee', borderRadius: '4px', flexShrink: 0 }}></div>
+                                                <div style={{ width: '60px', height: '40px', background: '#eee', borderRadius: '4px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    {compressingIndex === index && <Loader2 className="animate-spin" size={16} color="#64748b" />}
+                                                </div>
                                             )}
 
                                             <input
@@ -265,6 +321,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
                                                 className={styles.input}
                                                 style={{ fontSize: '0.8rem', padding: '0.4rem' }}
                                                 required={!variant.image && !variant.file} // Required if no existing image and no new file
+                                                disabled={compressingIndex !== null}
                                             />
                                         </div>
                                     </div>
@@ -285,7 +342,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
                             ))}
                         </div>
 
-                        <button type="button" onClick={handleAddVariant} className={styles.btnSecondary} style={{ marginTop: '15px' }}>
+                        <button type="button" onClick={handleAddVariant} className={styles.btnAddVariant} style={{ marginTop: '15px' }}>
                             <Plus size={16} /> Add Another Variant
                         </button>
                     </div>
@@ -293,7 +350,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
                     <div className={styles.fullWidth}>
                         <button type="submit" disabled={isSubmitting} className={styles.btnAddNew}>
                             {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (mode === 'create' ? <Plus size={18} /> : <Save size={18} />)}
-                            {mode === 'create' ? (isSubmitting ? ' Adding...' : ' Add Rental') : (isSubmitting ? ' Saving...' : ' Save Changes')}
+                            {getButtonText()}
                         </button>
                     </div>
                 </form>

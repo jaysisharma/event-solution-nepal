@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from 'react';
-import { submitTicketRequest } from '@/app/actions/ticketRequest';
+import React, { useState, useEffect } from 'react';
 import styles from './TicketRequestForm.module.css';
+import { submitTicketRequest } from '@/app/actions/ticketRequest';
+import { Loader2 } from 'lucide-react';
 
-const TicketRequestForm = ({ eventName, onCancel, onSubmit }) => {
+const TicketRequestForm = ({ eventName, eventId, ticketPrice, ticketTypes }) => {
     const [formData, setFormData] = useState({
         name: '',
         number: '',
@@ -11,12 +12,37 @@ const TicketRequestForm = ({ eventName, onCancel, onSubmit }) => {
         address: '',
         title: '',
         organization: '',
-        website: ''
+        website: '',
     });
 
-    const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [success, setSuccess] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('khalti'); // 'khalti' or 'fonepay'
+
+    // Parse ticket types
+    const [availableTypes, setAvailableTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState(null);
+
+    useEffect(() => {
+        if (ticketTypes) {
+            try {
+                // Determine if ticketTypes is String or Object
+                const types = typeof ticketTypes === 'string' ? JSON.parse(ticketTypes) : ticketTypes;
+                if (Array.isArray(types) && types.length > 0) {
+                    setAvailableTypes(types);
+                    setSelectedType(types[0]); // Default to first type
+                }
+            } catch (e) {
+                console.error("Failed to parse ticketTypes", e);
+            }
+        }
+    }, [ticketTypes]);
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Logic: If types exist, use selectedType price. Else use default ticketPrice.
+    // Quantity is ALWAYS 1.
+    const currentPrice = selectedType ? parseInt(selectedType.price) : (ticketPrice ? parseInt(ticketPrice) : 0);
+    const total = currentPrice * 1; // Quantity fixed to 1
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,208 +50,276 @@ const TicketRequestForm = ({ eventName, onCancel, onSubmit }) => {
             ...prev,
             [name]: value
         }));
-        // Clear error when user types
-        if (errors[name]) {
-            setErrors(prev => ({
-                ...prev,
-                [name]: ''
-            }));
-        }
     };
 
-    const validate = () => {
-        const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = "Name is required";
-
-        // Validate Phone (10 digits)
-        const phoneRegex = /^\d{10}$/;
-        if (!formData.number.trim()) {
-            newErrors.number = "Phone number is required";
-        } else if (!phoneRegex.test(formData.number.trim())) {
-            newErrors.number = "Please enter a valid 10-digit mobile number";
-        }
-
-        // Validate Email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!formData.email.trim()) {
-            newErrors.email = "Email is required";
-        } else if (!emailRegex.test(formData.email)) {
-            newErrors.email = "Please enter a valid email address";
-        }
-        return newErrors;
+    const handleTypeChange = (type) => {
+        setSelectedType(type);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newErrors = validate();
+        setLoading(true);
+        setError('');
 
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
+        if (paymentMethod === 'fonepay') {
+            // Placeholder for Fonepay
+            alert("Fonepay integration is coming soon! Please use Khalti for now, or proceed to manual payment.");
+            // We can still submit as UNPAID if desired, but for now blocking or warning.
+            // Let's allow submission as PENDING/UNPAID?
+            // For better UX, let's submit but show it's manual/pending.
         }
 
-        setIsSubmitting(true);
-
         try {
-            // Call Server Action
             const result = await submitTicketRequest({
-                ...formData,
-                eventName // Include event name from props
+                name: formData.name,
+                email: formData.email,
+                number: formData.number,
+                address: formData.address,
+                title: formData.title,
+                organization: formData.organization,
+                website: formData.website,
+                eventName: eventName,
+                eventId: eventId,
+                totalPrice: total,
+                paymentMethod: paymentMethod, // Pass selected method
+                ticketDetails: {
+                    quantity: 1, // Fixed to 1
+                    ticketType: selectedType ? (selectedType.label || selectedType.name) : 'Standard',
+                    unitPrice: currentPrice
+                }
             });
 
-            if (result.success) {
-                if (onSubmit) {
-                    await onSubmit(formData); // Optional prop callback
+            if (result.success && result.paymentUrl) {
+                window.location.href = result.paymentUrl;
+            } else if (result.success) {
+                if (paymentMethod === 'fonepay') {
+                    alert('Request submitted! Please contact support for Fonepay details.');
+                } else {
+                    alert('Ticket request submitted successfully!');
                 }
-                setSuccess(true);
+                // Optional: Reset form or redirect
             } else {
-                console.error("Submission failed:", result.error);
-                alert("Something went wrong. Please try again.");
+                setError(result.error || 'Something went wrong. Please try again.');
             }
-        } catch (error) {
-            console.error("Submission failed", error);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to submit request.');
         } finally {
-            setIsSubmitting(false);
+            setLoading(false);
         }
     };
 
-    if (success) {
-        return (
-            <div className={styles.successMessage}>
-                <h3>Request Sent Successfully!</h3>
-                <p style={{ marginTop: '0.5rem', color: '#166534' }}>
-                    Thank you for your interest in <strong>{eventName}</strong>.<br />
-                    We will get back to you shortly with ticket details.
-                </p>
-                <div className={styles.actions} style={{ justifyContent: 'center' }}>
-                    <button
-                        onClick={onCancel}
-                        className={styles.button}
-                        style={{ backgroundColor: '#059669', color: 'white', maxWidth: '200px' }}
-                    >
-                        Close
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className={styles.formContainer}>
-            <h3 className={styles.heading}>Get Tickets</h3>
-            <p className={styles.subHeading}>
-                Request tickets for <span style={{ fontWeight: 600, color: '#334155' }}>{eventName}</span>
-            </p>
+            <h3 className={styles.title}>Get Ticket for {eventName}</h3>
 
             <form onSubmit={handleSubmit}>
-                <div className={styles.formGrid}>
-                    {/* Mandatory Fields */}
-                    <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
-                        <label className={styles.label}>Full Name <span className={styles.required}>*</span></label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
-                            placeholder="Enter your full name"
-                        />
-                        {errors.name && <span className={styles.errorText}>{errors.name}</span>}
-                    </div>
+                {/* Personal Information */}
+                <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor="name">Full Name *</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={styles.input}
+                        required
+                        placeholder="John Doe"
+                    />
+                </div>
 
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>Phone Number <span className={styles.required}>*</span></label>
-                        <input
-                            type="tel"
-                            name="number"
-                            value={formData.number}
-                            onChange={handleChange}
-                            className={`${styles.input} ${errors.number ? styles.inputError : ''}`}
-                            placeholder="Enter your mobile number"
-                        />
-                        {errors.number && <span className={styles.errorText}>{errors.number}</span>}
-                    </div>
-
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>Email Address <span className={styles.required}>*</span></label>
+                {/* Contact Information */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="email">Email *</label>
                         <input
                             type="email"
+                            id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
-                            placeholder="Enter your email"
+                            className={styles.input}
+                            required
+                            placeholder="john@example.com"
                         />
-                        {errors.email && <span className={styles.errorText}>{errors.email}</span>}
                     </div>
-
-                    {/* Optional Fields */}
-                    <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
-                        <label className={styles.label}>Address</label>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="number">Phone *</label>
                         <input
-                            type="text"
-                            name="address"
-                            value={formData.address}
+                            type="tel"
+                            id="number"
+                            name="number"
+                            value={formData.number}
                             onChange={handleChange}
                             className={styles.input}
-                            placeholder="Your address (optional)"
+                            required
+                            placeholder="98XXXXXXXX"
                         />
                     </div>
+                </div>
 
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>Job Title/Role</label>
+                <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor="address">Address</label>
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="Kathmandu, Nepal"
+                    />
+                </div>
+
+                {/* Professional Information */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="title">Job Title</label>
                         <input
                             type="text"
+                            id="title"
                             name="title"
                             value={formData.title}
                             onChange={handleChange}
                             className={styles.input}
-                            placeholder="e.g. Manager"
+                            placeholder="Manager"
                         />
                     </div>
-
-                    <div className={styles.inputGroup}>
-                        <label className={styles.label}>Organization</label>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label} htmlFor="organization">Organization</label>
                         <input
                             type="text"
+                            id="organization"
                             name="organization"
                             value={formData.organization}
                             onChange={handleChange}
                             className={styles.input}
-                            placeholder="Company name"
-                        />
-                    </div>
-
-                    <div className={`${styles.inputGroup} ${styles.fullWidth}`}>
-                        <label className={styles.label}>Website</label>
-                        <input
-                            type="url"
-                            name="website"
-                            value={formData.website}
-                            onChange={handleChange}
-                            className={styles.input}
-                            placeholder="https://example.com"
+                            placeholder="Company Details"
                         />
                     </div>
                 </div>
 
-                <div className={styles.actions}>
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className={`${styles.button} ${styles.cancelBtn}`}
-                        disabled={isSubmitting}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className={`${styles.button} ${styles.submitBtn}`}
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? 'Sending...' : 'Request Tickets'}
-                    </button>
+                <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor="website">Website</label>
+                    <input
+                        type="url"
+                        id="website"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        className={styles.input}
+                        placeholder="https://..."
+                    />
                 </div>
+
+                {/* Ticket Selection Area */}
+                <div className={styles.ticketSection} style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
+                    <label className={styles.label} style={{ marginBottom: '1rem' }}>Select Ticket Type</label>
+
+                    {availableTypes.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {availableTypes.map((type, index) => {
+                                const isSelected = (selectedType?.label || selectedType?.name) === (type.label || type.name);
+                                return (
+                                    <div
+                                        key={index}
+                                        onClick={() => handleTypeChange(type)}
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            padding: '1rem',
+                                            borderRadius: '12px',
+                                            border: isSelected ? '2px solid #3b82f6' : '1px solid rgba(156, 163, 175, 0.3)',
+                                            background: isSelected ? 'rgba(59, 130, 246, 0.05)' : 'rgba(255,255,255,0.4)',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            {/* Custom Checkbox/Radio UI */}
+                                            <div style={{
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%', // Round for radio feel, or 4px for checkbox. User said "checkbox" but "1 at a time" implies radio behavior. Round is standard for single select.
+                                                border: isSelected ? '5px solid #3b82f6' : '2px solid #9ca3af',
+                                                backgroundColor: 'white',
+                                                transition: 'all 0.2s'
+                                            }}></div>
+                                            <span style={{ fontWeight: 600, color: '#334155' }}>{type.label || type.name}</span>
+                                        </div>
+                                        <span style={{ fontWeight: 700, class: styles.priceTag }}>Rs. {type.price}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div style={{
+                            padding: '1rem',
+                            borderRadius: '12px',
+                            background: 'rgba(57, 131, 246, 0.1)',
+                            border: '1px solid rgba(57, 131, 246, 0.3)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <span style={{ fontWeight: 600 }}>Standard Ticket</span>
+                            <span style={{ fontWeight: 700 }}>Rs. {ticketPrice}</span>
+                        </div>
+                    )}
+                </div>
+
+                {/* Payment Method Selection */}
+                <div className={styles.paymentMethodSection}>
+                    <label className={styles.label}>Select Payment Method</label>
+                    <div className={styles.paymentGrid}>
+                        <div
+                            className={`${styles.paymentOption} ${styles.khalti} ${paymentMethod === 'khalti' ? styles.selected : ''}`}
+                            onClick={() => setPaymentMethod('khalti')}
+                        >
+                            {/* Khalti Logo Placeholder or Text */}
+                            <span style={{ fontWeight: 800, color: '#5D2E8E' }}>Khalti</span>
+                        </div>
+                        <div
+                            className={`${styles.paymentOption} ${styles.fonepay} ${paymentMethod === 'fonepay' ? styles.selected : ''}`}
+                            onClick={() => setPaymentMethod('fonepay')}
+                        >
+                            {/* Fonepay Logo Placeholder or Text */}
+                            <span style={{ fontWeight: 800, color: '#c60021' }}>Fonepay</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.summary}>
+                    <div className={styles.summaryRow}>
+                        <span>Selected Ticket</span>
+                        <span>{selectedType ? (selectedType.label || selectedType.name) : 'Standard'}</span>
+                    </div>
+                    {/* Quantity Hidden as it's always 1 */}
+                    <div className={styles.totalRow}>
+                        <span>Total to Pay</span>
+                        <span>Rs. {total}</span>
+                    </div>
+                </div>
+
+                {error && <p className={styles.error}>{error}</p>}
+
+                <button
+                    type="submit"
+                    className={`${styles.submitBtn} ${paymentMethod === 'khalti' ? styles.khaltiBtn : styles.fonepayBtn}`}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <>
+                            <Loader2 className="animate-spin inline mr-2" size={18} />
+                            Processing...
+                        </>
+                    ) : (
+                        `Pay with ${paymentMethod === 'khalti' ? 'Khalti' : 'Fonepay'} (Rs. ${total})`
+                    )}
+                </button>
             </form>
         </div>
     );

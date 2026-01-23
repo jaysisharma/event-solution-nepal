@@ -9,9 +9,7 @@ import {
     Briefcase,
     Plus,
     TrendingUp,
-    ArrowRight,
-    Search,
-    Bell
+    ArrowRight
 } from 'lucide-react';
 import DashboardCharts from '@/components/admin/DashboardCharts';
 import { getSystemHealth } from './system/actions';
@@ -91,14 +89,7 @@ export default async function AdminDashboard() {
                     <span className={styles.pageSubtitle}>{date}</span>
                     <h1 className={styles.pageTitle}>Good Afternoon, Admin</h1>
                 </div>
-                <div className={styles.headerActions}>
-                    <div style={{ padding: '0.5rem', background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <Search size={20} color="#64748b" />
-                    </div>
-                    <div style={{ padding: '0.5rem', background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                        <Bell size={20} color="#64748b" />
-                    </div>
-                </div>
+
             </div>
 
             {/* 1. Metrics Grid (Top) */}

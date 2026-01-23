@@ -29,9 +29,10 @@ export default function AdminLayoutWrapper({ children }) {
                     <Image
                         src="/logo/es_logo_white.png"
                         alt="Logo"
-                        width={100}
-                        height={26}
-                        style={{ width: 'auto', height: '26px' }}
+                        width={140}
+                        height={36}
+                        style={{ width: 'auto', height: '36px' }}
+                        priority
                     />
                 </div>
                 <button
@@ -39,7 +40,7 @@ export default function AdminLayoutWrapper({ children }) {
                     onClick={() => setIsSidebarOpen(true)}
                     aria-label="Open menu"
                 >
-                    <Menu size={24} />
+                    <Menu size={28} />
                 </button>
             </header>
 

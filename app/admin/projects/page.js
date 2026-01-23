@@ -33,6 +33,7 @@ export default function ProjectAdminPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
     const [editingId, setEditingId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     // Form State
     const [title, setTitle] = useState('');
@@ -102,6 +103,26 @@ export default function ProjectAdminPage() {
 
     const handleRemoveImage = (index) => {
         setExistingImagesState(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this project?')) return;
+
+        setDeletingId(id);
+        try {
+            const res = await deleteProject(id);
+            if (res.success) {
+                setSnackbar({ message: 'Project deleted successfully', type: 'success' });
+                fetchProjects();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to delete project', type: 'error' });
+            }
+        } catch (error) {
+            console.error(error);
+            setSnackbar({ message: 'An unexpected error occurred', type: 'error' });
+        } finally {
+            setDeletingId(null);
+        }
     };
 
     // New: Handle File Change & Generate Previews
@@ -418,19 +439,33 @@ export default function ProjectAdminPage() {
                                     <td>{project.year}</td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEdit(project)} className={styles.btnIcon} title="Edit">
+                                            <button
+                                                onClick={() => handleEdit(project)}
+                                                className={styles.btnIcon}
+                                                title="Edit"
+                                                disabled={deletingId === project.id}
+                                            >
                                                 <Pencil size={18} />
                                             </button>
-                                            <form action={async () => {
-                                                if (confirm('Delete this project?')) {
-                                                    await deleteProject(project.id);
-                                                    fetchProjects();
-                                                }
-                                            }}>
-                                                <button type="submit" className={styles.btnIconDanger} title="Delete">
+                                            <button
+                                                onClick={() => handleDelete(project.id)}
+                                                className={styles.btnIconDanger}
+                                                title="Delete"
+                                                disabled={deletingId === project.id}
+                                                style={{
+                                                    cursor: deletingId === project.id ? 'not-allowed' : 'pointer',
+                                                    opacity: deletingId === project.id ? 0.7 : 1,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                            >
+                                                {deletingId === project.id ? (
+                                                    <Loader2 size={18} className="animate-spin" />
+                                                ) : (
                                                     <Trash2 size={18} />
-                                                </button>
-                                            </form>
+                                                )}
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

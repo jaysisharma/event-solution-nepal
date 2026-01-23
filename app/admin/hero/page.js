@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Star, Users, Globe, Building, Heart, Trophy, ShieldCheck, PartyPopper } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Star, Users, Globe, Building, Heart, Trophy, ShieldCheck, PartyPopper, Loader2 } from 'lucide-react';
 import { getHeroSlides, createHeroSlide, deleteHeroSlide, updateHeroSlide } from './actions';
 import styles from '../admin.module.css';
 
@@ -51,46 +51,7 @@ const Snackbar = ({ message, type, onClose }) => {
     );
 };
 
-const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
-    if (!isOpen) return null;
-    return (
-        <div style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 999,
-            backdropFilter: 'blur(4px)'
-        }}>
-            <div style={{
-                backgroundColor: 'white',
-                padding: '2rem',
-                borderRadius: '12px',
-                width: '100%',
-                maxWidth: '400px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem', color: '#dc2626' }}>
-                    <AlertTriangle size={24} />
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b', margin: 0 }}>{title}</h3>
-                </div>
-                <p style={{ color: '#64748b', marginBottom: '2rem', lineHeight: '1.5' }}>{message}</p>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    <button onClick={onCancel} className={styles.btnSecondary}>Cancel</button>
-                    <button
-                        onClick={onConfirm}
-                        className={styles.btnAddNew}
-                        style={{ backgroundColor: '#dc2626' }}
-                    >
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
+
 
 export default function HeroAdminPage() {
     const [slides, setSlides] = useState([]);
@@ -99,7 +60,7 @@ export default function HeroAdminPage() {
 
     // UI State
     const [snackbar, setSnackbar] = useState(null);
-    const [deleteId, setDeleteId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     // Form State
     const [editingId, setEditingId] = useState(null);
@@ -116,6 +77,8 @@ export default function HeroAdminPage() {
     const [capacityLabel, setCapacityLabel] = useState('Capacity');
     const [capacityIcon, setCapacityIcon] = useState('Users');
     const [showStats, setShowStats] = useState(true);
+    const [isFeatured, setIsFeatured] = useState(false);
+    const [uploadTime, setUploadTime] = useState(null);
 
     const fetchSlides = React.useCallback(async () => {
         setIsLoading(true);
@@ -135,6 +98,13 @@ export default function HeroAdminPage() {
         if (file) {
             setImage(file);
             setPreview(URL.createObjectURL(file));
+
+            // Calc time
+            const sizeInMB = file.size / (1024 * 1024);
+            const estTime = Math.ceil(sizeInMB * 2); // 0.5MB/s => 2s per MB
+            setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
+        } else {
+            setUploadTime(null);
         }
     };
 
@@ -152,6 +122,7 @@ export default function HeroAdminPage() {
         setCapacityLabel(slide.capacityLabel || 'Capacity');
         setCapacityIcon(slide.capacityIcon || 'Users');
         setShowStats(slide.showStats !== false); // Default true if undefined
+        setIsFeatured(slide.isFeatured || false);
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -168,7 +139,10 @@ export default function HeroAdminPage() {
         setCapacity('Handling events up to 10k guests.');
         setCapacityLabel('Capacity');
         setCapacityIcon('Users');
+        setCapacityIcon('Users');
         setShowStats(true);
+        setIsFeatured(false);
+        setUploadTime(null);
     };
 
     const handleSubmit = async (e) => {
@@ -194,6 +168,7 @@ export default function HeroAdminPage() {
         formData.append('capacityLabel', capacityLabel);
         formData.append('capacityIcon', capacityIcon);
         formData.append('showStats', showStats);
+        formData.append('isFeatured', isFeatured);
 
         let res;
         if (editingId) {
@@ -215,21 +190,20 @@ export default function HeroAdminPage() {
         setIsSubmitting(false);
     };
 
-    const confirmDelete = (id) => {
-        setDeleteId(id);
-    };
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this slide?')) return;
 
-    const handleConfirmDelete = async () => {
-        if (!deleteId) return;
-        const res = await deleteHeroSlide(deleteId);
+        setDeletingId(id);
+        const res = await deleteHeroSlide(id);
+
         if (res.success) {
-            fetchSlides();
-            if (editingId === deleteId) handleCancelEdit();
             setSnackbar({ message: 'Slide deleted successfully', type: 'success' });
+            fetchSlides();
+            if (editingId === id) handleCancelEdit();
         } else {
             setSnackbar({ message: 'Failed to delete slide', type: 'error' });
         }
-        setDeleteId(null);
+        setDeletingId(null);
     };
 
     return (
@@ -241,14 +215,6 @@ export default function HeroAdminPage() {
                     onClose={() => setSnackbar(null)}
                 />
             )}
-
-            <ConfirmDialog
-                isOpen={!!deleteId}
-                title="Delete Slide"
-                message="Are you sure you want to delete this slide? This action cannot be undone."
-                onConfirm={handleConfirmDelete}
-                onCancel={() => setDeleteId(null)}
-            />
 
             <div className={styles.pageHeader}>
                 <div>
@@ -272,137 +238,141 @@ export default function HeroAdminPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className={styles.formGroup} style={{ gap: '2rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Slide Image</label>
-                                <div
-                                    onClick={() => document.getElementById('slideImageInput').click()}
-                                    style={{
-                                        border: '2px dashed var(--border-soft)',
-                                        borderRadius: '12px',
-                                        height: '240px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        background: '#f8fafc',
-                                        overflow: 'hidden',
-                                        position: 'relative',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
-                                    onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
-                                >
-                                    <input
-                                        id="slideImageInput"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                        style={{ display: 'none' }}
-                                        required={!editingId}
-                                    />
-                                    {preview ? (
-                                        <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
-                                            <ImageIcon size={40} style={{ marginBottom: '0.5rem' }} />
-                                            <p style={{ fontSize: '0.85rem' }}>Click to upload image</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.label}>Label (e.g. Latest Project)</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                            <div className={styles.heroFormLayout}>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Slide Image</label>
+                                    <div
+                                        onClick={() => document.getElementById('slideImageInput').click()}
+                                        className={styles.imageUploadBox}
+                                        onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--primary)'}
+                                        onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--border-soft)'}
+                                    >
                                         <input
-                                            type="text"
-                                            value={label}
-                                            onChange={(e) => setLabel(e.target.value)}
-                                            className={styles.input}
-                                            required
-                                            placeholder="Latest Event"
+                                            id="slideImageInput"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            style={{ display: 'none' }}
+                                            required={!editingId}
                                         />
-                                    </div>
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.label}>Title (e.g. Tech Summit)</label>
-                                        <input
-                                            type="text"
-                                            value={title}
-                                            onChange={(e) => setTitle(e.target.value)}
-                                            className={styles.input}
-                                            required
-                                            placeholder="Mega Concert 2024"
-                                        />
+                                        {preview ? (
+                                            <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                                                <ImageIcon size={40} style={{ marginBottom: '0.5rem' }} />
+                                                <p style={{ fontSize: '0.85rem' }}>Click to upload image</p>
+                                            </div>
+                                        )}
+                                        {uploadTime && (
+                                            <div style={{ position: 'absolute', bottom: '8px', left: 0, right: 0, textAlign: 'center', fontSize: '0.75rem', color: '#64748b', background: 'rgba(255,255,255,0.8)', padding: '4px' }}>
+                                                Est. Upload: {uploadTime}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-soft)' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            Slide Stats
-                                        </h3>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
+                                    <div className={styles.heroInputsGrid}>
+                                        <div className={styles.formGroup}>
+                                            <label className={styles.label}>Label (e.g. Latest Project)</label>
                                             <input
-                                                type="checkbox"
-                                                checked={showStats}
-                                                onChange={(e) => setShowStats(e.target.checked)}
+                                                type="text"
+                                                value={label}
+                                                onChange={(e) => setLabel(e.target.value)}
+                                                className={styles.input}
+                                                required
+                                                placeholder="Latest Event"
                                             />
-                                            Show Stats Cards
-                                        </label>
-                                    </div>
-
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', opacity: showStats ? 1 : 0.5, pointerEvents: showStats ? 'auto' : 'none', transition: 'opacity 0.2s' }}>
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>Rating Value</label>
-                                            <input type="text" value={rating} onChange={(e) => setRating(e.target.value)} className={styles.input} />
                                         </div>
                                         <div className={styles.formGroup}>
-                                            <label className={styles.label}>Rating Label</label>
-                                            <input type="text" value={ratingLabel} onChange={(e) => setRatingLabel(e.target.value)} className={styles.input} />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>Rating Icon</label>
-                                            <select value={ratingIcon} onChange={(e) => setRatingIcon(e.target.value)} className={styles.input}>
-                                                <option value="Star">Star</option>
-                                                <option value="Heart">Heart</option>
-                                                <option value="Trophy">Trophy</option>
-                                                <option value="ShieldCheck">Shield</option>
-                                            </select>
-                                        </div>
-
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>Capacity Value</label>
-                                            <input type="text" value={capacity} onChange={(e) => setCapacity(e.target.value)} className={styles.input} />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>Capacity Label</label>
-                                            <input type="text" value={capacityLabel} onChange={(e) => setCapacityLabel(e.target.value)} className={styles.input} />
-                                        </div>
-                                        <div className={styles.formGroup}>
-                                            <label className={styles.label}>Capacity Icon</label>
-                                            <select value={capacityIcon} onChange={(e) => setCapacityIcon(e.target.value)} className={styles.input}>
-                                                <option value="Users">Users</option>
-                                                <option value="Globe">Globe</option>
-                                                <option value="Building">Building</option>
-                                                <option value="PartyPopper">Party</option>
-                                            </select>
+                                            <label className={styles.label}>Title (e.g. Tech Summit)</label>
+                                            <input
+                                                type="text"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                className={styles.input}
+                                                required
+                                                placeholder="Mega Concert 2024"
+                                            />
                                         </div>
                                     </div>
+
+                                    <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-soft)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                Slide Stats
+                                            </h3>
+                                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={showStats}
+                                                        onChange={(e) => setShowStats(e.target.checked)}
+                                                    />
+                                                    Show Stats Cards
+                                                </label>
+                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isFeatured}
+                                                        onChange={(e) => setIsFeatured(e.target.checked)}
+                                                    />
+                                                    Featured
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div className={styles.heroStatsGrid} style={{ opacity: showStats ? 1 : 0.5, pointerEvents: showStats ? 'auto' : 'none', transition: 'opacity 0.2s' }}>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Rating Value</label>
+                                                <input type="text" value={rating} onChange={(e) => setRating(e.target.value)} className={styles.input} />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Rating Label</label>
+                                                <input type="text" value={ratingLabel} onChange={(e) => setRatingLabel(e.target.value)} className={styles.input} />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Rating Icon</label>
+                                                <select value={ratingIcon} onChange={(e) => setRatingIcon(e.target.value)} className={styles.input}>
+                                                    <option value="Star">Star</option>
+                                                    <option value="Heart">Heart</option>
+                                                    <option value="Trophy">Trophy</option>
+                                                    <option value="ShieldCheck">Shield</option>
+                                                </select>
+                                            </div>
+
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Capacity Value</label>
+                                                <input type="text" value={capacity} onChange={(e) => setCapacity(e.target.value)} className={styles.input} />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Capacity Label</label>
+                                                <input type="text" value={capacityLabel} onChange={(e) => setCapacityLabel(e.target.value)} className={styles.input} />
+                                            </div>
+                                            <div className={styles.formGroup}>
+                                                <label className={styles.label}>Capacity Icon</label>
+                                                <select value={capacityIcon} onChange={(e) => setCapacityIcon(e.target.value)} className={styles.input}>
+                                                    <option value="Users">Users</option>
+                                                    <option value="Globe">Globe</option>
+                                                    <option value="Building">Building</option>
+                                                    <option value="PartyPopper">Party</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className={styles.btnAddNew}
+                                        style={{ alignSelf: 'flex-end', padding: '0.75rem 2rem' }}
+                                    >
+                                        {isSubmitting ? 'Saving...' : (
+                                            editingId ? <><Save size={18} /> Update Slide</> : <><Plus size={18} /> Save Slide</>
+                                        )}
+                                    </button>
                                 </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className={styles.btnAddNew}
-                                    style={{ alignSelf: 'flex-end', padding: '0.75rem 2rem' }}
-                                >
-                                    {isSubmitting ? 'Saving...' : (
-                                        editingId ? <><Save size={18} /> Update Slide</> : <><Plus size={18} /> Save Slide</>
-                                    )}
-                                </button>
                             </div>
                         </div>
                     </form>
@@ -427,6 +397,25 @@ export default function HeroAdminPage() {
                         {slides.map((slide) => (
                             <div key={slide.id} className={styles.heroCard}>
                                 <img src={slide.image} alt={slide.title} className={styles.heroCardImage} />
+                                {slide.isFeatured && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: 12,
+                                        left: 12,
+                                        background: 'rgba(255, 255, 255, 0.9)',
+                                        borderRadius: '20px',
+                                        padding: '4px 12px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 600,
+                                        color: '#ca8a04',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}>
+                                        <Star size={12} fill="#ca8a04" /> Featured
+                                    </div>
+                                )}
                                 <div className={styles.heroCardBody}>
                                     <span className={styles.heroCardLabel}>{slide.label}</span>
                                     <h3 className={styles.heroCardTitle}>{slide.title}</h3>
@@ -457,16 +446,26 @@ export default function HeroAdminPage() {
                                         onClick={() => handleEdit(slide)}
                                         className={styles.btnIcon}
                                         title="Edit Slide"
+                                        disabled={deletingId === slide.id}
                                     >
                                         <Pencil size={16} />
                                     </button>
                                     <button
-                                        onClick={() => confirmDelete(slide.id)}
+                                        onClick={() => handleDelete(slide.id)}
                                         className={styles.btnIcon}
-                                        style={{ color: '#ef4444' }}
+                                        style={{
+                                            color: '#ef4444',
+                                            cursor: deletingId === slide.id ? 'not-allowed' : 'pointer',
+                                            opacity: deletingId === slide.id ? 0.7 : 1
+                                        }}
                                         title="Delete Slide"
+                                        disabled={deletingId === slide.id}
                                     >
-                                        <Trash2 size={16} />
+                                        {deletingId === slide.id ? (
+                                            <Loader2 size={16} className="animate-spin" />
+                                        ) : (
+                                            <Trash2 size={16} />
+                                        )}
                                     </button>
                                 </div>
                             </div>

@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
 
 export async function addRental(formData) {
     const title = formData.get('title');
@@ -61,7 +61,7 @@ export async function addRental(formData) {
         return { success: true, message: "Rental item created successfully" };
     } catch (error) {
         console.error("Error creating rental:", error);
-        return { success: false, message: "Failed to create rental item" };
+        return { success: false, message: error.message || "Failed to create rental item" };
     }
 }
 
@@ -122,7 +122,7 @@ export async function updateRental(formData) {
 
     } catch (error) {
         console.error("Error updating rental:", error);
-        return { success: false, message: "Failed to update rental item" };
+        return { success: false, message: error.message || "Failed to update rental item" };
     }
 }
 
@@ -131,8 +131,52 @@ export async function deleteRental(formData) {
     if (!id) return { success: false, message: "No ID provided" };
 
     try {
+        const rentalId = parseInt(id);
+
+        // Fetch the item first to get images
+        const item = await prisma.rentalItem.findUnique({
+            where: { id: rentalId },
+        });
+
+        if (!item) {
+            return { success: false, message: "Item not found" };
+        }
+
+        // Collect all image URLs
+        const imagesToDelete = new Set();
+
+        // 1. From 'images' legacy array
+        if (item.images) {
+            try {
+                const imgArray = JSON.parse(item.images);
+                if (Array.isArray(imgArray)) {
+                    imgArray.forEach(img => {
+                        if (img) imagesToDelete.add(img);
+                    });
+                }
+            } catch (e) { console.error("Error parsing images for deletion", e); }
+        }
+
+        // 2. From 'variants' array
+        if (item.variants) {
+            try {
+                const variantsArray = JSON.parse(item.variants);
+                if (Array.isArray(variantsArray)) {
+                    variantsArray.forEach(v => {
+                        if (v.image) imagesToDelete.add(v.image);
+                    });
+                }
+            } catch (e) { console.error("Error parsing variants for deletion", e); }
+        }
+
+        // Delete files
+        for (const imageUrl of imagesToDelete) {
+            await deleteFile(imageUrl);
+        }
+
+        // Delete from DB
         await prisma.rentalItem.delete({
-            where: { id: parseInt(id) },
+            where: { id: rentalId },
         });
 
         revalidatePath('/admin/rentals');
@@ -140,6 +184,7 @@ export async function deleteRental(formData) {
         return { success: true, message: "Rental item deleted successfully" };
     } catch (error) {
         console.error("Error deleting rental:", error);
+        return { success: false, message: error.message || "Failed to delete rental item" };
     }
 }
 

@@ -1,11 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { getRentals, deleteRental, addRental, updateRental } from './actions';
-import { Plus, Edit, Trash2, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Edit, Trash2, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import styles from '../admin.module.css';
 import Link from 'next/link';
 import RentalForm from './RentalForm';
-import DeleteRentalButton from './DeleteRentalButton'; // We can reuse logic or implement inline
+
 
 // We can reuse the same Snackbar component or import it if shared
 const Snackbar = ({ message, type, onClose }) => {
@@ -33,6 +33,8 @@ export default function RentalsPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
+
+    const [deletingId, setDeletingId] = useState(null);
 
     // Need to fetch categories for the form
     const [existingCategories, setExistingCategories] = useState([]);
@@ -73,14 +75,22 @@ export default function RentalsPage() {
 
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to delete this rental item?")) return;
+        setDeletingId(id);
         const formData = new FormData();
         formData.append('id', id);
-        const res = await deleteRental(formData);
-        if (res.success) {
-            fetchData();
-            setSnackbar({ message: 'Item deleted', type: 'success' });
-        } else {
-            setSnackbar({ message: 'Failed to delete item', type: 'error' });
+
+        try {
+            const res = await deleteRental(formData);
+            if (res.success) {
+                fetchData();
+                setSnackbar({ message: 'Item deleted', type: 'success' });
+            } else {
+                setSnackbar({ message: 'Failed to delete item', type: 'error' });
+            }
+        } catch (error) {
+            setSnackbar({ message: 'An error occurred', type: 'error' });
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -120,8 +130,8 @@ export default function RentalsPage() {
 
             {/* Inline Form */}
             {showForm && (
-                <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
-                    <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
+                <div className={styles.rentalPageFormContainer}>
+                    <div className={styles.card} style={{ border: 'none', boxShadow: 'none' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
                             <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>
                                 {editingItem ? 'Edit Rental Item' : 'New Rental Details'}
@@ -154,7 +164,7 @@ export default function RentalsPage() {
                                     <th>Title</th>
                                     <th>Category</th>
                                     <th>Sizes</th>
-                                    <th>Actions</th>
+                                    <th style={{ textAlign: 'right' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -191,13 +201,23 @@ export default function RentalsPage() {
                                                 <td style={{ fontWeight: 500 }}>{item.title}</td>
                                                 <td><span className={styles.badge} style={{ background: '#f1f5f9' }}>{item.category}</span></td>
                                                 <td><span style={{ color: '#64748b', fontSize: '0.85rem' }}>{sizesCount} sizes</span></td>
-                                                <td>
-                                                    <div className={styles.actions}>
-                                                        <button onClick={() => handleEdit(item)} className={styles.btnIcon} title="Edit">
+                                                <td style={{ textAlign: 'right' }}>
+                                                    <div className={styles.actions} style={{ justifyContent: 'flex-end', display: 'flex', gap: '0.5rem' }}>
+                                                        <button onClick={() => handleEdit(item)} className={styles.btnIcon} title="Edit" disabled={deletingId === item.id}>
                                                             <Edit size={16} />
                                                         </button>
-                                                        <button onClick={() => handleDelete(item.id)} className={styles.btnIcon} style={{ color: '#ef4444', backgroundColor: '#fef2f2', borderColor: '#fee2e2' }} title="Delete">
-                                                            <Trash2 size={16} />
+                                                        <button
+                                                            onClick={() => handleDelete(item.id)}
+                                                            className={styles.btnIcon}
+                                                            style={{ color: '#ef4444', backgroundColor: '#fef2f2', borderColor: '#fee2e2' }}
+                                                            title="Delete"
+                                                            disabled={deletingId === item.id}
+                                                        >
+                                                            {deletingId === item.id ? (
+                                                                <Loader2 className="animate-spin" size={16} />
+                                                            ) : (
+                                                                <Trash2 size={16} />
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </td>

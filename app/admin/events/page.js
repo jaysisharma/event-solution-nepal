@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getEvents, deleteEvent } from './actions';
-import { Trash2, Pencil, Plus, CheckCircle, AlertCircle, X, Image as ImageIcon, MapPin, Calendar } from 'lucide-react';
+import { Trash2, Pencil, Plus, CheckCircle, AlertCircle, X, Image as ImageIcon, MapPin, Calendar, Loader2 } from 'lucide-react';
 import styles from '../admin.module.css';
 import Link from 'next/link';
 import FeaturedToggle from './FeaturedToggle';
@@ -29,6 +29,7 @@ const Snackbar = ({ message, type, onClose }) => {
 export default function EventsPage() {
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
 
     const fetchEvents = React.useCallback(async () => {
@@ -49,6 +50,7 @@ export default function EventsPage() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to delete this event?")) return;
 
+        setDeletingId(id);
         const formData = new FormData();
         formData.append('id', id);
         const res = await deleteEvent(formData);
@@ -59,6 +61,7 @@ export default function EventsPage() {
         } else {
             setSnackbar({ message: 'Failed to delete event', type: 'error' });
         }
+        setDeletingId(null);
     };
 
     return (
@@ -146,11 +149,18 @@ export default function EventsPage() {
                                                     style={{
                                                         color: '#ef4444',
                                                         backgroundColor: '#fef2f2',
-                                                        borderColor: '#fee2e2'
+                                                        borderColor: '#fee2e2',
+                                                        cursor: deletingId === event.id ? 'not-allowed' : 'pointer',
+                                                        opacity: deletingId === event.id ? 0.7 : 1
                                                     }}
+                                                    disabled={deletingId === event.id}
                                                     title="Delete"
                                                 >
-                                                    <Trash2 size={16} />
+                                                    {deletingId === event.id ? (
+                                                        <Loader2 size={16} className="animate-spin" />
+                                                    ) : (
+                                                        <Trash2 size={16} />
+                                                    )}
                                                 </button>
                                             </div>
                                         </td>

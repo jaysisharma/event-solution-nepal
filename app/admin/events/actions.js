@@ -36,6 +36,9 @@ export async function addEvent(formData) {
     const imageFile = formData.get('image');
     const ticketTemplateFile = formData.get('ticketTemplate');
     const ticketConfig = formData.get('ticketConfig');
+    const ticketPrice = formData.get('ticketPrice') || "0";
+    const ticketTypes = formData.get('ticketTypes');
+    const formConfig = formData.get('formConfig');
     // const status = formData.get('status') || 'UPCOMING'; // Removed manual status
 
     // Resolve logic
@@ -79,6 +82,9 @@ export async function addEvent(formData) {
                 image: imagePath || '',
                 ticketTemplate: ticketTemplatePath || '',
                 ticketConfig: ticketConfig || null,
+                ticketPrice: ticketPrice,
+                ticketTypes: ticketTypes || null,
+                formConfig: formConfig || null,
                 status: isEventCompleted(month, date, year) ? 'COMPLETED' : 'UPCOMING',
                 organizer,
                 managedBy,
@@ -92,7 +98,10 @@ export async function addEvent(formData) {
         return { success: true, message: "Event created successfully" };
     } catch (error) {
         console.error("Error creating event:", error);
-        return { success: false, message: "Failed to create event" };
+        // Check for common specific errors if any specific ones are known, otherwise return message
+        // Prisma errors usually have codes, but we can return the error message directly for now if it's safe, 
+        // or map common ones.
+        return { success: false, message: error.message || "Failed to create event" };
     }
 }
 
@@ -127,6 +136,8 @@ export async function updateEvent(formData) {
     const imageFile = formData.get('image');
     const ticketTemplateFile = formData.get('ticketTemplate');
     const ticketConfig = formData.get('ticketConfig');
+    const ticketPrice = formData.get('ticketPrice');
+    const ticketTypes = formData.get('ticketTypes');
 
     // Resolve logic
     const { organizer, managedBy } = resolveEntityFields(formData);
@@ -146,6 +157,9 @@ export async function updateEvent(formData) {
             managedBy,
             description: description || '',
             isFeatured: formData.get('isFeatured') === 'on',
+            ticketPrice: ticketPrice || "0",
+            ticketTypes: ticketTypes || null,
+            formConfig: formData.get('formConfig') || null,
         };
 
         const imagePath = await saveFile(imageFile, 'events');

@@ -1,8 +1,10 @@
 
 import prisma from '@/lib/db';
-import { addPartner, deletePartner } from './actions';
-import { Trash2, Plus } from 'lucide-react';
+import { addPartner } from './actions';
+import { Plus } from 'lucide-react';
 import styles from '../admin.module.css';
+import DeletePartnerButton from './DeletePartnerButton';
+import AddPartnerForm from './AddPartnerForm';
 
 export default async function PartnersPage() {
     const partners = await prisma.partner.findMany({
@@ -21,15 +23,7 @@ export default async function PartnersPage() {
             {/* Add Form */}
             <div className={styles.card}>
                 <h3 className={styles.cardTitle}>Add New Partner</h3>
-                <form action={addPartner} className={styles.formGrid} style={{ gridTemplateColumns: '1fr auto', alignItems: 'end' }}>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label} style={{ display: 'block', marginBottom: '0.5rem' }}>Logo (Required)</label>
-                        <input name="image" type="file" accept="image/*" required className={styles.input} style={{ paddingTop: '0.5rem' }} />
-                    </div>
-                    <button type="submit" className={styles.btnAddNew} style={{ marginBottom: '2px' }}>
-                        <Plus size={18} /> Add Partner
-                    </button>
-                </form>
+                <AddPartnerForm />
             </div>
 
             {/* List */}
@@ -53,16 +47,7 @@ export default async function PartnersPage() {
                                     </div>
                                 </td>
                                 <td style={{ textAlign: 'right' }}>
-                                    <form action={deletePartner}>
-                                        <input type="hidden" name="id" value={partner.id} />
-                                        <button
-                                            type="submit"
-                                            className={`${styles.btnIcon} delete`}
-                                            title="Delete"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </form>
+                                    <DeletePartnerButton id={partner.id} />
                                 </td>
                             </tr>
                         ))}

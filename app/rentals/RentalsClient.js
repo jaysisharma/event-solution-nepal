@@ -52,6 +52,9 @@ export default function RentalsClient({ initialItems }) {
         );
     };
 
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
     const handleWhatsappInquiry = () => {
         if (!selectedItem) return;
         const phoneNumber = "+9779703606342"; // Replace with actual number
@@ -59,6 +62,8 @@ export default function RentalsClient({ initialItems }) {
         const messageText = `Hello, I'm interested in renting the ${selectedItem.title}.
         
 Selected Option / Size: ${selectedSize}
+From: ${startDate || 'Not specified'}
+To: ${endDate || 'Not specified'}
 
 Please provide availability and pricing details.`;
 
@@ -241,6 +246,39 @@ Please provide availability and pricing details.`;
                                             {size}
                                         </button>
                                     ))}
+                                </div>
+
+                                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>From Date</label>
+                                        <input
+                                            type="date"
+                                            value={startDate}
+                                            onChange={(e) => setStartDate(e.target.value)}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.6rem',
+                                                borderRadius: '8px',
+                                                border: '1px solid #e2e8f0',
+                                                fontSize: '0.9rem'
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>To Date</label>
+                                        <input
+                                            type="date"
+                                            value={endDate}
+                                            onChange={(e) => setEndDate(e.target.value)}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.6rem',
+                                                borderRadius: '8px',
+                                                border: '1px solid #e2e8f0',
+                                                fontSize: '0.9rem'
+                                            }}
+                                        />
+                                    </div>
                                 </div>
 
                                 <button className={styles.whatsappBtn} onClick={handleWhatsappInquiry}>

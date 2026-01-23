@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { getTicketRequests, updateTicketRequestStatus, deleteTicketRequest } from '@/app/actions/ticketRequest';
 import AdminLayoutWrapper from '@/app/admin/AdminLayoutWrapper';
-import { Trash2, Phone, Mail, CheckCircle, Clock, ExternalLink, Globe, MapPin } from 'lucide-react';
+import { Trash2, Phone, Mail, CheckCircle, Clock, ExternalLink, Globe, MapPin, Loader2 } from 'lucide-react';
 import styles from './requests.module.css';
 
 export default function TicketRequestsPage() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState(null);
 
     const fetchRequests = async () => {
         setLoading(true);
@@ -37,12 +38,15 @@ export default function TicketRequestsPage() {
     const handleDelete = async (id) => {
         if (!confirm("Are you sure you want to delete this request? This cannot be undone.")) return;
 
+        setDeletingId(id);
         const res = await deleteTicketRequest(id);
+
         if (res.success) {
             fetchRequests();
         } else {
             alert("Failed to delete request");
         }
+        setDeletingId(null);
     };
 
     const getStatusBadge = (status) => {
@@ -83,7 +87,7 @@ export default function TicketRequestsPage() {
                                     <tr>
                                         <th className={styles.th}>Date & Time</th>
                                         <th className={styles.th}>User Details</th>
-                                        <th className={styles.th}>Event Interest</th>
+                                        <th className={styles.th}>Event & Tickets</th>
                                         <th className={styles.th}>Contact Info</th>
                                         <th className={styles.th}>Professional Info</th>
                                         <th className={styles.th}>Status</th>
@@ -106,7 +110,31 @@ export default function TicketRequestsPage() {
                                                 )}
                                             </td>
                                             <td className={styles.td}>
-                                                <span className={styles.eventName}>{request.eventName}</span>
+                                                <div className={styles.eventName}>{request.eventName}</div>
+                                                <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
+                                                    {request.amount > 0 ? (
+                                                        <span style={{ fontWeight: 600, color: '#10b981' }}>
+                                                            Rs. {request.amount / 100}
+                                                        </span>
+                                                    ) : (
+                                                        <span style={{ color: '#94a3b8' }}>Free</span>
+                                                    )}
+                                                </div>
+                                                {request.ticketDetails && (
+                                                    <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '2px', fontStyle: 'italic' }}>
+                                                        {(() => {
+                                                            try {
+                                                                const details = JSON.parse(request.ticketDetails);
+                                                                if (details.ticketType) {
+                                                                    return `${details.quantity || 1}x ${details.ticketType}`;
+                                                                }
+                                                                return request.ticketDetails;
+                                                            } catch (e) {
+                                                                return request.ticketDetails;
+                                                            }
+                                                        })()}
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className={styles.td}>
                                                 <a href={`tel:${request.number}`} className={styles.contactLink}>
@@ -160,8 +188,17 @@ export default function TicketRequestsPage() {
                                                         onClick={() => handleDelete(request.id)}
                                                         title="Delete Request"
                                                         className={`${styles.actionBtn} ${styles.btnDelete}`}
+                                                        disabled={deletingId === request.id}
+                                                        style={{
+                                                            cursor: deletingId === request.id ? 'not-allowed' : 'pointer',
+                                                            opacity: deletingId === request.id ? 0.7 : 1
+                                                        }}
                                                     >
-                                                        <Trash2 size={16} />
+                                                        {deletingId === request.id ? (
+                                                            <Loader2 size={16} className="animate-spin" />
+                                                        ) : (
+                                                            <Trash2 size={16} />
+                                                        )}
                                                     </button>
                                                 </div>
                                             </td>

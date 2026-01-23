@@ -30,6 +30,9 @@ model Event {
   isFeatured Boolean @default(false)
   ticketTemplate String?  // URL to clean ticket image
   ticketConfig   String?  // JSON string for field positions/styles
+  ticketPrice    String   @default("0")
+  ticketTypes    String?  // JSON string for multiple ticket types
+  formConfig     String?  // JSON string for form configuration
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -132,6 +135,7 @@ model HeroSlide {
   capacityLabel String   @default("Capacity")
   capacityIcon  String   @default("Users") // Users, Globe, Building
   showStats     Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -196,6 +200,15 @@ model TicketRequest {
   website      String?
   eventName    String
   status       String   @default("PENDING") // PENDING, CONTACTED, RESOLVED
+  
+  // Payment Details
+  paymentStatus String   @default("UNPAID")
+  pidx          String?
+  amount        Int?
+  transactionId String?
+  
+  ticketDetails String? // JSON or text: "Adult x2, Child x1"
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

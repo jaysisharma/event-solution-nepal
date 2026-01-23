@@ -6,10 +6,10 @@ import JsonLd from "@/components/JsonLd";
 
 export const metadata = {
   title: "Event Solution Nepal | Best Event Management Company in Nepal",
-  description: "Event Solution Nepal offers premium event management, rentals, decoration, and corporate event services in Kathmandu, Nepal. Contact us for a quote.",
+  description: "Event Solution Nepal offers premium event management, rentals, and decoration services in Kathmandu, Lalitpur, and Bhaktapur. Contact us for a quote.",
   openGraph: {
     title: "Event Solution Nepal | Create Memorable Events",
-    description: "Your trusted partner for planning, executing, and managing events since 2014.",
+    description: "Your trusted partner for planning, executing, and managing events in Kathmandu Valley since 2014.",
     url: "https://eventsolutionnepal.com.np",
     siteName: "Event Solution Nepal",
     images: [
@@ -55,7 +55,7 @@ export default async function Home() {
         orderBy: { createdAt: 'desc' }
       }),
       prisma.testimonial.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.heroSlide.findMany({ orderBy: { order: 'asc' } }),
+      prisma.heroSlide.findMany({ where: { isFeatured: true }, orderBy: { order: 'asc' } }),
       prisma.heroSettings.findFirst(),
       prisma.timelineMemory.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
       prisma.workProject.findMany({ where: { isFeatured: true }, orderBy: { createdAt: 'desc' }, take: 6 }),
@@ -115,7 +115,7 @@ export default async function Home() {
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Kathmandu",
-          "addressLocality": "Kathmandu",
+          "addressLocality": "Kathmandu, Lalitpur, Bhaktapur",
           "addressCountry": "NP"
         },
         "geo": {
@@ -123,6 +123,11 @@ export default async function Home() {
           "latitude": 27.7172,
           "longitude": 85.3240
         },
+        "areaServed": [
+          { "@type": "City", "name": "Kathmandu" },
+          { "@type": "City", "name": "Lalitpur" },
+          { "@type": "City", "name": "Bhaktapur" }
+        ],
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": [

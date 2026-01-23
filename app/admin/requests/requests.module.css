@@ -249,3 +249,16 @@
     color: #9ca3af;
     font-size: 0.95rem;
 }
+
+@media (max-width: 768px) {
+    .container {
+        margin-left: 0;
+        padding: 24px 16px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}

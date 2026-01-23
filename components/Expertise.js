@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import MagneticButton from './MagneticButton';
 import styles from './Expertise.module.css';
 import { useTheme } from '@/context/ThemeContext';
+import JsonLd from './JsonLd';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -164,7 +165,28 @@ const Expertise = () => {
                     </MagneticButton>
                 </div>
             </div>
-        </section>
+
+
+            {/* Service Schema for SEO */}
+            <JsonLd data={services.map(service => ({
+                "@context": "https://schema.org",
+                "@type": "Service",
+                "name": service.title,
+                "description": `${service.subtitle} - Professional ${service.title} services in Kathmandu, Lalitpur, and Bhaktapur.`,
+                "provider": {
+                    "@type": "Organization",
+                    "name": "Event Solution Nepal",
+                    "url": "https://eventsolutionnepal.com.np"
+                },
+                "areaServed": [
+                    { "@type": "City", "name": "Kathmandu" },
+                    { "@type": "City", "name": "Lalitpur" },
+                    { "@type": "City", "name": "Bhaktapur" }
+                ],
+                "image": `https://eventsolutionnepal.com.np${service.image}`
+            }))} />
+
+        </section >
     );
 };
 

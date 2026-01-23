@@ -28,16 +28,25 @@ export async function addPartner(formData) {
     revalidatePath('/'); // Update homepage
 }
 
-export async function deletePartner(formData) {
-    const id = formData.get('id');
-    if (!id) return;
+export async function deletePartner(id) {
+    if (id instanceof FormData) {
+        id = id.get('id');
+    }
 
-    await prisma.partner.delete({
-        where: { id: parseInt(id) },
-    });
+    if (!id) return { success: false, error: "Invalid ID" };
 
-    revalidatePath('/admin/partners');
-    revalidatePath('/');
+    try {
+        await prisma.partner.delete({
+            where: { id: parseInt(id) },
+        });
+
+        revalidatePath('/admin/partners');
+        revalidatePath('/');
+        return { success: true };
+    } catch (error) {
+        console.error("Delete Partner Error:", error);
+        return { success: false, error: "Failed to delete partner" };
+    }
 }
 
 export async function updatePartner(formData) {

@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import styles from '../admin.module.css';
-import { Plus, Save, ArrowLeft, Loader2 } from 'lucide-react';
+import { Plus, Save, ArrowLeft, Loader2, Trash } from 'lucide-react';
 import Link from 'next/link';
 import TicketCanvas from '@/components/admin/TicketCanvas';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/admin/ToastContext';
-import { useEffect } from 'react';
 
 export default function EventForm({ initialData, action, mode = 'create', isInline = false }) {
     const { showToast } = useToast();
@@ -26,12 +26,55 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
     const [manageType, setManageType] = useState(getInitialType);
     const [compressedFile, setCompressedFile] = useState(null);
+    const [uploadTime, setUploadTime] = useState(null);
     const [ticketConfig, setTicketConfig] = useState(initialData?.ticketConfig ? JSON.parse(initialData.ticketConfig) : null);
+
+    // Initial Form Config Logic
+    const getInitialFormConfig = () => {
+        if (initialData?.formConfig && initialData.formConfig !== 'null') {
+            try {
+                const parsed = JSON.parse(initialData.formConfig);
+                return parsed;
+            } catch (e) { console.error("Error parsing formConfig", e); }
+        }
+        return {
+            address: { show: true, required: false },
+            jobTitle: { show: true, required: false },
+            organization: { show: true, required: false },
+            website: { show: true, required: false }
+        };
+    };
+    const [formConfig, setFormConfig] = useState(getInitialFormConfig);
+
+    const handleFormConfigChange = (field, key, value) => {
+        setFormConfig(prev => ({
+            ...prev,
+            [field]: { ...prev[field], [key]: value }
+        }));
+    };
+
+    // Initial Ticket Types Logic
+    const getInitialTicketTypes = () => {
+        if (initialData?.ticketTypes && initialData.ticketTypes !== 'null') {
+            try {
+                const parsed = JSON.parse(initialData.ticketTypes);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            } catch (e) { console.error("Error parsing types", e); }
+        }
+        // Fallback for Legacy or New
+        if (initialData?.ticketPrice && parseInt(initialData.ticketPrice) > 0) {
+            return [{ label: 'General', price: initialData.ticketPrice }];
+        }
+        return [];
+    };
+
+    const [ticketTypes, setTicketTypes] = useState(getInitialTicketTypes);
 
     // Update state when initialData changes (for inline editing)
     useEffect(() => {
         if (initialData) {
             setManageType(getInitialType());
+            setTicketTypes(getInitialTicketTypes());
         }
     }, [initialData]);
 
@@ -39,8 +82,14 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         const file = e.target.files?.[0];
         if (!file) {
             setCompressedFile(null);
+            setUploadTime(null);
             return;
         }
+
+        // Calc time
+        const sizeInMB = file.size / (1024 * 1024);
+        const estTime = Math.ceil(sizeInMB * 2); // 0.5MB/s => 2s per MB
+        setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
 
         const validResolutions = [
             { w: 1920, h: 1080 },
@@ -92,6 +141,19 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         }
     };
 
+    // Ticket Type Handlers
+    const addTicketType = () => {
+        setTicketTypes([...ticketTypes, { label: '', price: '' }]);
+    };
+    const removeTicketType = (index) => {
+        setTicketTypes(ticketTypes.filter((_, i) => i !== index));
+    };
+    const updateTicketType = (index, field, value) => {
+        const newTypes = [...ticketTypes];
+        newTypes[index][field] = value;
+        setTicketTypes(newTypes);
+    };
+
     async function handleSubmit(e) {
         e.preventDefault(); // Prevent default since we are using onSubmit
         setIsSubmitting(true);
@@ -99,6 +161,11 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         const formData = new FormData(e.currentTarget);
         // Append manageType manually if it wasn't picked up or to ensure it's there
         formData.set('manageType', manageType);
+        formData.set('ticketTypes', JSON.stringify(ticketTypes));
+        formData.set('formConfig', JSON.stringify(formConfig));
+        // Calculate min price for legacy check or display
+        const minPrice = ticketTypes.length > 0 ? Math.min(...ticketTypes.map(t => parseInt(t.price) || 0)) : 0;
+        formData.set('ticketPrice', minPrice.toString()); // Keep legacy field populated with min price
 
         // Logic Validation
         let errorMessage = "";
@@ -129,6 +196,12 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
             errorMessage = "Event Image is required for new events.";
         }
 
+        // Validate Ticket Types
+        const invalidTicket = ticketTypes.find(t => !t.label || !t.price);
+        if (invalidTicket) {
+            errorMessage = "All ticket types must have a Label and Price.";
+        }
+
         if (errorMessage) {
             showToast(errorMessage, "error");
             setIsSubmitting(false);
@@ -157,11 +230,9 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                 newOrganizer = null;
             }
 
-            // Status check
-            const { isEventCompleted } = require('@/lib/dateUtils'); // This might fail on client, handle gracefully?
-            // Actually dateUtils is likely client safe if it just does date math.
-            // If not, we can skip strict status check optimization or move it.
-            // Let's assume safe or skip for now to avoid breakage.
+            // Serialize types for comparison
+            const typesChanged = JSON.stringify(ticketTypes) !== (initialData.ticketTypes || JSON.stringify(getInitialTicketTypes()));
+            const configChanged = JSON.stringify(formConfig) !== (initialData.formConfig || JSON.stringify(getInitialFormConfig()));
 
             const hasTextChanged = (
                 title !== initialData.title ||
@@ -173,10 +244,12 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                 description !== initialData.description ||
                 isFeatured !== (initialData.isFeatured || false) ||
                 (newOrganizer || null) !== (initialData.organizer || null) ||
-                (newManagedBy || null) !== (initialData.managedBy || null)
+                (newManagedBy || null) !== (initialData.managedBy || null) ||
+                typesChanged ||
+                configChanged
             );
 
-            if (!hasFile && !hasTextChanged) { // Simplified check
+            if (!hasFile && !hasTextChanged && !typesChanged && !configChanged) { // Simplified check
                 showToast("No changes detected.", "info");
                 setIsSubmitting(false);
                 return;
@@ -224,7 +297,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
             {!isInline && (
                 <div className={styles.pageHeader}>
                     <div>
-                        <Link href="/admin/events" className={styles.btnSecondary} style={{ marginBottom: '1rem', display: 'inline-flex' }}>
+                        <Link href="/admin/events" className={styles.btnSecondary} style={{ marginBottom: '1rem', display: 'inline-flex', border: 'none', paddingLeft: 0 }}>
                             <ArrowLeft size={16} /> Back to Events
                         </Link>
                         <h1 className={styles.pageTitle}>{mode === 'create' ? 'Create New Event' : 'Edit Event'}</h1>
@@ -238,6 +311,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                     {initialData && <input type="hidden" name="id" value={initialData.id} />}
                     {/* Pass the type so server knows how to handle it if needed */}
                     <input type="hidden" name="manageType" value={manageType} />
+                    <input type="hidden" name="formConfig" value={JSON.stringify(formConfig)} />
                     <input type="hidden" name="ticketConfig" value={JSON.stringify(ticketConfig)} />
 
                     {/* --- Common Fields --- */}
@@ -360,7 +434,105 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                         />
                     </div>
 
+                    {/* --- Ticket Types Section --- */}
+                    <div className={styles.fullWidth} style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '0.5rem', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <label className={styles.label} style={{ marginBottom: 0 }}>Ticket Types</label>
+                            <button
+                                type="button"
+                                onClick={addTicketType}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    padding: '0.5rem 1rem',
+                                    backgroundColor: '#0f172a',
+                                    color: 'white',
+                                    borderRadius: '0.25rem',
+                                    fontSize: '0.85rem'
+                                }}
+                            >
+                                <Plus size={14} /> Add Type
+                            </button>
+                        </div>
 
+                        {ticketTypes.map((type, index) => (
+                            <div key={index} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '0.75rem' }}>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Label</label>
+                                    <input
+                                        type="text"
+                                        value={type.label}
+                                        onChange={(e) => updateTicketType(index, 'label', e.target.value)}
+                                        placeholder="e.g. Adult"
+                                        className={styles.input}
+                                    />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Price (NPR)</label>
+                                    <input
+                                        type="number"
+                                        value={type.price}
+                                        onChange={(e) => updateTicketType(index, 'price', e.target.value)}
+                                        placeholder="1000"
+                                        className={styles.input}
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => removeTicketType(index)}
+                                    style={{
+                                        marginBottom: '0.25rem',
+                                        padding: '0.6rem',
+                                        color: '#ef4444',
+                                        backgroundColor: '#fee2e2',
+                                        borderRadius: '0.25rem',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <Trash size={16} />
+                                </button>
+                            </div>
+                        ))}
+                        {ticketTypes.length === 0 && (
+                            <p style={{ fontSize: '0.9rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                                No ticket types added. This event will be free or unavailable for booking.
+                            </p>
+                        )}
+                    </div>
+
+
+
+
+                    {/* --- Ticket Form Settings Section --- */}
+                    <div className={styles.fullWidth} style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '0.5rem', marginBottom: '1.5rem', border: '1px solid #e2e8f0' }}>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <label className={styles.label} style={{ marginBottom: 0 }}>Ticket Form Settings</label>
+                            <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Configure which extra fields are visible on the user registration form.</p>
+                        </div>
+
+                        <div className={styles.ticketSettingsGrid}>
+                            {['address', 'jobTitle', 'organization', 'website'].map((fieldKey) => (
+                                <div key={fieldKey} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem', background: 'white', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                                    <span style={{ textTransform: 'capitalize', fontWeight: 500, color: '#334155' }}>
+                                        {fieldKey.replace(/([A-Z])/g, ' $1').trim()}
+                                    </span>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formConfig[fieldKey]?.show}
+                                                onChange={(e) => handleFormConfigChange(fieldKey, 'show', e.target.checked)}
+                                                style={{ width: '16px', height: '16px' }}
+                                            />
+                                            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Show</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
                     <div className={styles.formGroup} style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
                         <input
@@ -385,6 +557,11 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                         <p style={{ fontSize: '0.8rem', color: '#eab308', marginTop: '0.5rem' }}>
                             Required Size: 1920x1080 or 1280x720 only.
                         </p>
+                        {uploadTime && (
+                            <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
+                                Estimated Upload Time: {uploadTime}
+                            </p>
+                        )}
                         {mode === 'edit' && initialData?.image && (
                             <div style={{ marginTop: '0.8rem' }}>
                                 <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>Current Image:</p>
@@ -451,7 +628,8 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
+

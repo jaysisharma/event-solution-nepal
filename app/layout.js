@@ -1,18 +1,6 @@
 import { Poppins, Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import Preloader from "@/components/Preloader";
-import SmoothScroll from "@/components/SmoothScroll";
-import Cursor from "@/components/Cursor";
-import AnalyticsTracker from "@/components/AnalyticsTracker";
-import { GoogleAnalytics } from '@next/third-parties/google';
-import JsonLd from "@/components/JsonLd";
-import { ThemeProvider } from "@/context/ThemeContext";
-import { SettingsProvider } from "@/context/SettingsContext";
-import BackToTop from "@/components/BackToTop";
-import WhatsAppFloat from "@/components/WhatsAppFloat";
-
+import ClientRootLayout from "./ClientRootLayout";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -38,8 +26,8 @@ export const metadata = {
     default: "Event Solution Nepal | Premier Event Management Company",
     template: "%s | Event Solution Nepal"
   },
-  description: "Leading event management company in Nepal since 2014. We specialize in weddings, corporate events, private parties, and concerts. Bringing your vision to life.",
-  keywords: ["Event Management Nepal", "Wedding Planner Nepal", "Corporate Events Kathmandu", "Event Solution Nepal", "Party Palace", "Concert Organizer"],
+  description: "Leading event management company in Nepal since 2014. We specialize in weddings, corporate events, and concerts across Kathmandu, Lalitpur, and Bhaktapur.",
+  keywords: ["Event Management Nepal", "Wedding Planner Nepal", "Corporate Events Kathmandu", "Event Management Lalitpur", "Event Management Bhaktapur", "Event Solution Nepal", "Party Palace", "Concert Organizer"],
   authors: [{ name: "Event Solution Nepal" }],
   creator: "Event Solution Nepal",
   publisher: "Event Solution Nepal",
@@ -53,7 +41,7 @@ export const metadata = {
   },
   openGraph: {
     title: "Event Solution Nepal | Premier Event Management",
-    description: "Creating meaningful and memorable events for over a decade. Your trusted partner for planning, executing, and managing events.",
+    description: "Creating meaningful and memorable events in Kathmandu, Lalitpur, and Bhaktapur. Your trusted partner since 2014.",
     url: 'https://eventsolutionnepal.com.np',
     siteName: 'Event Solution Nepal',
     locale: 'en_US',
@@ -62,7 +50,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: "Event Solution Nepal",
-    description: "Premier Event Management Company in Nepal.",
+    description: "Premier Event Management in Kathmandu, Lalitpur, and Bhaktapur.",
     creator: "@eventsolutionnepal", // Placeholder
   },
   robots: {
@@ -76,44 +64,19 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: '/',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <body className={`${poppins.variable} ${inter.variable} ${playfair.variable}`} suppressHydrationWarning={true}>
-        <SettingsProvider>
-          <ThemeProvider>
-            <SmoothScroll />
-            <Preloader />
-            <Cursor />
-            <AnalyticsTracker />
-            <Navbar />
-            <main style={{ minHeight: 'calc(100vh - 80px - 300px)', position: 'relative', zIndex: 10, backgroundColor: 'var(--background)' }}>
-              {children}
-            </main>
-            <BackToTop />
-            <WhatsAppFloat />
-            <Footer />
-            {process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
-            <JsonLd data={{
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "Event Solution Nepal",
-              "url": "https://eventsolutionnepal.com.np",
-              "logo": "https://eventsolutionnepal.com.np/logo.png",
-              "sameAs": [
-                "https://www.facebook.com/eventsolutionnepal",
-                "https://www.instagram.com/eventsolutionnepal"
-              ],
-              "contactPoint": {
-                "@type": "ContactPoint",
-                "telephone": "+977-9851182375",
-                "contactType": "customer service"
-              }
-            }} />
-          </ThemeProvider>
-        </SettingsProvider>
+        <ClientRootLayout>
+          {children}
+        </ClientRootLayout>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff } from 'lucide-react';
+import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { getAdminUsers, createAdminUser, deleteAdminUser, updateAdminPassword } from './actions';
 import { getSiteSettings, updateSiteSettings } from './siteActions';
 import styles from '../admin.module.css';
@@ -102,6 +102,7 @@ export default function SettingsPage() {
     const [snackbar, setSnackbar] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSavingSettings, setIsSavingSettings] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
     const [selectedAdmin, setSelectedAdmin] = useState(null); // For password change modal
 
     async function loadData() {
@@ -142,13 +143,17 @@ export default function SettingsPage() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this admin?')) return;
+
+        setDeletingId(id);
         const res = await deleteAdminUser(id);
+
         if (res.success) {
             setSnackbar({ message: res.success, type: 'success' });
             loadData();
         } else {
             setSnackbar({ message: res.error, type: 'error' });
         }
+        setDeletingId(null);
     };
 
     const handleUpdateSettings = async (e) => {
@@ -280,16 +285,27 @@ export default function SettingsPage() {
                                             className={styles.btnIcon}
                                             style={{ color: '#6366f1', background: '#eef2ff' }}
                                             title="Change Password"
+                                            disabled={deletingId === admin.id}
                                         >
                                             <Lock size={18} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(admin.id)}
                                             className={styles.btnIcon}
-                                            style={{ color: '#ef4444', background: '#fee2e2' }}
+                                            style={{
+                                                color: '#ef4444',
+                                                background: '#fee2e2',
+                                                cursor: deletingId === admin.id ? 'not-allowed' : 'pointer',
+                                                opacity: deletingId === admin.id ? 0.7 : 1
+                                            }}
                                             title="Delete Admin"
+                                            disabled={deletingId === admin.id}
                                         >
-                                            <Trash2 size={18} />
+                                            {deletingId === admin.id ? (
+                                                <Loader2 size={18} className="animate-spin" />
+                                            ) : (
+                                                <Trash2 size={18} />
+                                            )}
                                         </button>
                                     </div>
                                 </div>

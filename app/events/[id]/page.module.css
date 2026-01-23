@@ -1,0 +1,186 @@
+.main {
+    min-height: 100vh;
+    background-color: #ffffff;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    padding-bottom: 5rem;
+}
+
+/* --- Container --- */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* --- Navigation --- */
+.navBar {
+    padding: 1.5rem 0;
+    margin-bottom: 3rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.backLink:hover {
+    color: #0f172a;
+}
+
+/* --- Hero / Header Section --- */
+.headerSection {
+    margin-bottom: 4rem;
+    text-align: center;
+}
+
+.dateBadge {
+    display: inline-block;
+    background: #f1f5f9;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.eventTitle {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: #0f172a;
+}
+
+.eventMeta {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Hero Image --- */
+.heroImageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 4rem;
+    background-color: #f8fafc;
+}
+
+.heroImage {
+    object-fit: cover;
+}
+
+/* --- Layout Grid --- */
+.contentGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+}
+
+/* --- Left Column (Content) --- */
+.detailsColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #0f172a;
+}
+
+.description {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #334155;
+    white-space: pre-wrap;
+}
+
+.organizerBlock {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 2rem;
+}
+
+.organizerLabel {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.organizerName {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+/* --- Right Column (Sticky Ticket) --- */
+.ticketColumn {
+    position: relative;
+}
+
+.stickyWrapper {
+    position: sticky;
+    top: 2rem;
+}
+
+.ticketCard {
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    background: #ffffff;
+    /* No shadow for minimalism, or very subtle */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.ticketTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.ticketSubtitle {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Responsive --- */
+@media (min-width: 768px) {
+    .eventTitle {
+        font-size: 3.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .contentGrid {
+        grid-template-columns: 1.6fr 1fr;
+        /* 60/40 approx */
+        gap: 5rem;
+        align-items: start;
+    }
+}

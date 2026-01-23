@@ -29,6 +29,7 @@ export default function AdminGallery() {
     const [galleryItems, setGalleryItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
 
     // Form inputs
@@ -37,6 +38,7 @@ export default function AdminGallery() {
     const [size, setSize] = useState('normal');
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [uploadTime, setUploadTime] = useState(null);
 
     const [showForm, setShowForm] = useState(false);
 
@@ -103,6 +105,7 @@ export default function AdminGallery() {
                 setSize('normal');
                 setFile(null);
                 setPreview(null);
+                setUploadTime(null);
                 setShowForm(false); // Close form
                 fetchGallery();
             } else {
@@ -118,13 +121,17 @@ export default function AdminGallery() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this image?')) return;
+
+        setDeletingId(id);
         const res = await deleteGalleryItem(id);
+
         if (res.success) {
             setSnackbar({ message: 'Image deleted', type: 'success' });
             fetchGallery();
         } else {
             setSnackbar({ message: res.error || 'Failed to delete', type: 'error' });
         }
+        setDeletingId(null);
     };
 
     return (
@@ -146,7 +153,7 @@ export default function AdminGallery() {
             {showForm && (
                 <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
                     <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
                             <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>Add Gallery Item</h3>
                             <button onClick={handleCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
                                 <X size={20} />
@@ -196,6 +203,11 @@ export default function AdminGallery() {
                                 {preview && (
                                     <div style={{ marginTop: '0.5rem' }}>
                                         <img src={preview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #3b82f6' }} />
+                                        {uploadTime && (
+                                            <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
+                                                Est: {uploadTime}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -241,21 +253,38 @@ export default function AdminGallery() {
                                     </td>
                                     <td>{item.size}</td>
                                     <td style={{ textAlign: 'right' }}>
-                                        <button onClick={() => handleDelete(item.id)} className={`${styles.btnIcon} delete`} title="Delete">
-                                            <Trash2 size={18} />
+                                        <button
+                                            onClick={() => handleDelete(item.id)}
+                                            className={`${styles.btnIcon} delete`}
+                                            title="Delete"
+                                            disabled={deletingId === item.id}
+                                            style={{
+                                                cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
+                                                opacity: deletingId === item.id ? 0.7 : 1
+                                            }}
+                                        >
+                                            {deletingId === item.id ? (
+                                                <Loader2 size={18} className="animate-spin" />
+                                            ) : (
+                                                <Trash2 size={18} />
+                                            )}
                                         </button>
                                     </td>
+
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                )}
-                {!isLoading && galleryItems.length === 0 && (
-                    <div className={styles.emptyState} style={{ border: 'none' }}>
-                        No images found.
-                    </div>
-                )}
-            </div>
-        </div>
+                )
+                }
+                {
+                    !isLoading && galleryItems.length === 0 && (
+                        <div className={styles.emptyState} style={{ border: 'none' }}>
+                            No images found.
+                        </div>
+                    )
+                }
+            </div >
+        </div >
     );
 }

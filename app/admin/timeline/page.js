@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { getTimelineMemories, createTimelineMemory, updateTimelineMemory, deleteTimelineMemory } from './actions';
 import styles from '../admin.module.css';
 
@@ -26,37 +26,14 @@ const Snackbar = ({ message, type, onClose }) => {
     );
 };
 
-const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
-    if (!isOpen) return null;
-    return (
-        <div style={{
-            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', zIndex: 999
-        }}>
-            <div style={{
-                backgroundColor: 'white', padding: '2rem', borderRadius: '12px', width: '100%', maxWidth: '400px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem', color: '#dc2626' }}>
-                    <AlertTriangle size={24} />
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>{title}</h3>
-                </div>
-                <p style={{ color: '#64748b', marginBottom: '2rem', lineHeight: '1.5' }}>{message}</p>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    <button onClick={onCancel} style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: 'white', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                    <button onClick={onConfirm} style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', border: 'none', backgroundColor: '#dc2626', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
-                </div>
-            </div>
-        </div>
-    );
-};
+
 
 export default function TimelineAdminPage() {
     const [memories, setMemories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
-    const [deleteId, setDeleteId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
     const [editingId, setEditingId] = useState(null);
 
     // Form Toggle
@@ -67,6 +44,7 @@ export default function TimelineAdminPage() {
     const [year, setYear] = useState('');
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState('');
+    const [uploadTime, setUploadTime] = useState(null);
 
     const fetchMemories = React.useCallback(async () => {
         setIsLoading(true);
@@ -107,6 +85,7 @@ export default function TimelineAdminPage() {
         setYear('');
         setImage(null);
         setPreview('');
+        setUploadTime(null);
     };
 
     const handleImageChange = async (e) => {
@@ -114,6 +93,11 @@ export default function TimelineAdminPage() {
         if (!file) return;
 
         setPreview(URL.createObjectURL(file));
+
+        // Calc time
+        const sizeInMB = file.size / (1024 * 1024);
+        const estTime = Math.ceil(sizeInMB * 2); // 0.5MB/s => 2s per MB
+        setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
 
         try {
             const compressedFile = await compressImage(file);
@@ -156,22 +140,24 @@ export default function TimelineAdminPage() {
         setIsSubmitting(false);
     };
 
-    const handleConfirmDelete = async () => {
-        if (!deleteId) return;
-        const res = await deleteTimelineMemory(deleteId);
+    const handleDelete = async (id) => {
+        if (!confirm('Are you sure you want to delete this memory?')) return;
+
+        setDeletingId(id);
+        const res = await deleteTimelineMemory(id);
+
         if (res.success) {
             fetchMemories();
             setSnackbar({ message: 'Memory deleted successfully', type: 'success' });
         } else {
             setSnackbar({ message: 'Failed to delete memory', type: 'error' });
         }
-        setDeleteId(null);
+        setDeletingId(null);
     };
 
     return (
         <div style={{ paddingBottom: '4rem' }}>
             {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
-            <ConfirmDialog isOpen={!!deleteId} title="Delete Memory" message="Are you sure?" onConfirm={handleConfirmDelete} onCancel={() => setDeleteId(null)} />
 
             {/* Header */}
             <div className={styles.pageHeader}>
@@ -187,14 +173,7 @@ export default function TimelineAdminPage() {
 
             {/* Inline Form */}
             {showForm && (
-                <div style={{
-                    marginBottom: '2rem',
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    padding: '1.5rem',
-                    animation: 'slideDown 0.2s ease-out'
-                }}>
+                <div className={styles.timelineFormCard}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
                         <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>{editingId ? 'Edit Memory' : 'Add New Memory'}</h3>
                         <button onClick={handleCancelForm} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
@@ -202,29 +181,36 @@ export default function TimelineAdminPage() {
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <form onSubmit={handleSubmit} className={styles.timelineFormLayout}>
                         {/* Image Input */}
-                        <div style={{ width: '120px', height: '120px', flexShrink: 0, position: 'relative', border: '1px dashed #cbd5e1', borderRadius: '8px', overflow: 'hidden', background: '#f8fafc' }}>
-                            <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 10 }} />
-                            {preview ? (
-                                <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
-                                    <ImageIcon size={24} />
+                        <div className={styles.timelineImageSection}>
+                            <div className={styles.timelineImageUpload}>
+                                <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 10 }} />
+                                {preview ? (
+                                    <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
+                                        <ImageIcon size={24} />
+                                    </div>
+                                )}
+                            </div>
+                            {uploadTime && (
+                                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', textAlign: 'center' }}>
+                                    Est: {uploadTime}
                                 </div>
                             )}
                         </div>
 
                         {/* Fields */}
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: '250px' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '1rem' }}>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Caption</label>
-                                    <input type="text" value={alt} onChange={(e) => setAlt(e.target.value)} required style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="Event Title" />
+                        <div className={styles.timelineFieldsSection}>
+                            <div className={styles.timelineInputRow} style={{ gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                <div style={{ flex: 3 }}>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.5rem' }}>Caption</label>
+                                    <input type="text" value={alt} onChange={(e) => setAlt(e.target.value)} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }} placeholder="Event Title" />
                                 </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>Year</label>
-                                    <input type="text" value={year} onChange={(e) => setYear(e.target.value)} required style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '4px' }} placeholder="2024" />
+                                <div style={{ flex: 1 }}>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.5rem' }}>Year</label>
+                                    <input type="text" value={year} onChange={(e) => setYear(e.target.value)} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }} placeholder="2024" />
                                 </div>
                             </div>
 
@@ -269,11 +255,25 @@ export default function TimelineAdminPage() {
                                     <td style={{ color: '#64748b' }}>{m.year}</td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <button onClick={() => handleEditClick(m)} style={{ padding: '0.4rem', border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }} title="Edit">
+                                            <button onClick={() => handleEditClick(m)} className={styles.btnIcon} title="Edit">
                                                 <Pencil size={16} />
                                             </button>
-                                            <button onClick={() => setDeleteId(m.id)} style={{ padding: '0.4rem', border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }} title="Delete">
-                                                <Trash2 size={16} />
+                                            <button
+                                                onClick={() => handleDelete(m.id)}
+                                                className={styles.btnIcon}
+                                                style={{
+                                                    color: '#ef4444',
+                                                    cursor: deletingId === m.id ? 'not-allowed' : 'pointer',
+                                                    opacity: deletingId === m.id ? 0.7 : 1
+                                                }}
+                                                title="Delete"
+                                                disabled={deletingId === m.id}
+                                            >
+                                                {deletingId === m.id ? (
+                                                    <Loader2 size={16} className="animate-spin" />
+                                                ) : (
+                                                    <Trash2 size={16} />
+                                                )}
                                             </button>
                                         </div>
                                     </td>

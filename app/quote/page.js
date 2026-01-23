@@ -12,7 +12,8 @@ export default function Quote() {
         email: '',
         phone: '',
         eventType: '',
-        date: '',
+        dateFrom: '',
+        dateTo: '',
         location: '',
         guests: '',
         services: [],
@@ -38,7 +39,7 @@ export default function Quote() {
         e.preventDefault();
 
         // Validate all required fields
-        const requiredFields = ['name', 'email', 'phone', 'eventType', 'date', 'location', 'guests', 'budget', 'details'];
+        const requiredFields = ['name', 'email', 'phone', 'eventType', 'dateFrom', 'dateTo', 'location', 'guests', 'budget', 'details'];
         const emptyFields = requiredFields.filter(field => !formData[field]);
 
         if (emptyFields.length > 0) {
@@ -63,7 +64,7 @@ Phone: ${formData.phone}
 
 *Event Specifics*
 Type: ${formData.eventType}
-Date: ${formData.date}
+Date: ${formData.dateFrom} to ${formData.dateTo}
 Location: ${formData.location}
 Guests: ${formData.guests}
 
@@ -137,8 +138,12 @@ ${formData.details}`;
                                 </select>
                             </div>
                             <div className={styles.formGroup}>
-                                <label className={styles.label}>Date of Event</label>
-                                <input name="date" type="date" className={styles.input} onChange={handleChange} required />
+                                <label className={styles.label}>Event Date (From)</label>
+                                <input name="dateFrom" type="date" className={styles.input} onChange={handleChange} required />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Event Date (To)</label>
+                                <input name="dateTo" type="date" className={styles.input} onChange={handleChange} required />
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Venue Location</label>

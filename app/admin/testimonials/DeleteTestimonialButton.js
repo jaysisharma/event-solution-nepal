@@ -2,8 +2,9 @@
 
 import { deleteTestimonial } from './actions';
 import { useToast } from '@/components/admin/ToastContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import styles from '../admin.module.css';
 
 export default function DeleteTestimonialButton({ id }) {
     const [isDeleting, setIsDeleting] = useState(false);
@@ -27,9 +28,17 @@ export default function DeleteTestimonialButton({ id }) {
         <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-red-600 hover:text-red-800 font-medium disabled:opacity-50"
+            className={styles.btnIcon}
+            title="Delete"
+            style={{
+                color: '#ef4444',
+                backgroundColor: '#fef2f2',
+                borderColor: '#fee2e2',
+                opacity: isDeleting ? 0.7 : 1,
+                cursor: isDeleting ? 'not-allowed' : 'pointer'
+            }}
         >
-            {isDeleting ? <Loader2 size={16} className="animate-spin" /> : 'Delete'}
+            {isDeleting ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
         </button>
     );
 }
