@@ -369,7 +369,7 @@ export default function ProjectAdminPage() {
                             accept="image/*"
                             className={styles.input}
                             style={{ paddingTop: '0.7rem' }}
-                            required={!editingId} // Required only on create
+                            required={!editingId && uploadedUrls.length === 0} // Required only on create and if no images uploaded yet
                         />
 
                         {/* Preview Area */}

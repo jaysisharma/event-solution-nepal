@@ -37,6 +37,7 @@ export default function AdminGallery() {
     // Form inputs
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('Wedding');
+    const [customCategory, setCustomCategory] = useState('');
     const [size, setSize] = useState('normal');
     // const [file, setFile] = useState(null); // No longer needed
     // const [preview, setPreview] = useState(null); // No longer needed
@@ -58,6 +59,7 @@ export default function AdminGallery() {
         // Reset form
         setTitle('');
         setCategory('Wedding');
+        setCustomCategory('');
         setSize('normal');
         // setFile(null);
         // setPreview(null);
@@ -132,7 +134,8 @@ export default function AdminGallery() {
         try {
             const formData = new FormData();
             formData.append('title', title);
-            formData.append('category', category);
+            const finalCategory = category === 'Other' ? customCategory : category;
+            formData.append('category', finalCategory);
             formData.append('size', size);
             formData.append('src', uploadedImageUrl);
 
@@ -211,13 +214,32 @@ export default function AdminGallery() {
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Category</label>
-                                <select value={category} onChange={(e) => setCategory(e.target.value)} className={styles.select}>
-                                    <option value="Wedding">Wedding</option>
-                                    <option value="Corporate">Corporate</option>
-                                    <option value="Concert">Concert</option>
-                                    <option value="Party">Party</option>
-                                    <option value="Decoration">Decoration</option>
-                                </select>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className={styles.select}
+                                        style={{ flex: 1 }}
+                                    >
+                                        <option value="Wedding">Wedding</option>
+                                        <option value="Corporate">Corporate</option>
+                                        <option value="Concert">Concert</option>
+                                        <option value="Party">Party</option>
+                                        <option value="Decoration">Decoration</option>
+                                        <option value="Other">Other (Add New)</option>
+                                    </select>
+                                    {category === 'Other' && (
+                                        <input
+                                            value={customCategory}
+                                            onChange={(e) => setCustomCategory(e.target.value)}
+                                            type="text"
+                                            placeholder="Enter Category"
+                                            className={styles.input}
+                                            style={{ flex: 1 }}
+                                            required
+                                        />
+                                    )}
+                                </div>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Size</label>
@@ -306,8 +328,9 @@ export default function AdminGallery() {
                             </div>
                         </form>
                     </div>
-                </div>
-            )}
+                </div >
+            )
+            }
 
             <div className={styles.tableContainer}>
                 {isLoading ? (
