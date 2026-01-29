@@ -13,13 +13,6 @@ const Footer = () => {
     const whatsappNum = settings?.whatsappNumber || '9779851336342';
 
     const footerRef = React.useRef(null);
-    // ... (rest of hook logic unchanged, verify if I need to skip lines to avoid overwriting)
-    /* actually I need to be careful with matching. */
-    /* I'll just replace the component start and specific lines later? No, I'll use multi-step replacement. */
-    /* This tool call replaces the component start. */
-
-    // ...
-    /* I will just return the first few lines modification here. */
 
     const [footerHeight, setFooterHeight] = React.useState(0);
     /* Wait, I can't leave invalid syntax. I'll replace the top part of the function. */
