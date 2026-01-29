@@ -3,9 +3,26 @@ import React, { useState } from 'react';
 import styles from './quote.module.css';
 import MagneticButton from '@/components/MagneticButton';
 import { useTheme } from '@/context/ThemeContext';
+import { getSiteSettings } from '@/app/admin/settings/siteActions';
 
 export default function Quote() {
     const { theme } = useTheme();
+    const [whatsappNumber, setWhatsappNumber] = useState('9779851336342'); // Default fallback
+
+    React.useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await getSiteSettings();
+                if (res.success && res.data?.whatsappNumber) {
+                    setWhatsappNumber(res.data.whatsappNumber);
+                }
+            } catch (error) {
+                console.error("Failed to fetch WhatsApp settings", error);
+            }
+        };
+        fetchSettings();
+    }, []);
+
     const [formData, setFormData] = useState({
         name: '',
         company: '',
@@ -76,7 +93,8 @@ Budget: ${formData.budget}
 ${formData.details}`;
 
 
-        const phoneNumber = "9779703606340";
+
+        const phoneNumber = whatsappNumber;
         const encodedMessage = encodeURIComponent(message);
         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     };
