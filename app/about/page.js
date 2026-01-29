@@ -8,13 +8,15 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 import React from 'react';
-import prisma from "@/lib/db";
+import prisma from "@/lib/prisma";
 
 export default async function About() {
     const team = await prisma.teamMember.findMany({
         orderBy: { id: 'asc' }
     });
 
-    return <AboutClient initialTeam={team} />;
+    const aboutData = await prisma.aboutPage.findFirst();
+
+    return <AboutClient initialTeam={team} initialAbout={aboutData} />;
 }
 

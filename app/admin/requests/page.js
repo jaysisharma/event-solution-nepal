@@ -49,162 +49,121 @@ export default function TicketRequestsPage() {
         setDeletingId(null);
     };
 
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'RESOLVED':
-                return <span className={`${styles.statusBadge} ${styles.statusResolved}`}><CheckCircle size={12} /> Resolved</span>;
-            case 'CONTACTED':
-                return <span className={`${styles.statusBadge} ${styles.statusContacted}`}><Phone size={12} /> Contacted</span>;
-            default:
-                return <span className={`${styles.statusBadge} ${styles.statusPending}`}><Clock size={12} /> Pending</span>;
-        }
-    };
+    // Kanban Grouping
+    const pendingRequests = requests.filter(r => r.status === 'PENDING' || !r.status);
+    const contactedRequests = requests.filter(r => r.status === 'CONTACTED');
+    const resolvedRequests = requests.filter(r => r.status === 'RESOLVED');
+
+    const renderCard = (request) => (
+        <div key={request.id} className={styles.kanbanCard}>
+            <div className={styles.cardHeader}>
+                <span className={styles.date}>
+                    {new Date(request.createdAt).toLocaleDateString()}
+                    <span className={styles.time}>{new Date(request.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </span>
+                <button
+                    onClick={() => handleDelete(request.id)}
+                    className={styles.deleteBtn}
+                    disabled={deletingId === request.id}
+                    title="Delete"
+                >
+                    {deletingId === request.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                </button>
+            </div>
+
+            <div className={styles.cardContent}>
+                <h4 className={styles.userName}>{request.name}</h4>
+                <div className={styles.eventName}>{request.eventName}</div>
+
+                {/* Ticket Badge */}
+                <div className={styles.ticketBadge}>
+                    <span className={styles.ticketPrice}>
+                        {request.amount > 0 ? `Rs. ${request.amount / 100}` : 'Free'}
+                    </span>
+                    <span className={styles.ticketType}>
+                        {(() => {
+                            try {
+                                const details = JSON.parse(request.ticketDetails);
+                                return details.ticketType ? `${details.quantity || 1}x ${details.ticketType}` : request.ticketDetails;
+                            } catch (e) {
+                                return request.ticketDetails;
+                            }
+                        })()}
+                    </span>
+                </div>
+
+                {/* Contact Condensed */}
+                <div className={styles.contactRow}>
+                    <a href={`tel:${request.number}`} title={request.number}><Phone size={14} /></a>
+                    <a href={`mailto:${request.email}`} title={request.email}><Mail size={14} /></a>
+                    {request.organization && <span title={request.organization}>🏢</span>}
+                </div>
+            </div>
+
+            <div className={styles.cardActions}>
+                {request.status === 'PENDING' && (
+                    <button onClick={() => handleStatusChange(request.id, 'CONTACTED')} className={styles.moveBtn}>
+                        Mark Contacted <CheckCircle size={14} />
+                    </button>
+                )}
+                {request.status === 'CONTACTED' && (
+                    <button onClick={() => handleStatusChange(request.id, 'RESOLVED')} className={styles.moveBtn}>
+                        Mark Resolved <CheckCircle size={14} />
+                    </button>
+                )}
+                {request.status === 'RESOLVED' && (
+                    <div className={styles.resolvedLabel}>
+                        <CheckCircle size={14} /> Done
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1 className={styles.title}>Ticket Requests</h1>
-                <button
-                    onClick={fetchRequests}
-                    style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontSize: '0.9rem', color: '#64748b' }}
-                >
+                <button onClick={fetchRequests} className={styles.refreshBtn}>
                     Refresh
                 </button>
             </div>
 
             {loading ? (
-                <div className={styles.loading}>Loading requests...</div>
-            ) : requests.length === 0 ? (
-                <div className={styles.empty}>
-                    No ticket requests found.
-                </div>
+                <div className={styles.loading}>Loading board...</div>
             ) : (
-                <div className={styles.card}>
-                    <div className={styles.tableWrapper}>
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th className={styles.th}>Date & Time</th>
-                                    <th className={styles.th}>User Details</th>
-                                    <th className={styles.th}>Event & Tickets</th>
-                                    <th className={styles.th}>Contact Info</th>
-                                    <th className={styles.th}>Professional Info</th>
-                                    <th className={styles.th}>Status</th>
-                                    <th className={styles.th}>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {requests.map((request) => (
-                                    <tr key={request.id} className={styles.tr}>
-                                        <td className={styles.td}>
-                                            <div className={styles.date}>{new Date(request.createdAt).toLocaleDateString()}</div>
-                                            <div className={styles.time}>{new Date(request.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                        </td>
-                                        <td className={styles.td}>
-                                            <div className={styles.name}>{request.name}</div>
-                                            {request.address && (
-                                                <div className={styles.detailItem} style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                    <MapPin size={12} className={styles.detailLabel} /> {request.address}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className={styles.td}>
-                                            <div className={styles.eventName}>{request.eventName}</div>
-                                            <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
-                                                {request.amount > 0 ? (
-                                                    <span style={{ fontWeight: 600, color: '#10b981' }}>
-                                                        Rs. {request.amount / 100}
-                                                    </span>
-                                                ) : (
-                                                    <span style={{ color: '#94a3b8' }}>Free</span>
-                                                )}
-                                            </div>
-                                            {request.ticketDetails && (
-                                                <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '2px', fontStyle: 'italic' }}>
-                                                    {(() => {
-                                                        try {
-                                                            const details = JSON.parse(request.ticketDetails);
-                                                            if (details.ticketType) {
-                                                                return `${details.quantity || 1}x ${details.ticketType}`;
-                                                            }
-                                                            return request.ticketDetails;
-                                                        } catch (e) {
-                                                            return request.ticketDetails;
-                                                        }
-                                                    })()}
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className={styles.td}>
-                                            <a href={`tel:${request.number}`} className={styles.contactLink}>
-                                                <Phone size={14} /> {request.number}
-                                            </a>
-                                            <a href={`mailto:${request.email}`} className={styles.contactLink}>
-                                                <Mail size={14} /> {request.email}
-                                            </a>
-                                        </td>
-                                        <td className={styles.td}>
-                                            {request.organization ? (
-                                                <>
-                                                    <div className={styles.organization}>🏢 {request.organization}</div>
-                                                    {request.title && <div className={styles.detailItem}>{request.title}</div>}
-                                                </>
-                                            ) : (
-                                                <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>N/A</span>
-                                            )}
-                                            {request.website && (
-                                                <div style={{ marginTop: '4px' }}>
-                                                    <a href={request.website} target="_blank" className={styles.websiteLink}>
-                                                        <Globe size={12} /> Website <ExternalLink size={10} />
-                                                    </a>
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className={styles.td}>
-                                            {getStatusBadge(request.status)}
-                                        </td>
-                                        <td className={styles.td}>
-                                            <div className={styles.actions}>
-                                                {request.status !== 'RESOLVED' && (
-                                                    <button
-                                                        onClick={() => handleStatusChange(request.id, 'RESOLVED')}
-                                                        title="Mark as Resolved"
-                                                        className={`${styles.actionBtn} ${styles.btnResolved}`}
-                                                    >
-                                                        <CheckCircle size={16} />
-                                                    </button>
-                                                )}
-                                                {request.status === 'PENDING' && (
-                                                    <button
-                                                        onClick={() => handleStatusChange(request.id, 'CONTACTED')}
-                                                        title="Mark as Contacted"
-                                                        className={`${styles.actionBtn} ${styles.btnContacted}`}
-                                                    >
-                                                        <Phone size={16} />
-                                                    </button>
-                                                )}
-                                                <button
-                                                    onClick={() => handleDelete(request.id)}
-                                                    title="Delete Request"
-                                                    className={`${styles.actionBtn} ${styles.btnDelete}`}
-                                                    disabled={deletingId === request.id}
-                                                    style={{
-                                                        cursor: deletingId === request.id ? 'not-allowed' : 'pointer',
-                                                        opacity: deletingId === request.id ? 0.7 : 1
-                                                    }}
-                                                >
-                                                    {deletingId === request.id ? (
-                                                        <Loader2 size={16} className="animate-spin" />
-                                                    ) : (
-                                                        <Trash2 size={16} />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <div className={styles.board}>
+                    {/* Pending Column */}
+                    <div className={styles.column}>
+                        <div className={`${styles.columnHeader} ${styles.headerPending}`}>
+                            <span>Pending</span>
+                            <span className={styles.countBadge}>{pendingRequests.length}</span>
+                        </div>
+                        <div className={styles.columnBody}>
+                            {pendingRequests.length === 0 ? <div className={styles.emptyCol}>No pending requests</div> : pendingRequests.map(renderCard)}
+                        </div>
+                    </div>
+
+                    {/* Contacted Column */}
+                    <div className={styles.column}>
+                        <div className={`${styles.columnHeader} ${styles.headerContacted}`}>
+                            <span>Contacted</span>
+                            <span className={styles.countBadge}>{contactedRequests.length}</span>
+                        </div>
+                        <div className={styles.columnBody}>
+                            {contactedRequests.length === 0 ? <div className={styles.emptyCol}>No contacted requests</div> : contactedRequests.map(renderCard)}
+                        </div>
+                    </div>
+
+                    {/* Resolved Column */}
+                    <div className={styles.column}>
+                        <div className={`${styles.columnHeader} ${styles.headerResolved}`}>
+                            <span>Resolved</span>
+                            <span className={styles.countBadge}>{resolvedRequests.length}</span>
+                        </div>
+                        <div className={styles.columnBody}>
+                            {resolvedRequests.length === 0 ? <div className={styles.emptyCol}>No resolved requests</div> : resolvedRequests.map(renderCard)}
+                        </div>
                     </div>
                 </div>
             )}

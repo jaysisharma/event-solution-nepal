@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
-import { createGalleryItem, deleteGalleryItem, getGalleryItems } from './actions';
+import { createGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction } from './actions';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
@@ -31,14 +31,15 @@ export default function AdminGallery() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     // Form inputs
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('Wedding');
     const [size, setSize] = useState('normal');
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(null);
-    const [uploadTime, setUploadTime] = useState(null);
+    // const [file, setFile] = useState(null); // No longer needed
+    // const [preview, setPreview] = useState(null); // No longer needed
 
     const [showForm, setShowForm] = useState(false);
 
@@ -58,31 +59,74 @@ export default function AdminGallery() {
         setTitle('');
         setCategory('Wedding');
         setSize('normal');
-        setFile(null);
-        setPreview(null);
+        // setFile(null);
+        // setPreview(null);
+        setUploadedImageUrl(null);
+        setIsUploading(false);
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleCancel = () => {
+    const handleCancel = async () => {
+        // Clean up any uploaded but unsaved image
+        if (uploadedImageUrl) {
+            await deleteGalleryImageAction(uploadedImageUrl);
+        }
         setShowForm(false);
+        setUploadedImageUrl(null);
     };
 
     const handleFileChange = async (e) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
-            setFile(f);
-            const objectUrl = URL.createObjectURL(f);
-            setPreview(objectUrl);
-            return () => URL.revokeObjectURL(objectUrl);
-        } else {
-            setFile(null);
-            setPreview(null);
+
+            // Start background upload
+            setIsUploading(true);
+            try {
+                // Delete old image if new one selected
+                if (uploadedImageUrl) {
+                    await deleteGalleryImageAction(uploadedImageUrl);
+                }
+
+                const compressed = await compressImage(f);
+
+                const formData = new FormData();
+                formData.append('image', compressed); // Use 'image' key
+                formData.append('folder', 'gallery');
+
+                const res = await uploadGalleryImage(formData);
+
+                if (res.success && res.url) {
+                    setUploadedImageUrl(res.url); // Use returned URL
+                    setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
+                } else {
+                    setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
+                }
+            } catch (err) {
+                console.error("Upload error:", err);
+                setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
+            } finally {
+                setIsUploading(false);
+            }
         }
     };
 
+    const handleRemoveImage = async () => {
+        if (uploadedImageUrl) {
+            await deleteGalleryImageAction(uploadedImageUrl);
+            setUploadedImageUrl(null);
+        }
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!uploadedImageUrl) {
+            setSnackbar({ message: 'Please wait for image to finish uploading', type: 'error' });
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
@@ -90,26 +134,20 @@ export default function AdminGallery() {
             formData.append('title', title);
             formData.append('category', category);
             formData.append('size', size);
-
-            if (file) {
-                const compressed = await compressImage(file);
-                formData.append('src', compressed);
-            }
+            formData.append('src', uploadedImageUrl);
 
             const res = await createGalleryItem(formData);
             if (res.success) {
-                setSnackbar({ message: 'Image added successfully!', type: 'success' });
+                setSnackbar({ message: 'Item added successfully!', type: 'success' });
                 // Reset form
                 setTitle('');
                 setCategory('Wedding');
                 setSize('normal');
-                setFile(null);
-                setPreview(null);
-                setUploadTime(null);
+                setUploadedImageUrl(null);
                 setShowForm(false); // Close form
                 fetchGallery();
             } else {
-                setSnackbar({ message: res.error || 'Failed to add image', type: 'error' });
+                setSnackbar({ message: res.error || 'Failed to add item', type: 'error' });
             }
         } catch (err) {
             console.error(err);
@@ -189,32 +227,81 @@ export default function AdminGallery() {
                                     <option value="tall">Tall</option>
                                     <option value="large">Large</option>
                                 </select>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
+                                    {size === 'normal' && 'Recommended: 800x600px'}
+                                    {size === 'wide' && 'Recommended: 1200x600px'}
+                                    {size === 'tall' && 'Recommended: 600x900px'}
+                                    {size === 'large' && 'Recommended: 1200x900px'}
+                                </div>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Gallery Image</label>
-                                <input
-                                    onChange={handleFileChange}
-                                    type="file"
-                                    accept="image/*"
-                                    className={styles.input}
-                                    style={{ paddingTop: '0.7rem' }}
-                                    required
-                                />
-                                {preview && (
-                                    <div style={{ marginTop: '0.5rem' }}>
-                                        <img src={preview} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #3b82f6' }} />
-                                        {uploadTime && (
-                                            <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>
-                                                Est: {uploadTime}
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        disabled={isUploading}
+                                        style={{ position: 'absolute', inset: 0, opacity: 0, cursor: isUploading ? 'not-allowed' : 'pointer', zIndex: 10, width: '100%', height: '100%' }}
+                                    />
+
+                                    {isUploading ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: '#f8fafc', color: '#64748b' }}>
+                                            <Loader2 size={24} className="animate-spin" />
+                                            <span style={{ fontSize: '0.8rem', marginTop: '8px' }}>Uploading...</span>
+                                        </div>
+                                    ) : uploadedImageUrl ? (
+                                        <div style={{ position: 'relative', marginTop: '0.5rem', display: 'inline-block', maxWidth: '300px', width: '100%' }}>
+                                            <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                                                <img
+                                                    src={uploadedImageUrl}
+                                                    alt="Preview"
+                                                    style={{
+                                                        width: '100%',
+                                                        display: 'block'
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '8px',
+                                                        right: '8px',
+                                                        background: 'rgba(0,0,0,0.5)',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '50%',
+                                                        width: '24px',
+                                                        height: '24px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        cursor: 'pointer',
+                                                        transition: 'background 0.2s',
+                                                        zIndex: 20
+                                                    }}
+                                                    title="Remove Selection"
+                                                >
+                                                    <X size={14} />
+                                                </button>
                                             </div>
-                                        )}
-                                    </div>
-                                )}
+                                            <div style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <CheckCircle size={14} /> Ready to save
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                                            <Plus size={24} />
+                                            <span style={{ fontSize: '0.9rem', marginTop: '4px' }}>Click to Upload</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div className={styles.fullWidth}>
-                                <button type="submit" disabled={isSubmitting} className={styles.btnAddNew} style={{ opacity: isSubmitting ? 0.7 : 1, display: 'flex', gap: '8px' }}>
+                                <button type="submit" disabled={isSubmitting || isUploading || !uploadedImageUrl} className={styles.btnAddNew} style={{ opacity: (isSubmitting || isUploading || !uploadedImageUrl) ? 0.7 : 1, display: 'flex', gap: '8px' }}>
                                     {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                                    {isSubmitting ? 'Uploading...' : 'Add Item'}
+                                    {isSubmitting ? 'Saving...' : 'Add Item'}
                                 </button>
                             </div>
                         </form>

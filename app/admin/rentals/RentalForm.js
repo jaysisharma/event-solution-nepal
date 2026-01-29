@@ -5,8 +5,9 @@ import styles from '../admin.module.css';
 import { Plus, Save, ArrowLeft, Loader2, X, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
 import imageCompression from 'browser-image-compression';
+import { uploadRentalImage, deleteRentalImageAction } from './actions';
 
 // Default categories to bootstrap
 const DEFAULT_CATEGORIES = ["HANGERS", "STALLS", "PANDALS", "STAGE", "LED", "AUDIO", "FURNITURE"];
@@ -73,37 +74,30 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
         setVariants(newVariants);
     };
 
+    // Track upload status per variant index
+    const [uploadingStatus, setUploadingStatus] = useState({}); // { [index]: boolean }
+
     const handleImageChange = async (index, e) => {
         const file = e.target.files[0];
         if (!file) {
-            // If file input is cleared, remove the file and preview from state
-            const newVariants = [...variants];
-            newVariants[index].file = null;
-            if (newVariants[index].preview) {
-                URL.revokeObjectURL(newVariants[index].preview); // Clean up old preview URL
-                newVariants[index].preview = null;
-            }
-            setVariants(newVariants);
+            // ... (clear state logic)
+            // If clearing via file input cancel, we might want to keep previous?
+            // Standard behavior: if user cancels dialog, no change. 
+            // If they select nothing... actually file input usually keeps old value if canceled. 
+            // If they programmatically clear, handle it.
             return;
         }
 
         setCompressingIndex(index);
-
-        // Validation
-        const validResolutions = [
-            { w: 1920, h: 1080 },
-            { w: 1280, h: 720 }
-        ];
-
-        const img = document.createElement('img');
-        const objectUrl = URL.createObjectURL(file);
-        img.src = objectUrl;
+        setUploadingStatus(prev => ({ ...prev, [index]: true }));
 
         try {
-            await new Promise(r => img.onload = r);
-            const isValid = validResolutions.some(res => res.w === img.naturalWidth && res.h === img.naturalHeight);
+            // Auto-cleanup old image if exists for this variant
+            const currentVariant = variants[index];
+            if (currentVariant.uploadedUrl) {
+                await deleteRentalImageAction(currentVariant.uploadedUrl);
+            }
 
-            // Compress image
             const options = {
                 maxSizeMB: 1,
                 maxWidthOrHeight: 1920,
@@ -111,66 +105,93 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             };
 
             const compressedFile = await imageCompression(file, options);
-            console.log(`Compressed file size: ${compressedFile.size / 1024 / 1024} MB`); // Optional logging
 
+            // Create preview
             const newVariants = [...variants];
-            // Clean up previous preview URL if it exists
-            if (newVariants[index].preview) {
-                URL.revokeObjectURL(newVariants[index].preview);
-            }
+            if (newVariants[index].preview) URL.revokeObjectURL(newVariants[index].preview);
             newVariants[index].file = compressedFile;
-            newVariants[index].preview = URL.createObjectURL(compressedFile); // For immediate preview
+            newVariants[index].preview = URL.createObjectURL(compressedFile);
             setVariants(newVariants);
+
+            // Trigger Upload via Server Action
+            const formData = new FormData();
+            formData.append('image', compressedFile);
+            formData.append('folder', 'rentals');
+
+            const res = await uploadRentalImage(formData);
+
+            if (res.success && res.url) {
+                setVariants(prev => {
+                    const updated = [...prev];
+                    updated[index].uploadedUrl = res.url;
+                    return updated;
+                });
+                showToast("Image uploaded", "success");
+            } else {
+                showToast(res.error || "Upload failed", "error");
+            }
 
         } catch (err) {
             console.error(err);
-            showToast("Error processing/compressing image.", "error");
-            e.target.value = ''; // Clear the file input
-            URL.revokeObjectURL(objectUrl); // Clean up the object URL
+            showToast("Error processing/uploading image.", "error");
         } finally {
             setCompressingIndex(null);
+            setUploadingStatus(prev => ({ ...prev, [index]: false }));
+            // URL.revokeObjectURL(objectUrl); // No objectUrl to revoke here
         }
+    };
+
+    // New: Remove specific image from variant
+    const handleRemoveVariantImage = async (index) => {
+        const v = variants[index];
+        if (v.uploadedUrl) {
+            await deleteRentalImageAction(v.uploadedUrl);
+        }
+
+        const newVariants = [...variants];
+        newVariants[index].image = null; // Clear server image
+        newVariants[index].uploadedUrl = null; // Clear new upload
+        newVariants[index].file = null;
+        if (newVariants[index].preview) {
+            URL.revokeObjectURL(newVariants[index].preview);
+            newVariants[index].preview = null;
+        }
+        setVariants(newVariants);
+
+        // Reset file input if possible (hard with list map, rely on UI state)
     };
 
     const [remainingTime, setRemainingTime] = useState(null);
 
     async function handleSubmit(e) {
         e.preventDefault();
+
+        // Block if any uploading
+        const isAnyUploading = Object.values(uploadingStatus).some(status => status);
+        if (isAnyUploading) {
+            showToast("Please wait for all images to upload", "warning");
+            return;
+        }
+
         setIsSubmitting(true);
         setRemainingTime(null);
 
-        // Calculate total size
-        let totalBytes = 0;
-        variants.forEach(v => {
-            if (v.file) {
-                totalBytes += v.file.size;
-            }
-        });
-
-        // Estimate time: Assume 500KB/s (approx 0.5 MB/s) + 2s base latency
-        const uploadSpeed = 500 * 1024;
-        const estimatedSeconds = Math.ceil(totalBytes / uploadSpeed) + 2;
-
-        if (totalBytes > 0) {
-            setRemainingTime(estimatedSeconds);
-        }
+        // ... (removed total bytes estimation as we expect bg upload mostly) ...
 
         const formData = new FormData(e.currentTarget);
 
-        // Prepare variants data
-        // We will send a JSON string describing the structure, and append files with specific keys
         const variantsData = variants.map((v, i) => ({
             index: i,
             size: v.size,
-            // If a new file is uploaded, existingImage should be null.
-            // Otherwise, send the current server image path.
-            existingImage: v.file ? null : v.image
+            // Priority: Uploaded URL -> Existing Server Image -> null
+            existingImage: v.uploadedUrl ? v.uploadedUrl : (v.image || null)
         }));
 
         formData.set('variants_meta', JSON.stringify(variantsData));
 
+        // Only append file if NO uploadedUrl (fallback) AND file exists
         variants.forEach((v, i) => {
-            if (v.file) {
+            if (v.file && !v.uploadedUrl) {
                 formData.append(`variant_file_${i}`, v.file);
             }
         });
@@ -302,15 +323,39 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
                                                         alt="Preview"
                                                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', opacity: compressingIndex === index ? 0.5 : 1 }}
                                                     />
-                                                    {compressingIndex === index && (
+                                                    {compressingIndex === index ? (
                                                         <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                             <Loader2 className="animate-spin" size={16} color="#3b82f6" />
                                                         </div>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveVariantImage(index)}
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '-6px',
+                                                                right: '-6px',
+                                                                background: 'red',
+                                                                color: 'white',
+                                                                border: '1px solid white',
+                                                                borderRadius: '50%',
+                                                                width: '16px',
+                                                                height: '16px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                cursor: 'pointer',
+                                                                zIndex: 10
+                                                            }}
+                                                            title="Remove Image"
+                                                        >
+                                                            <X size={10} />
+                                                        </button>
                                                     )}
                                                 </div>
                                             ) : (
                                                 <div style={{ width: '60px', height: '40px', background: '#eee', borderRadius: '4px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    {compressingIndex === index && <Loader2 className="animate-spin" size={16} color="#64748b" />}
+                                                    {compressingIndex === index ? <Loader2 className="animate-spin" size={16} color="#64748b" /> : <Upload size={16} className="text-gray-400" />}
                                                 </div>
                                             )}
 

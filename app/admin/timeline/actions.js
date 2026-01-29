@@ -2,9 +2,35 @@
 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { saveFile } from "@/lib/upload";
+import { saveFile, deleteFile } from "@/lib/upload";
 
 const prisma = new PrismaClient();
+
+// Standalone actions for Auto-Upload
+export async function uploadTimelineImage(formData) {
+    const image = formData.get("image");
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, "timeline");
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteTimelineImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 export async function getTimelineMemories() {
     try {
@@ -27,14 +53,20 @@ export async function createTimelineMemory(formData) {
     const image = formData.get("image");
     const alt = formData.get("alt");
     const year = formData.get("year");
+    const size = formData.get("size") || "normal";
 
     if (!image || !alt || !year) {
         return { success: false, error: "Missing required fields" };
     }
 
     try {
-        // Upload to Cloudinary (or local fallback)
-        const imagePath = await saveFile(image, "timeline");
+        let imagePath = '';
+        if (typeof image === 'string') {
+            imagePath = image;
+        } else if (image && typeof image === 'object' && image.size > 0) {
+            imagePath = await saveFile(image, "timeline");
+        }
+
         if (!imagePath) throw new Error("Image upload failed");
 
         const newMemory = await prisma.timelineMemory.create({
@@ -42,12 +74,12 @@ export async function createTimelineMemory(formData) {
                 image: imagePath,
                 alt,
                 year,
-                size: formData.get('size') || "normal",
+                size,
             },
         });
         revalidatePath("/");
         revalidatePath("/admin/timeline");
-        revalidatePath("/about"); // Assuming it might be shown there or user expects global update
+        revalidatePath("/about");
         return { success: true, data: newMemory };
     } catch (error) {
         console.error("Failed to create timeline memory:", error);
@@ -62,22 +94,24 @@ export async function updateTimelineMemory(id, formData) {
     const image = formData.get("image");
 
     try {
-        let imageData = {};
+        const dataToUpdate = {
+            alt,
+            year,
+            size,
+        };
 
-        // Only process image if a new one is uploaded
-        if (image && image.size > 0) {
-            const imagePath = await saveFile(image, "timeline");
-            if (imagePath) imageData.image = imagePath;
+        if (image) {
+            if (typeof image === 'object' && image.size > 0) {
+                const imagePath = await saveFile(image, "timeline");
+                if (imagePath) dataToUpdate.image = imagePath;
+            } else if (typeof image === 'string') {
+                dataToUpdate.image = image;
+            }
         }
 
         const updatedMemory = await prisma.timelineMemory.update({
             where: { id: parseInt(id) },
-            data: {
-                alt,
-                year,
-                size,
-                ...imageData
-            },
+            data: dataToUpdate,
         });
 
         revalidatePath("/");

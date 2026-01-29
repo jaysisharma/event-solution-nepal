@@ -4,6 +4,34 @@ import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { saveFile, deleteFile } from '@/lib/upload';
 
+// Standalone actions for Auto-Upload
+export async function uploadRentalImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "rentals";
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteRentalImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
+
 export async function addRental(formData) {
     const title = formData.get('title');
     const category = formData.get('category');
@@ -29,7 +57,10 @@ export async function addRental(formData) {
             const file = formData.get(`variant_file_${index}`);
             let imagePath = meta.existingImage || '';
 
-            if (file && file.size > 0) {
+            // Check if file is actually a URL string (from background upload)
+            if (file && typeof file === 'string' && file.includes('/uploads/')) {
+                imagePath = file;
+            } else if (file && typeof file === 'object' && file.size > 0) {
                 imagePath = await saveFile(file, 'rentals');
             }
 

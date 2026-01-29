@@ -1,8 +1,8 @@
 
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star } from 'lucide-react';
-import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject } from './actions';
+import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star, Upload } from 'lucide-react';
+import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction } from './actions';
 import styles from '../admin.module.css';
 
 
@@ -98,6 +98,7 @@ export default function ProjectAdminPage() {
         setIsFeatured(false);
         setFiles(null);
         setPreviews([]); // Clear previews
+        setUploadedUrls([]);
         setExistingImagesState([]);
     };
 
@@ -125,25 +126,85 @@ export default function ProjectAdminPage() {
         }
     };
 
-    // New: Handle File Change & Generate Previews
-    const handleFileChange = (e) => {
+    // New: Handle File Change & Generate Previews & Upload
+    const [uploadedUrls, setUploadedUrls] = useState([]);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0); // Optional: if we want to show count 
+
+    const handleFileChange = async (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            setFiles(e.target.files);
 
-            // Create object URLs for previews
-            const newPreviews = Array.from(e.target.files).map(file => URL.createObjectURL(file));
-            setPreviews(newPreviews);
+            // Start Background Upload
+            setIsUploading(true);
+            setUploadProgress(0);
 
-            // Cleanup old previews to avoid memory leaks (optional but good practice)
-            return () => newPreviews.forEach(url => URL.revokeObjectURL(url));
-        } else {
-            setFiles(null);
-            setPreviews([]);
+            const newFiles = Array.from(e.target.files);
+            const total = newFiles.length;
+            let completed = 0;
+
+            const newUrls = [];
+
+            try {
+                // Upload files concurrently
+                const uploadPromises = newFiles.map(async (file) => {
+                    if (file && file.size > 0) {
+                        try {
+                            const compressed = await compressImage(file);
+                            const formData = new FormData();
+                            formData.append('image', compressed);
+                            formData.append('folder', 'projects');
+
+                            const res = await uploadProjectImage(formData);
+                            if (res.success && res.url) {
+                                completed++;
+                                setUploadProgress(Math.floor((completed / total) * 100));
+                                return res.url;
+                            }
+                        } catch (err) {
+                            console.error("Single file upload error:", err);
+                        }
+                    }
+                    return null;
+                });
+
+                const results = await Promise.all(uploadPromises);
+                const successfulUrls = results.filter(u => u !== null);
+
+                // Append to existing uploadedUrls (allows adding more batches)
+                setUploadedUrls(prev => [...prev, ...successfulUrls]);
+
+                if (successfulUrls.length < total) {
+                    setSnackbar({ message: `${total - successfulUrls.length} images failed to upload`, type: 'warning' });
+                } else {
+                    setSnackbar({ message: 'All images uploaded ready for save', type: 'success' });
+                }
+
+            } catch (err) {
+                console.error("Upload error", err);
+                setSnackbar({ message: 'Error uploading images', type: 'error' });
+            } finally {
+                setIsUploading(false);
+                setUploadProgress(0);
+                e.target.value = ''; // Reset input to allow selecting same files again if needed
+            }
         }
+    };
+
+    const handleRemoveNewImage = async (index) => {
+        const urlToRemove = uploadedUrls[index];
+        if (urlToRemove) {
+            await deleteProjectImageAction(urlToRemove); // Auto-cleanup
+        }
+        setUploadedUrls(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isUploading) {
+            setSnackbar({ message: 'Please wait for images to finish uploading', type: 'warning' });
+            return;
+        }
 
         // 1. Validate Year
         if (!validateYear(year)) {
@@ -166,12 +227,19 @@ export default function ProjectAdminPage() {
             formData.append('category', finalCategory);
             formData.append('isFeatured', isFeatured);
 
-            if (files && files.length > 0) {
+            // Use uploaded URLs
+            if (uploadedUrls.length > 0) {
                 // Use 'images' for Create, 'newImages' for Update
                 const fieldName = editingId ? 'newImages' : 'images';
+                uploadedUrls.forEach(url => {
+                    formData.append(fieldName, url);
+                });
+            } else if (files && files.length > 0) {
+                // Fallback (shouldn't happen if isUploading check passes, unless upload failed completely)
+                // Just in case, we try to send files, but we removed compression here to keep it simple
+                const fieldName = editingId ? 'newImages' : 'images';
                 for (let i = 0; i < files.length; i++) {
-                    const compressed = await compressImage(files[i]);
-                    formData.append(fieldName, compressed);
+                    formData.append(fieldName, files[i]);
                 }
             }
 
@@ -343,16 +411,46 @@ export default function ProjectAdminPage() {
                         )}
 
                         {/* 2. New Selected Previews */}
-                        {previews.length > 0 && (
+                        {uploadedUrls.length > 0 && (
                             <div style={{ marginTop: '1rem' }}>
                                 <label className={styles.label} style={{ fontSize: '0.8rem', color: '#64748b' }}>New Selection Preview:</label>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                                    {previews.map((src, i) => (
-                                        <div key={i} style={{ width: '80px', height: '80px' }}>
+                                    {uploadedUrls.map((src, i) => (
+                                        <div key={i} style={{ position: 'relative', width: '80px', height: '80px' }}>
                                             <img src={src} alt={`Preview ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px', border: '1px solid #3b82f6', boxShadow: '0 2px 4px rgba(59, 130, 246, 0.2)' }} />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveNewImage(i)}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: -5,
+                                                    right: -5,
+                                                    background: '#ef4444',
+                                                    color: 'white',
+                                                    border: '1px solid white',
+                                                    borderRadius: '50%',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    cursor: 'pointer',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}
+                                                title="Remove Image"
+                                            >
+                                                <X size={12} />
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {isUploading && (
+                            <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.85rem' }}>
+                                <Loader2 size={16} className="animate-spin" />
+                                <span>Uploading... {uploadProgress}%</span>
                             </div>
                         )}
                     </div>

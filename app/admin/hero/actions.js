@@ -20,6 +20,20 @@ export async function getHeroSlides() {
     }
 }
 
+// Helper to determine status from date
+function determineStatus(dateString) {
+    console.log("determineStatus called with:", dateString);
+    if (!dateString) return "UPCOMING";
+    const eventDate = new Date(dateString);
+    const today = new Date();
+    // Reset time part for accurate date comparison
+    today.setHours(0, 0, 0, 0);
+    console.log("Event Date:", eventDate.toString());
+    console.log("Today:", today.toString());
+    console.log("Comparison result:", eventDate < today);
+    return eventDate < today ? "COMPLETED" : "UPCOMING";
+}
+
 export async function createHeroSlide(formData) {
     try {
         const image = formData.get('image');
@@ -35,14 +49,23 @@ export async function createHeroSlide(formData) {
         const showStats = formData.get('showStats') === 'true';
         const isFeatured = formData.get('isFeatured') === 'true';
 
+        const eventDate = formData.get('eventDate') || null;
+        const status = determineStatus(eventDate);
+
         if (!image || !label || !title) {
             return { success: false, error: 'Missing required fields' };
         }
 
         // Handle Image Upload
-        const imagePath = await saveFile(image, 'hero');
+        let imagePath = '';
+        if (typeof image === 'string') {
+            imagePath = image;
+        } else if (image && typeof image === 'object' && image.size > 0) {
+            imagePath = await saveFile(image, 'hero');
+        }
+
         if (!imagePath) {
-            return { success: false, error: 'Failed to upload image' };
+            return { success: false, error: 'Failed to upload image. Please try again.' };
         }
 
         // Get max order to append to end
@@ -64,7 +87,9 @@ export async function createHeroSlide(formData) {
                 capacityLabel,
                 capacityIcon,
                 showStats,
-                isFeatured
+                isFeatured,
+                status,
+                eventDate
             }
         });
 
@@ -72,7 +97,8 @@ export async function createHeroSlide(formData) {
         return { success: true };
     } catch (error) {
         console.error('Failed to create hero slide:', error);
-        return { success: false, error: 'Failed to create slide' };
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create slide';
+        return { success: false, error: errorMessage };
     }
 }
 
@@ -105,6 +131,8 @@ export async function updateHeroSlide(id, formData) {
         const capacityIcon = formData.get('capacityIcon');
         const showStats = formData.get('showStats') === 'true';
         const isFeatured = formData.get('isFeatured') === 'true';
+        const eventDate = formData.get('eventDate');
+        const status = determineStatus(eventDate);
 
         const dataToUpdate = {
             label,
@@ -116,14 +144,19 @@ export async function updateHeroSlide(id, formData) {
             capacityLabel,
             capacityIcon,
             showStats,
-            isFeatured
+            isFeatured,
+            status,
+            eventDate
         };
 
-        if (image && image.size > 0) {
-            // New image provided
-            const imagePath = await saveFile(image, 'hero');
-            if (imagePath) {
-                dataToUpdate.image = imagePath;
+        if (image) {
+            if (typeof image === 'object' && image.size > 0) {
+                // New image provided as File
+                const imagePath = await saveFile(image, 'hero');
+                if (imagePath) dataToUpdate.image = imagePath;
+            } else if (typeof image === 'string') {
+                // New image provided as URL (background upload)
+                dataToUpdate.image = image;
             }
         }
 
@@ -136,7 +169,8 @@ export async function updateHeroSlide(id, formData) {
         return { success: true };
     } catch (error) {
         console.error('Failed to update hero slide:', error);
-        return { success: false, error: 'Failed to update slide' };
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update slide';
+        return { success: false, error: errorMessage };
     }
 }
 

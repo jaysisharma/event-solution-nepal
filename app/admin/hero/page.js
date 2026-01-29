@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Star, Users, Globe, Building, Heart, Trophy, ShieldCheck, PartyPopper, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Star, Users, Globe, Building, Heart, Trophy, ShieldCheck, PartyPopper, Loader2, Crop } from 'lucide-react';
 import { getHeroSlides, createHeroSlide, deleteHeroSlide, updateHeroSlide } from './actions';
 import styles from '../admin.module.css';
 
@@ -53,6 +53,109 @@ const Snackbar = ({ message, type, onClose }) => {
 
 
 
+import Cropper from 'react-easy-crop';
+
+// --- Utility: Get Cropped Image ---
+const createImage = (url) =>
+    new Promise((resolve, reject) => {
+        const image = new Image();
+        image.addEventListener('load', () => resolve(image));
+        image.addEventListener('error', (error) => reject(error));
+        image.setAttribute('crossOrigin', 'anonymous');
+        image.src = url;
+    });
+
+function getRadianAngle(degreeValue) {
+    return (degreeValue * Math.PI) / 180;
+}
+
+/**
+ * Returns the new bounding area of a rotated rectangle.
+ */
+function rotateSize(width, height, rotation) {
+    const rotRad = getRadianAngle(rotation);
+
+    return {
+        width:
+            Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+        height:
+            Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    };
+}
+
+async function getCroppedImg(
+    imageSrc,
+    pixelCrop,
+    rotation = 0,
+    flip = { horizontal: false, vertical: false },
+    targetWidth = 500,
+    targetHeight = 425
+) {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+        return null;
+    }
+
+    const rotRad = getRadianAngle(rotation);
+
+    // calculate bounding box of the rotated image
+    const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
+        image.width,
+        image.height,
+        rotation
+    );
+
+    // set canvas size to match the bounding box
+    canvas.width = bBoxWidth;
+    canvas.height = bBoxHeight;
+
+    // translate canvas context to a central location on image to allow rotating and flipping around the center.
+    ctx.translate(bBoxWidth / 2, bBoxHeight / 2);
+    ctx.rotate(rotRad);
+    ctx.scale(flip.horizontal ? -1 : 1, flip.vertical ? -1 : 1);
+    ctx.translate(-image.width / 2, -image.height / 2);
+
+    // draw rotated image
+    ctx.drawImage(image, 0, 0);
+
+    // croppedAreaPixels values are bounding box relative
+    // extract the cropped image using these values
+    const data = ctx.getImageData(
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height
+    );
+
+    // Create a new canvas for the final resized output
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = targetWidth;
+    finalCanvas.height = targetHeight;
+    const finalCtx = finalCanvas.getContext('2d');
+
+    // Create a temporary canvas to hold the cropped (but not resized) image
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = pixelCrop.width;
+    tempCanvas.height = pixelCrop.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.putImageData(data, 0, 0);
+
+    // Draw the temp canvas onto the final canvas, resizing it
+    finalCtx.drawImage(tempCanvas, 0, 0, pixelCrop.width, pixelCrop.height, 0, 0, targetWidth, targetHeight);
+
+    // As Blob
+    return new Promise((resolve, reject) => {
+        finalCanvas.toBlob((file) => {
+            resolve(file);
+        }, 'image/jpeg', 0.95); // High quality
+    });
+}
+
+// ... existing Snackbar component ...
+
 export default function HeroAdminPage() {
     const [slides, setSlides] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -69,15 +172,17 @@ export default function HeroAdminPage() {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState('');
 
+    // Cropping State
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [isCropping, setIsCropping] = useState(false);
+    const [cropImageSrc, setCropImageSrc] = useState(null);
+    const [cropSize, setCropSize] = useState({ width: 0, height: 0 });
+
     // Slide-Specific Stats State
-    const [rating, setRating] = useState('4.9');
-    const [ratingLabel, setRatingLabel] = useState('Average Rating');
-    const [ratingIcon, setRatingIcon] = useState('Star');
-    const [capacity, setCapacity] = useState('Handling events up to 10k guests.');
-    const [capacityLabel, setCapacityLabel] = useState('Capacity');
-    const [capacityIcon, setCapacityIcon] = useState('Users');
-    const [showStats, setShowStats] = useState(true);
     const [isFeatured, setIsFeatured] = useState(false);
+    const [eventDate, setEventDate] = useState('');
     const [uploadTime, setUploadTime] = useState(null);
 
     const fetchSlides = React.useCallback(async () => {
@@ -93,18 +198,94 @@ export default function HeroAdminPage() {
         fetchSlides();
     }, [fetchSlides]);
 
-    const handleImageChange = (e) => {
+    // Upload State
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => {
+                setCropImageSrc(reader.result);
+                setIsCropping(true);
+            });
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const onCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+        setCropSize({ width: croppedAreaPixels.width, height: croppedAreaPixels.height });
+    };
+
+    const handleCropConfirm = async () => {
+        try {
+            // Force 500x425 output
+            const croppedImageBlob = await getCroppedImg(cropImageSrc, croppedAreaPixels, 0, { horizontal: false, vertical: false }, 500, 425);
+
+            // Create a File object from Blob to mimic standard file upload
+            const file = new File([croppedImageBlob], "cropped-hero-image.jpg", { type: "image/jpeg" });
+
             setImage(file);
             setPreview(URL.createObjectURL(file));
+            setIsCropping(false);
 
-            // Calc time
-            const sizeInMB = file.size / (1024 * 1024);
-            const estTime = Math.ceil(sizeInMB * 2); // 0.5MB/s => 2s per MB
-            setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
-        } else {
-            setUploadTime(null);
+            // Trigger Background Upload
+            setIsUploading(true);
+            setUploadTime("Uploading...");
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', 'hero');
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+
+            if (response.ok && data.url) {
+                setUploadedImageUrl(data.url);
+                setUploadTime("Upload Complete");
+            } else {
+                setSnackbar({ message: 'Background upload failed', type: 'error' });
+                setUploadTime("Failed");
+            }
+
+        } catch (e) {
+            console.error("Crop/Upload Error", e);
+            setSnackbar({ message: 'Failed to process image', type: 'error' });
+            setUploadTime("Error");
+            setIsUploading(false);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const handleCropCancel = () => {
+        setIsCropping(false);
+        setCropImageSrc(null);
+        // Clear input to allow re-selecting same file
+        const input = document.getElementById('slideImageInput');
+        if (input) input.value = '';
+    };
+
+    const handleRemoveImage = (e) => {
+        e.stopPropagation(); // Prevent triggering the file input
+        setImage(null);
+        setPreview('');
+        setCropImageSrc(null); // Clear original source too
+        setUploadedImageUrl(null);
+        setUploadTime(null);
+        const input = document.getElementById('slideImageInput');
+        if (input) input.value = '';
+    };
+
+    const handleReCrop = (e) => {
+        e.stopPropagation();
+        if (cropImageSrc) {
+            setIsCropping(true);
         }
     };
 
@@ -114,15 +295,11 @@ export default function HeroAdminPage() {
         setTitle(slide.title);
         setPreview(slide.image);
         setImage(null);
-
-        setRating(slide.rating || '4.9');
-        setRatingLabel(slide.ratingLabel || 'Average Rating');
-        setRatingIcon(slide.ratingIcon || 'Star');
-        setCapacity(slide.capacity || 'Handling events up to 10k guests.');
-        setCapacityLabel(slide.capacityLabel || 'Capacity');
-        setCapacityIcon(slide.capacityIcon || 'Users');
-        setShowStats(slide.showStats !== false); // Default true if undefined
+        setUploadedImageUrl(null); // Reset new upload URL
+        // ... rest of handleEdit
+        // ... rest of handleEdit
         setIsFeatured(slide.isFeatured || false);
+        setEventDate(slide.eventDate || '');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -133,22 +310,22 @@ export default function HeroAdminPage() {
         setTitle('');
         setImage(null);
         setPreview('');
-        setRating('4.9');
-        setRatingLabel('Average Rating');
-        setRatingIcon('Star');
-        setCapacity('Handling events up to 10k guests.');
-        setCapacityLabel('Capacity');
-        setCapacityIcon('Users');
-        setCapacityIcon('Users');
-        setShowStats(true);
+        setUploadedImageUrl(null);
+        setUploadedImageUrl(null);
         setIsFeatured(false);
+        setEventDate('');
         setUploadTime(null);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!editingId && !image) {
+        if (isUploading) {
+            setSnackbar({ message: 'Please wait for image to finish uploading', type: 'warning' });
+            return;
+        }
+
+        if (!editingId && !uploadedImageUrl && !image) {
             setSnackbar({ message: 'Please select an image', type: 'error' });
             return;
         }
@@ -156,19 +333,19 @@ export default function HeroAdminPage() {
 
         setIsSubmitting(true);
         const formData = new FormData();
-        if (image) formData.append('image', image);
+
+        // Use uploaded URL if available, otherwise fallback (though we try to enforce upload first)
+        // For edits, if no new image, we don't send 'image' field or handle it in action
+        if (uploadedImageUrl) {
+            formData.append('image', uploadedImageUrl);
+        } else if (image) {
+            formData.append('image', image); // Fallback to file if bg upload failed but user submits
+        }
+
         formData.append('label', label);
         formData.append('title', title);
-
-        // Append Stats
-        formData.append('rating', rating);
-        formData.append('ratingLabel', ratingLabel);
-        formData.append('ratingIcon', ratingIcon);
-        formData.append('capacity', capacity);
-        formData.append('capacityLabel', capacityLabel);
-        formData.append('capacityIcon', capacityIcon);
-        formData.append('showStats', showStats);
         formData.append('isFeatured', isFeatured);
+        formData.append('eventDate', eventDate);
 
         let res;
         if (editingId) {
@@ -216,6 +393,95 @@ export default function HeroAdminPage() {
                 />
             )}
 
+            {/* Crop Modal */}
+            {isCropping && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.85)',
+                    zIndex: 2000,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <div style={{
+                        position: 'relative',
+                        width: '90%',
+                        height: '70%',
+                        backgroundColor: '#000',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        marginBottom: '1rem'
+                    }}>
+                        <Cropper
+                            image={cropImageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={500 / 425}
+                            onCropChange={setCrop}
+                            onZoomChange={setZoom}
+                            onCropComplete={onCropComplete}
+                            objectFit="contain" // Allow image to be contained within crop area initially
+                        />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', color: 'white', marginBottom: '1rem' }}>
+                        <span>Zoom</span>
+                        <input
+                            type="range"
+                            value={zoom}
+                            min={1}
+                            max={3}
+                            step={0.1}
+                            aria-labelledby="Zoom"
+                            onChange={(e) => setZoom(e.target.value)}
+                            className="range"
+                        />
+                        <span style={{ marginLeft: '1rem', opacity: 0.8, fontSize: '0.9rem' }}>
+                            Size: {cropSize.width} x {cropSize.height} px
+                        </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button
+                            onClick={handleCropCancel}
+                            style={{
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                border: '1px solid white',
+                                background: 'transparent',
+                                color: 'white',
+                                cursor: 'pointer',
+                                fontWeight: 600
+                            }}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleCropConfirm}
+                            style={{
+                                padding: '10px 20px',
+                                borderRadius: '8px',
+                                border: 'none',
+                                background: '#10b981',
+                                color: 'white',
+                                cursor: 'pointer',
+                                fontWeight: 600,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                            }}
+                        >
+                            <CheckCircle size={18} /> Crop & Upload
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className={styles.pageHeader}>
                 <div>
                     <h1 className={styles.pageTitle}>Manage Hero Slides</h1>
@@ -257,7 +523,59 @@ export default function HeroAdminPage() {
                                             required={!editingId}
                                         />
                                         {preview ? (
-                                            <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    top: '8px',
+                                                    right: '8px',
+                                                    display: 'flex',
+                                                    gap: '8px'
+                                                }}>
+                                                    {cropImageSrc && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleReCrop}
+                                                            style={{
+                                                                background: 'rgba(255, 255, 255, 0.9)',
+                                                                border: 'none',
+                                                                borderRadius: '50%',
+                                                                width: '28px',
+                                                                height: '28px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                cursor: 'pointer',
+                                                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                                color: '#2563eb'
+                                                            }}
+                                                            title="Crop Image"
+                                                        >
+                                                            <Crop size={16} />
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleRemoveImage}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.9)',
+                                                            border: 'none',
+                                                            borderRadius: '50%',
+                                                            width: '28px',
+                                                            height: '28px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            cursor: 'pointer',
+                                                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                                            color: '#ef4444' // Red for delete
+                                                        }}
+                                                        title="Remove Image"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
                                         ) : (
                                             <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
                                                 <ImageIcon size={40} style={{ marginBottom: '0.5rem' }} />
@@ -301,17 +619,9 @@ export default function HeroAdminPage() {
                                     <div style={{ padding: '1.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border-soft)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                                             <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                Slide Stats
+                                                Options
                                             </h3>
                                             <div style={{ display: 'flex', gap: '1rem' }}>
-                                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={showStats}
-                                                        onChange={(e) => setShowStats(e.target.checked)}
-                                                    />
-                                                    Show Stats Cards
-                                                </label>
                                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>
                                                     <input
                                                         type="checkbox"
@@ -322,42 +632,23 @@ export default function HeroAdminPage() {
                                                 </label>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className={styles.heroStatsGrid} style={{ opacity: showStats ? 1 : 0.5, pointerEvents: showStats ? 'auto' : 'none', transition: 'opacity 0.2s' }}>
+                                    <div className={styles.formGroup} style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-soft)', paddingTop: '1.5rem' }}>
+                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem' }}>Event Details</h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
                                             <div className={styles.formGroup}>
-                                                <label className={styles.label}>Rating Value</label>
-                                                <input type="text" value={rating} onChange={(e) => setRating(e.target.value)} className={styles.input} />
-                                            </div>
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Rating Label</label>
-                                                <input type="text" value={ratingLabel} onChange={(e) => setRatingLabel(e.target.value)} className={styles.input} />
-                                            </div>
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Rating Icon</label>
-                                                <select value={ratingIcon} onChange={(e) => setRatingIcon(e.target.value)} className={styles.input}>
-                                                    <option value="Star">Star</option>
-                                                    <option value="Heart">Heart</option>
-                                                    <option value="Trophy">Trophy</option>
-                                                    <option value="ShieldCheck">Shield</option>
-                                                </select>
-                                            </div>
-
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Capacity Value</label>
-                                                <input type="text" value={capacity} onChange={(e) => setCapacity(e.target.value)} className={styles.input} />
-                                            </div>
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Capacity Label</label>
-                                                <input type="text" value={capacityLabel} onChange={(e) => setCapacityLabel(e.target.value)} className={styles.input} />
-                                            </div>
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Capacity Icon</label>
-                                                <select value={capacityIcon} onChange={(e) => setCapacityIcon(e.target.value)} className={styles.input}>
-                                                    <option value="Users">Users</option>
-                                                    <option value="Globe">Globe</option>
-                                                    <option value="Building">Building</option>
-                                                    <option value="PartyPopper">Party</option>
-                                                </select>
+                                                <label className={styles.label}>Event Date (Text or Date)</label>
+                                                <input
+                                                    type="text"
+                                                    value={eventDate}
+                                                    onChange={(e) => setEventDate(e.target.value)}
+                                                    className={styles.input}
+                                                    placeholder="Oct 24, 2025"
+                                                />
+                                                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
+                                                    Status (Upcoming/Completed) will be automatically set based on this date.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -420,26 +711,11 @@ export default function HeroAdminPage() {
                                     <span className={styles.heroCardLabel}>{slide.label}</span>
                                     <h3 className={styles.heroCardTitle}>{slide.title}</h3>
 
-                                    <div className={styles.heroCardStats}>
-                                        <div className={styles.heroStatItem}>
-                                            <div className={styles.heroStatIcon}>
-                                                {IconMap[slide.ratingIcon || 'Star']}
-                                            </div>
-                                            <div className={styles.heroStatText}>
-                                                <span className={styles.heroStatValue}>{slide.rating}</span>
-                                                <span className={styles.heroStatLabel}>{slide.ratingLabel}</span>
-                                            </div>
+                                    {slide.eventDate && (
+                                        <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#64748b' }}>
+                                            Date: {slide.eventDate}
                                         </div>
-                                        <div className={styles.heroStatItem}>
-                                            <div className={styles.heroStatIcon}>
-                                                {IconMap[slide.capacityIcon || 'Users']}
-                                            </div>
-                                            <div className={styles.heroStatText}>
-                                                <span className={styles.heroStatValue}>{slide.capacity}</span>
-                                                <span className={styles.heroStatLabel}>{slide.capacityLabel}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                                 <div className={styles.heroCardActions}>
                                     <button

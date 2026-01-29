@@ -239,9 +239,10 @@
 
 .imageContainer {
     position: relative;
-    width: 100%;
-    aspect-ratio: 1/1;
-    max-width: 500px;
+    width: 500px;
+    height: 425px;
+    /* Fixed height matching 500/425 ratio */
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -249,7 +250,8 @@
     position: absolute;
     inset: 0;
     width: 100%;
-    height: 85%;
+    height: 100%;
+    /* Fill container completely */
     border-radius: 1.5rem;
     overflow: hidden;
     box-shadow: 0 25px 50px -12px rgba(6, 78, 161, 0.1);
@@ -499,9 +501,7 @@
     font-family: monospace;
 }
 
-.italic {
-    /* font-style: italic; */
-}
+
 
 .tedX {
     color: #EB1F26;
@@ -599,4 +599,137 @@
     .heading {
         font-size: 4.5rem;
     }
+}
+
+.statusBadge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 20;
+}
+
+.statusLabel {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.upcoming {
+    background-color: #22c55e;
+    color: white;
+}
+
+.completed {
+    background-color: #64748b;
+    color: white;
+}
+
+.dateLabel {
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #0f172a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Floating Status Card - Minimalist */
+.statusFloatCard {
+    position: absolute;
+    top: -1.75rem;
+    right: -1.75rem;
+    background: #ffffff;
+    border-radius: 1.25rem;
+    padding: 1rem 1.25rem;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    min-width: 140px;
+    z-index: 30;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.statusFloatCard:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.statusPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pillUpcoming {
+    background-color: #ecfdf5;
+    /* User green bg */
+    color: #047857;
+    /* Darker green text */
+    border: 1px solid #d1fae5;
+}
+
+.pillCompleted {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.statusDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.dateLarge {
+    font-family: 'Geist Sans', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+/* Dark Mode Overrides */
+.dark .statusFloatCard {
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .pillUpcoming {
+    background-color: rgba(6, 78, 161, 0.15);
+    /* Brand Blue tint for dark mode */
+    color: #38bdf8;
+    border-color: rgba(56, 189, 248, 0.2);
+}
+
+.dark .pillCompleted {
+    background-color: #334155;
+    color: #94a3b8;
+    border-color: #475569;
+}
+
+.dark .dateLarge {
+    color: #ffffff;
 }

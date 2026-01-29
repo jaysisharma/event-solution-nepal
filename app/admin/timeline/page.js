@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { getTimelineMemories, createTimelineMemory, updateTimelineMemory, deleteTimelineMemory } from './actions';
+import { getTimelineMemories, createTimelineMemory, updateTimelineMemory, deleteTimelineMemory, uploadTimelineImage, deleteTimelineImageAction } from './actions';
 import styles from '../admin.module.css';
 
 import { compressImage } from '@/lib/compress';
@@ -32,6 +32,7 @@ export default function TimelineAdminPage() {
     const [memories, setMemories] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false); // New State
     const [snackbar, setSnackbar] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
     const [editingId, setEditingId] = useState(null);
@@ -42,7 +43,7 @@ export default function TimelineAdminPage() {
     // Form State
     const [alt, setAlt] = useState('');
     const [year, setYear] = useState('');
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState(null); // Now holds URL string
     const [preview, setPreview] = useState('');
     const [uploadTime, setUploadTime] = useState(null);
 
@@ -74,6 +75,7 @@ export default function TimelineAdminPage() {
         setAlt(memory.alt);
         setYear(memory.year);
         setPreview(memory.image);
+        setImage(memory.image); // Pre-fill existing image URL
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -88,11 +90,34 @@ export default function TimelineAdminPage() {
         setUploadTime(null);
     };
 
+    const handleRemoveImage = async () => {
+        if (!image) return;
+
+        // If it's a freshly uploaded image (not saved to DB yet), delete it from server
+        // If it's an existing DB image being edited, we don't delete from server yet (only on Save or explicit delete)
+        // Ideally for "Immediate Upload" pattern, we treat it as replaceable.
+        // For simplicity/safety: we delete from UI. Actual file cleanup can happen here if we track "isNewUpload".
+        // Let's assume we delete if it's currently in the 'image' state to let user start over.
+
+        if (image.includes('/uploads/') || image.includes('cloudinary')) {
+            await deleteTimelineImageAction(image);
+        }
+
+        setImage(null);
+        setPreview('');
+    };
+
     const handleImageChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        // 1. Delete previous image if exists and is different (optional logic, but good for cleanup)
+        if (image) {
+            await handleRemoveImage();
+        }
+
         setPreview(URL.createObjectURL(file));
+        setIsUploading(true);
 
         // Calc time
         const sizeInMB = file.size / (1024 * 1024);
@@ -101,24 +126,39 @@ export default function TimelineAdminPage() {
 
         try {
             const compressedFile = await compressImage(file);
-            setImage(compressedFile);
+
+            // Auto Upload
+            const formData = new FormData();
+            formData.append('image', compressedFile);
+
+            const res = await uploadTimelineImage(formData);
+            if (res.success) {
+                setImage(res.url); // Set URL
+                setPreview(res.url); // Update preview to robust URL
+                setSnackbar({ message: 'Image uploaded!', type: 'success' });
+            } else {
+                setSnackbar({ message: 'Upload failed', type: 'error' });
+                setPreview('');
+            }
         } catch (error) {
-            console.error("Compression Error:", error);
-            setSnackbar({ message: 'Compression failed', type: 'error' });
+            console.error("Upload Error:", error);
+            setSnackbar({ message: 'Upload failed', type: 'error' });
+        } finally {
+            setIsUploading(false);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!editingId && !image) {
-            setSnackbar({ message: 'Please select an image', type: 'error' });
+        if (!image) {
+            setSnackbar({ message: 'Please upload an image', type: 'error' });
             return;
         }
 
         setIsSubmitting(true);
         const formData = new FormData();
-        if (image) formData.append('image', image);
+        formData.append('image', image); // Sending URL string now
         formData.append('alt', alt);
         formData.append('year', year);
         formData.append('size', 'normal');
@@ -182,19 +222,54 @@ export default function TimelineAdminPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className={styles.timelineFormLayout}>
-                        {/* Image Input */}
                         <div className={styles.timelineImageSection}>
                             <div className={styles.timelineImageUpload}>
-                                <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 10 }} />
-                                {preview ? (
-                                    <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    disabled={isUploading}
+                                    style={{ position: 'absolute', inset: 0, opacity: 0, cursor: isUploading ? 'not-allowed' : 'pointer', zIndex: 10 }}
+                                />
+
+                                {isUploading ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#64748b' }}>
+                                        <Loader2 size={24} className="animate-spin" />
+                                        <span style={{ fontSize: '0.8rem', marginTop: '8px' }}>Uploading...</span>
+                                    </div>
+                                ) : preview ? (
+                                    <>
+                                        <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '8px',
+                                                right: '8px',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '50%',
+                                                padding: '4px',
+                                                cursor: 'pointer',
+                                                zIndex: 20,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                            title="Remove Image"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    </>
                                 ) : (
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>
                                         <ImageIcon size={24} />
                                     </div>
                                 )}
                             </div>
-                            {uploadTime && (
+                            {uploadTime && !isUploading && (
                                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px', textAlign: 'center' }}>
                                     Est: {uploadTime}
                                 </div>

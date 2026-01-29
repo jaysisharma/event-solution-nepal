@@ -22,7 +22,10 @@ export async function createService(formData) {
     const tagsVal = formData.get('tags');
 
     try {
-        const imagePath = await saveFile(imageFile, 'services');
+        let imagePath = imageFile;
+        if (imageFile && typeof imageFile === 'object' && imageFile.size > 0) {
+            imagePath = await saveFile(imageFile, 'services');
+        }
 
         let tags = "[]";
         if (tagsVal) {
@@ -65,10 +68,13 @@ export async function updateService(id, formData) {
         }
 
         // Handle Image Update
-        if (imageFile && imageFile.size > 0) {
-            const imagePath = await saveFile(imageFile, 'services');
-            if (imagePath) {
-                updateData.image = imagePath;
+        // Handle Image Update
+        if (imageFile) {
+            if (typeof imageFile === 'object' && imageFile.size > 0) {
+                const imagePath = await saveFile(imageFile, 'services');
+                if (imagePath) updateData.image = imagePath;
+            } else if (typeof imageFile === 'string') {
+                updateData.image = imageFile;
             }
         }
 

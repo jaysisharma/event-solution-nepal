@@ -1,13 +1,14 @@
 "use client";
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from '../admin.module.css';
-import { Plus, Save, ArrowLeft, Loader2, Trash } from 'lucide-react';
+import { Plus, Save, ArrowLeft, Loader2, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import TicketCanvas from '@/components/admin/TicketCanvas';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
+import { uploadEventImage, deleteEventImageAction } from './actions';
 
 export default function EventForm({ initialData, action, mode = 'create', isInline = false }) {
     const { showToast } = useToast();
@@ -28,6 +29,8 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
     const [compressedFile, setCompressedFile] = useState(null);
     const [uploadTime, setUploadTime] = useState(null);
     const [ticketConfig, setTicketConfig] = useState(initialData?.ticketConfig ? JSON.parse(initialData.ticketConfig) : null);
+
+    const fileInputRef = useRef(null);
 
     // Initial Form Config Logic
     const getInitialFormConfig = () => {
@@ -78,18 +81,27 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         }
     }, [initialData]);
 
+    // Upload States
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [uploadedTicketUrl, setUploadedTicketUrl] = useState(null);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const [isUploadingTicket, setIsUploadingTicket] = useState(false);
+
+    // --- Actions Import ---
+    // Assuming you import these at the top:
+    // import { uploadEventImage, deleteEventImageAction } from './actions';
+    // We need to actually import them in the file imports section first, 
+    // but here I am replacing the body methods. I'll need to do the import separately or in one go if I replaced the whole file. 
+    // Since this tool replaces a chunk, I'll replace the methods.
+
     const handleImageChange = async (e) => {
         const file = e.target.files?.[0];
         if (!file) {
-            setCompressedFile(null);
-            setUploadTime(null);
             return;
         }
 
-        // Calc time
-        const sizeInMB = file.size / (1024 * 1024);
-        const estTime = Math.ceil(sizeInMB * 2); // 0.5MB/s => 2s per MB
-        setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
+        setIsUploadingImage(true);
+        setUploadTime("Uploading...");
 
         const validResolutions = [
             { w: 1920, h: 1080 },
@@ -113,7 +125,14 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                 e.target.value = ''; // Reset input
                 setCompressedFile(null);
                 URL.revokeObjectURL(objectUrl);
+                setIsUploadingImage(false);
+                setUploadTime(null);
                 return;
+            }
+
+            // DELETE OLD IF EXISTS (Auto Cleanup)
+            if (uploadedImageUrl) {
+                await deleteEventImageAction(uploadedImageUrl);
             }
 
             // Compress
@@ -123,14 +142,36 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
 
-            canvas.toBlob((blob) => {
+            canvas.toBlob(async (blob) => {
                 if (blob) {
                     const newFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
                         type: "image/jpeg",
                         lastModified: Date.now(),
                     });
                     setCompressedFile(newFile);
-                    showToast("Image validated & compressed!", "success");
+
+                    // Server Action Upload
+                    const formData = new FormData();
+                    formData.append('image', newFile);
+                    formData.append('folder', 'events');
+
+                    try {
+                        const result = await uploadEventImage(formData);
+
+                        if (result.success && result.url) {
+                            setUploadedImageUrl(result.url);
+                            setUploadTime("Upload Complete");
+                            showToast("Image validated & uploaded!", "success");
+                        } else {
+                            setUploadTime("Failed");
+                            showToast("Upload failed", "error");
+                        }
+                    } catch (uploadErr) {
+                        console.error("Upload error", uploadErr);
+                        setUploadTime("Error");
+                    } finally {
+                        setIsUploadingImage(false);
+                    }
                 }
                 URL.revokeObjectURL(objectUrl);
             }, 'image/jpeg', 0.8);
@@ -138,6 +179,54 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         } catch (error) {
             console.error("Image processing error:", error);
             showToast("Failed to process image", "error");
+            setIsUploadingImage(false);
+        }
+    };
+
+    const handleRemoveImage = async () => {
+        // If we have an uploaded URL (that isn't the initial saved one, OR even if it is? 
+        // Ideally we only delete new uploads or if user explicitly wants to remove saved image. 
+        // For now, let's delete if it's in uploadedImageUrl which tracks the *current* form session upload.
+        if (uploadedImageUrl) {
+            await deleteEventImageAction(uploadedImageUrl);
+        }
+
+        setCompressedFile(null);
+        setUploadedImageUrl(null);
+        setUploadTime(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const handleTicketTemplateChange = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingTicket(true);
+        try {
+            // Delete old if exists
+            if (uploadedTicketUrl) {
+                await deleteEventImageAction(uploadedTicketUrl);
+            }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('folder', 'events/tickets'); // Helper supports folder param
+
+            const result = await uploadEventImage(formData);
+
+            if (result.success && result.url) {
+                setUploadedTicketUrl(result.url);
+                showToast("Ticket template uploaded!", "success");
+            } else {
+                showToast("Ticket upload failed", "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("Ticket upload network error", "error");
+        } finally {
+            setIsUploadingTicket(false);
         }
     };
 
@@ -155,7 +244,13 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
     };
 
     async function handleSubmit(e) {
-        e.preventDefault(); // Prevent default since we are using onSubmit
+        e.preventDefault();
+
+        if (isUploadingImage || isUploadingTicket) {
+            showToast("Please wait for images to finish uploading", "warning");
+            return;
+        }
+
         setIsSubmitting(true);
 
         const formData = new FormData(e.currentTarget);
@@ -191,7 +286,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
             errorMessage = "Please enter the Organizer name.";
         } else if (manageType === 'MANAGER_ONLY' && !fieldManagedBy) {
             errorMessage = "Please enter the Manager name.";
-        } else if (mode === 'create' && !compressedFile) {
+        } else if (mode === 'create' && !uploadedImageUrl && !compressedFile) {
             // For create, image is strictly required (unless we allows generic default, but user said 'invalid' if not entered)
             errorMessage = "Event Image is required for new events.";
         }
@@ -210,7 +305,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
         // --- CHECK FOR CHANGES ---
         if (mode === 'edit' && initialData) {
-            const hasFile = !!compressedFile;
+            const hasFile = !!(uploadedImageUrl || uploadedTicketUrl || compressedFile); // More robust check
 
             // Resolve intended organizer/managedBy based on current form state
             let newOrganizer = null;
@@ -257,8 +352,18 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         }
         // --- END CHECK ---
 
-        if (compressedFile) {
+        if (uploadedImageUrl) {
+            formData.set('image', uploadedImageUrl);
+        } else if (compressedFile) {
+            // Fallback if background upload failed? Or user re-selected and it's processing?
+            // Since we handle upload inside handleMainImageChange, if it failed, uploadedImageUrl is null 
+            // but compressedFile is set. We can send file if we want, but better to enforce URL?
+            // Lets assume we fallback to file upload.
             formData.set('image', compressedFile);
+        }
+
+        if (uploadedTicketUrl) {
+            formData.set('ticketTemplate', uploadedTicketUrl);
         }
 
         try {
@@ -269,11 +374,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                 if (isInline) {
                     // Refresh handled by parent or router refresh
                     router.refresh();
-                    // Ideally we should call a callback here to close form, but for now refresh does the trick if parent reacts to it.
-                    // Actually, we need to clear form or close it. 
-                    // Dispatch a custom event or let parent handle?
-                    // For simplicity, we just rely on parent re-rendering or user closing.
-                    // But better DX: 
+                    // Ideally check if there is a window event
                     if (window.dispatchEvent) {
                         window.dispatchEvent(new CustomEvent('event-saved'));
                     }
@@ -547,6 +648,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                         <label className={styles.label}>Event Image {mode === 'edit' && "(Leave empty to keep current)"}</label>
                         <input
+                            ref={fileInputRef}
                             name="image"
                             type="file"
                             accept="image/*"
@@ -562,20 +664,47 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                                 Estimated Upload Time: {uploadTime}
                             </p>
                         )}
-                        {mode === 'edit' && initialData?.image && (
-                            <div style={{ marginTop: '0.8rem' }}>
-                                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>Current Image:</p>
-                                <img
-                                    src={initialData.image}
-                                    alt="Current Event Image"
-                                    style={{
-                                        width: '100%',
-                                        maxWidth: '300px',
-                                        borderRadius: '0.5rem',
-                                        border: '1px solid #e2e8f0',
-                                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-                                    }}
-                                />
+                        {/* Image Preview with Overlay Remove Button */}
+                        {(uploadedImageUrl || (mode === 'edit' && initialData?.image)) && (
+                            <div style={{ marginTop: '0.8rem', position: 'relative', display: 'inline-block', maxWidth: '300px', width: '100%' }}>
+                                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                                    {uploadedImageUrl ? 'New Selected Image:' : 'Current Image:'}
+                                </p>
+                                <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                                    <img
+                                        src={uploadedImageUrl || initialData.image}
+                                        alt="Event Image"
+                                        style={{
+                                            width: '100%',
+                                            display: 'block'
+                                        }}
+                                    />
+                                    {uploadedImageUrl && (
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '8px',
+                                                right: '8px',
+                                                background: 'rgba(0,0,0,0.5)',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '50%',
+                                                width: '24px',
+                                                height: '24px',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.2s'
+                                            }}
+                                            title="Remove Selection"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -586,6 +715,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                             name="ticketTemplate"
                             type="file"
                             accept="image/*"
+                            onChange={handleTicketTemplateChange}
                             className={styles.input}
                             style={{ paddingTop: '0.7rem' }}
                         />

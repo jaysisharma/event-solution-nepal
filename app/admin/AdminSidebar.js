@@ -19,7 +19,8 @@ import {
     Settings,
     Activity,
     Ticket,
-    X
+    X,
+    Info
 } from 'lucide-react';
 
 export default function AdminSidebar({ isOpen, onClose }) {
@@ -29,6 +30,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
         { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
         { name: 'Requests', path: '/admin/requests', icon: Ticket },
         { name: 'Hero Slides', path: '/admin/hero', icon: ImageIcon },
+        { name: 'About Page', path: '/admin/about', icon: Info },
         { name: 'Timeline', path: '/admin/timeline', icon: Clock },
         { name: 'Events', path: '/admin/events', icon: Calendar },
         { name: 'Rentals', path: '/admin/rentals', icon: Package },

@@ -78,6 +78,9 @@ export default async function AdminDashboard() {
     const eventCount = await prisma.event.count();
     const rentalCount = await prisma.rentalItem.count();
     const projectCount = await prisma.workProject.count();
+    const pendingRequestsCount = await prisma.ticketRequest.count({
+        where: { status: 'PENDING' }
+    });
 
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
@@ -94,6 +97,24 @@ export default async function AdminDashboard() {
 
             {/* 1. Metrics Grid (Top) */}
             <div className={styles.metricsGrid}>
+                {/* Pending Requests (High Priority) */}
+                <Link href="/admin/requests" style={{ textDecoration: 'none' }}>
+                    <div className={styles.metricCard} style={{ borderLeft: '4px solid #f59e0b' }}>
+                        <div className={styles.metricHeader}>
+                            <span className={styles.metricLabel} style={{ color: '#d97706' }}>Pending Request</span>
+                            <div className={styles.metricIcon} style={{ background: '#fef3c7', color: '#d97706' }}>
+                                <Users size={18} />
+                            </div>
+                        </div>
+                        <div>
+                            <div className={styles.metricValue} style={{ color: '#b45309' }}>{pendingRequestsCount}</div>
+                            <div className={styles.metricTrend}>
+                                <span className={styles.trendNeutral}>Needs attention</span>
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+
                 {/* Events */}
                 <div className={styles.metricCard}>
                     <div className={styles.metricHeader}>

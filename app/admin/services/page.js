@@ -84,22 +84,51 @@ export default function AdminServices() {
         setPreview(null);
         setExistingImage(null);
         setUploadTime(null);
+        setUploadedImageUrl(null);
     };
 
-    const handleFileChange = (e) => {
+    // Upload State
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
             setPreview(URL.createObjectURL(selectedFile));
 
-            // Calculate estimated upload time
-            const sizeInMB = selectedFile.size / (1024 * 1024);
-            const estTime = Math.ceil(sizeInMB * 2); // Assuming 0.5 MB/s upload speed, so 2 seconds per MB
-            setUploadTime(estTime < 1 ? '< 1s' : `~${estTime}s`);
+            // Background Upload
+            setIsUploading(true);
+            setUploadTime("Uploading...");
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('folder', 'services');
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (response.ok && data.url) {
+                    setUploadedImageUrl(data.url);
+                    setUploadTime("Upload Complete");
+                } else {
+                    setUploadTime("Failed");
+                    setSnackbar({ message: 'Upload failed', type: 'error' });
+                }
+            } catch (err) {
+                console.error("Upload Error", err);
+                setUploadTime("Error");
+            } finally {
+                setIsUploading(false);
+            }
         } else {
             setFile(null);
             setPreview(null);
             setUploadTime(null);
+            setUploadedImageUrl(null);
         }
     };
 
@@ -125,13 +154,23 @@ export default function AdminServices() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (isUploading) {
+            setSnackbar({ message: 'Please wait for image upload', type: 'warning' });
+            return;
+        }
+
         setIsSubmitting(true);
         try {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
             formData.append('tags', tags);
-            if (file) {
+
+            if (uploadedImageUrl) {
+                formData.append('image', uploadedImageUrl);
+            } else if (file) {
+                // Fallback
                 const compressed = await compressImage(file);
                 formData.append('image', compressed);
             }

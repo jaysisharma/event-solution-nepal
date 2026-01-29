@@ -1,6 +1,6 @@
 'use client';
 
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
 import { deleteRental } from './actions';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';

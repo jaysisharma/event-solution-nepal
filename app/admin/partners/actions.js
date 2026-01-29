@@ -3,7 +3,35 @@
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
+
+// Standalone actions for Auto-Upload
+export async function uploadPartnerImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "partners";
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deletePartnerImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 export async function addPartner(formData) {
     let name = formData.get('name');
@@ -15,7 +43,10 @@ export async function addPartner(formData) {
     }
     if (!name) name = `Partner ${Date.now()}`;
 
-    const imagePath = await saveFile(imageFile, 'partners');
+    let imagePath = imageFile;
+    if (imageFile && typeof imageFile === 'object' && imageFile.size > 0) {
+        imagePath = await saveFile(imageFile, 'partners');
+    }
 
     await prisma.partner.create({
         data: {

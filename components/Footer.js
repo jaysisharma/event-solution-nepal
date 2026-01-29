@@ -67,7 +67,7 @@ const Footer = () => {
                                     />
                                 </Link>
                                 <p className={styles.text}>
-                                    Crafting unforgettable experiences since 2014. We specialize in turning your vision into reality with precision, creativity, and passion.
+                                    Founded in 2014 A.D , Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.
                                 </p>
                                 <div className={styles.socials}>
                                     <a href="https://www.facebook.com/eventsolutionnepal/" target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Facebook"><FaFacebookF /></a>

@@ -2,7 +2,35 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
+
+// Standalone actions for Auto-Upload
+export async function uploadTeamImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "team";
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteTeamImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 export async function getTeamMembers() {
     try {
@@ -18,10 +46,13 @@ export async function getTeamMembers() {
 export async function createTeamMember(formData) {
     const name = formData.get('name');
     const role = formData.get('role');
-    const imageFile = formData.get('image');
+    const imageSource = formData.get('image');
 
     try {
-        const imagePath = await saveFile(imageFile, 'team');
+        let imagePath = imageSource;
+        if (imageSource && typeof imageSource === 'object' && imageSource.size > 0) {
+            imagePath = await saveFile(imageSource, 'team');
+        }
 
         await prisma.teamMember.create({
             data: {

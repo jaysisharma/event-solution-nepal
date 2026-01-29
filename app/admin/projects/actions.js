@@ -2,7 +2,35 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
+
+// Standalone actions for Auto-Upload
+export async function uploadProjectImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "projects";
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteProjectImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 export async function getProjects() {
     try {
@@ -25,7 +53,10 @@ export async function createProject(formData) {
     try {
         // Upload all images
         const uploadPromises = imageFiles.map(file => {
-            if (file.size > 0) return saveFile(file, 'projects');
+            // Handle background uploaded URLs (string)
+            if (typeof file === 'string') return Promise.resolve(file);
+
+            if (file && typeof file === 'object' && file.size > 0) return saveFile(file, 'projects');
             return null;
         });
         const paths = await Promise.all(uploadPromises);
@@ -74,7 +105,8 @@ export async function updateProject(id, formData) {
 
         if (newImageFiles && newImageFiles.length > 0) {
             const uploadPromises = newImageFiles.map(file => {
-                if (file.size > 0) return saveFile(file, 'projects');
+                if (typeof file === 'string') return Promise.resolve(file);
+                if (file && typeof file === 'object' && file.size > 0) return saveFile(file, 'projects');
                 return null;
             });
             const paths = await Promise.all(uploadPromises);
@@ -106,6 +138,21 @@ export async function updateProject(id, formData) {
 
 export async function deleteProject(id) {
     try {
+        const project = await prisma.workProject.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (project && project.images) {
+            try {
+                const images = JSON.parse(project.images);
+                if (Array.isArray(images)) {
+                    for (const img of images) {
+                        await deleteFile(img);
+                    }
+                }
+            } catch (e) { }
+        }
+
         await prisma.workProject.delete({
             where: { id: parseInt(id) }
         });
@@ -113,6 +160,7 @@ export async function deleteProject(id) {
         revalidatePath('/admin/projects');
         return { success: true };
     } catch (e) {
+        console.error("Delete Project Error:", e);
         return { success: false, error: 'Failed to delete project.' };
     }
 }

@@ -11,7 +11,7 @@ import { useTheme } from '@/context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AboutClient = ({ initialTeam }) => {
+const AboutClient = ({ initialTeam, initialAbout }) => {
     const { theme } = useTheme();
     const containerRef = useRef(null);
 
@@ -134,21 +134,28 @@ const AboutClient = ({ initialTeam }) => {
                     <div className={styles.storyGrid}>
                         <div>
                             <p className={styles.storyText}>
-                                Founded in 2014, Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.
+                                {initialAbout?.subtitle || "Founded in 2014, Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism."}
                             </p>
                             <br />
-                            <p className={styles.storyText} style={{ fontSize: '1.25rem', color: '#525252' }}>
-                                We bridge the gap between logistical precision and artistic expression. Whether it&apos;s a high-stakes corporate summit or an intimate destination wedding,
-                                we bring the same level of discipline and flair. We don&apos;t just manage events; we design experiences that linger.
-                            </p>
+                            <div className={styles.storyText} style={{ fontSize: '1.25rem', color: '#525252' }}>
+                                {initialAbout?.description ? (
+                                    <p style={{ whiteSpace: 'pre-line' }}>{initialAbout.description}</p>
+                                ) : (
+                                    <p>
+                                        We bridge the gap between logistical precision and artistic expression. Whether it&apos;s a high-stakes corporate summit or an intimate destination wedding,
+                                        we bring the same level of discipline and flair. We don&apos;t just manage events; we design experiences that linger.
+                                    </p>
+                                )}
+                            </div>
                         </div>
                         <div className={styles.storyImageWrapper}>
                             <Image
-                                src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop"
-                                alt="Our Story"
+                                src={initialAbout?.image || "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop"}
+                                alt={initialAbout?.title || "Our Story"}
                                 fill
                                 className={styles.storyImage}
                                 sizes="(max-width: 1024px) 100vw, 50vw"
+                                style={{ objectFit: 'cover' }}
                             />
                         </div>
                     </div>

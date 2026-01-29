@@ -1,7 +1,7 @@
 'use client';
 
 import { deleteTestimonial } from './actions';
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import styles from '../admin.module.css';

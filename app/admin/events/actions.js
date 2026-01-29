@@ -3,7 +3,35 @@
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
+
+// Standalone actions for Auto-Upload
+export async function uploadEventImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "events"; // Support subfolders like 'events/tickets'
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteEventImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 // Helper to resolve entity fields
 function resolveEntityFields(formData) {
@@ -68,8 +96,19 @@ export async function addEvent(formData) {
     }
 
     try {
-        const imagePath = await saveFile(imageFile, 'events');
-        const ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
+        let imagePath = '';
+        if (typeof imageFile === 'string') {
+            imagePath = imageFile;
+        } else if (imageFile && typeof imageFile === 'object' && imageFile.size > 0) {
+            imagePath = await saveFile(imageFile, 'events');
+        }
+
+        let ticketTemplatePath = '';
+        if (typeof ticketTemplateFile === 'string') {
+            ticketTemplatePath = ticketTemplateFile;
+        } else if (ticketTemplateFile && typeof ticketTemplateFile === 'object' && ticketTemplateFile.size > 0) {
+            ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
+        }
 
         await prisma.event.create({
             data: {
@@ -79,8 +118,8 @@ export async function addEvent(formData) {
                 year,
                 location: location || '',
                 time: time || '',
-                image: imagePath || '',
-                ticketTemplate: ticketTemplatePath || '',
+                image: imagePath,
+                ticketTemplate: ticketTemplatePath,
                 ticketConfig: ticketConfig || null,
                 ticketPrice: ticketPrice,
                 ticketTypes: ticketTypes || null,
@@ -93,15 +132,17 @@ export async function addEvent(formData) {
             },
         });
 
+        // Log success
+        console.log("Event created successfully");
+
         revalidatePath('/admin/events');
         revalidatePath('/');
         return { success: true, message: "Event created successfully" };
     } catch (error) {
         console.error("Error creating event:", error);
-        // Check for common specific errors if any specific ones are known, otherwise return message
-        // Prisma errors usually have codes, but we can return the error message directly for now if it's safe, 
-        // or map common ones.
-        return { success: false, message: error.message || "Failed to create event" };
+        // Serialize the error message safely
+        const errorMessage = error instanceof Error ? error.message : "Failed to create event";
+        return { success: false, message: errorMessage };
     }
 }
 
@@ -110,6 +151,15 @@ export async function deleteEvent(formData) {
     if (!id) return { success: false, message: "No ID provided" };
 
     try {
+        const event = await prisma.event.findUnique({
+            where: { id: parseInt(id) },
+        });
+
+        if (event) {
+            if (event.image) await deleteFile(event.image);
+            if (event.ticketTemplate) await deleteFile(event.ticketTemplate);
+        }
+
         await prisma.event.delete({
             where: { id: parseInt(id) },
         });
@@ -145,6 +195,13 @@ export async function updateEvent(formData) {
     if (!id || !title) return { success: false, message: "Missing required fields" };
 
     try {
+        const existingEvent = await prisma.event.findUnique({
+            where: { id: parseInt(id) },
+        });
+
+        if (!existingEvent) {
+            return { success: false, message: "Event not found" };
+        }
         const data = {
             title,
             date,
@@ -162,14 +219,28 @@ export async function updateEvent(formData) {
             formConfig: formData.get('formConfig') || null,
         };
 
-        const imagePath = await saveFile(imageFile, 'events');
-        if (imagePath) {
-            data.image = imagePath;
+        if (imageFile) {
+            if (typeof imageFile === 'object' && imageFile.size > 0) {
+                const imagePath = await saveFile(imageFile, 'events');
+                if (imagePath) {
+                    data.image = imagePath;
+                    if (existingEvent.image) await deleteFile(existingEvent.image);
+                }
+            } else if (typeof imageFile === 'string') {
+                data.image = imageFile;
+            }
         }
 
-        const ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
-        if (ticketTemplatePath) {
-            data.ticketTemplate = ticketTemplatePath;
+        if (ticketTemplateFile) {
+            if (typeof ticketTemplateFile === 'object' && ticketTemplateFile.size > 0) {
+                const ticketTemplatePath = await saveFile(ticketTemplateFile, 'tickets');
+                if (ticketTemplatePath) {
+                    data.ticketTemplate = ticketTemplatePath;
+                    if (existingEvent.ticketTemplate) await deleteFile(existingEvent.ticketTemplate);
+                }
+            } else if (typeof ticketTemplateFile === 'string') {
+                data.ticketTemplate = ticketTemplateFile;
+            }
         }
 
         if (ticketConfig) {

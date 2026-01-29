@@ -2,7 +2,35 @@
 
 import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
-import { saveFile } from '@/lib/upload';
+import { saveFile, deleteFile } from '@/lib/upload';
+
+// Standalone actions for Auto-Upload
+export async function uploadGalleryImage(formData) {
+    const image = formData.get("image");
+    const folder = formData.get("folder") || "gallery";
+
+    if (!image) return { success: false, error: "No image provided" };
+
+    try {
+        const imagePath = await saveFile(image, folder);
+        if (!imagePath) throw new Error("Upload failed");
+        return { success: true, url: imagePath };
+    } catch (error) {
+        console.error("Auto-upload failed:", error);
+        return { success: false, error: "Upload failed" };
+    }
+}
+
+export async function deleteGalleryImageAction(url) {
+    if (!url) return { success: false };
+    try {
+        await deleteFile(url);
+        return { success: true };
+    } catch (error) {
+        console.error("Delete failed:", error);
+        return { success: false, error: "Delete failed" };
+    }
+}
 
 export async function getGalleryItems() {
     try {
@@ -19,10 +47,15 @@ export async function createGalleryItem(formData) {
     const title = formData.get('title');
     const category = formData.get('category');
     const size = formData.get('size');
-    const imageFile = formData.get('src');
+    const imageSource = formData.get('src');
 
     try {
-        const imagePath = await saveFile(imageFile, 'gallery');
+        let imagePath = imageSource;
+
+        // If it's a file object (fallback), upload it
+        if (imageSource && typeof imageSource === 'object' && imageSource.size > 0) {
+            imagePath = await saveFile(imageSource, 'gallery');
+        }
 
         await prisma.galleryItem.create({
             data: {

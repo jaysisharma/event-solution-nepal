@@ -136,6 +136,10 @@ model HeroSlide {
   capacityIcon  String   @default("Users") // Users, Globe, Building
   showStats     Boolean  @default(true)
   isFeatured    Boolean  @default(false)
+  
+  // New Fields
+  status        String   @default("UPCOMING") // UPCOMING, COMPLETED
+  eventDate     String?  // e.g. "2025-10-24" or text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -211,4 +215,14 @@ model TicketRequest {
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model AboutPage {
+  id          Int      @id @default(autoincrement())
+  title       String   @default("Our Story")
+  subtitle    String   @default("Founded in 2014, Event Solution Nepal has been creating meaningful and memorable events.")
+  description String   @default("We bring your vision to life with care, creativity, and professionalism.")
+  image       String   @default("/images/about-hero.jpg")
+  stats       String?  // JSON string for stats: e.g. { "years": "10+", "events": "500+" }
+  updatedAt   DateTime @updatedAt
 }

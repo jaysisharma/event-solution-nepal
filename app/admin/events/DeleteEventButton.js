@@ -3,7 +3,7 @@
 import { Trash2 } from 'lucide-react';
 import { deleteEvent } from './actions';
 import styles from '../admin.module.css';
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function DeleteEventButton({ id }) {
     const { showToast } = useToast();

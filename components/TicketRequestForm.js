@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './TicketRequestForm.module.css';
 import { submitTicketRequest } from '@/app/actions/ticketRequest';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
 
 const TicketRequestForm = ({ eventName, eventId, ticketPrice, ticketTypes }) => {
     const [formData, setFormData] = useState({
@@ -39,6 +40,8 @@ const TicketRequestForm = ({ eventName, eventId, ticketPrice, ticketTypes }) => 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const { showToast } = useToast();
+
     // Logic: If types exist, use selectedType price. Else use default ticketPrice.
     // Quantity is ALWAYS 1.
     const currentPrice = selectedType ? parseInt(selectedType.price) : (ticketPrice ? parseInt(ticketPrice) : 0);
@@ -62,11 +65,7 @@ const TicketRequestForm = ({ eventName, eventId, ticketPrice, ticketTypes }) => 
         setError('');
 
         if (paymentMethod === 'fonepay') {
-            // Placeholder for Fonepay
-            alert("Fonepay integration is coming soon! Please use Khalti for now, or proceed to manual payment.");
-            // We can still submit as UNPAID if desired, but for now blocking or warning.
-            // Let's allow submission as PENDING/UNPAID?
-            // For better UX, let's submit but show it's manual/pending.
+            showToast("Fonepay integration coming soon! Proceeding with request.", "warning");
         }
 
         try {
@@ -90,20 +89,33 @@ const TicketRequestForm = ({ eventName, eventId, ticketPrice, ticketTypes }) => 
             });
 
             if (result.success && result.paymentUrl) {
+                showToast("Redirecting to payment...", "success");
                 window.location.href = result.paymentUrl;
             } else if (result.success) {
                 if (paymentMethod === 'fonepay') {
-                    alert('Request submitted! Please contact support for Fonepay details.');
+                    showToast('Request submitted! Contact support for Fonepay.', "success");
                 } else {
-                    alert('Ticket request submitted successfully!');
+                    showToast('Ticket request submitted successfully!', "success");
                 }
                 // Optional: Reset form or redirect
+                setFormData({
+                    name: '',
+                    number: '',
+                    email: '',
+                    address: '',
+                    title: '',
+                    organization: '',
+                    website: '',
+                });
             } else {
-                setError(result.error || 'Something went wrong. Please try again.');
+                const msg = result.error || 'Something went wrong. Please try again.';
+                setError(msg);
+                showToast(msg, "error");
             }
         } catch (err) {
             console.error(err);
             setError('Failed to submit request.');
+            showToast('Failed to submit request.', "error");
         } finally {
             setLoading(false);
         }

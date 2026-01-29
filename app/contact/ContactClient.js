@@ -88,20 +88,20 @@ export default function ContactClient() {
                         <span className={styles.infoLabel}>Call Us</span>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <a
-                                href="tel:+977015260535"
+                                href="tel:+977015268535"
                                 className={styles.infoValue}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
                             >
                                 <Phone size={22} color="#EB1F26" />
-                                +977-01-5260535
+                                +977-01-5268535
                             </a>
                             <a
-                                href="tel:+977015260103"
+                                href="tel:+977015268103"
                                 className={styles.infoValue}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
                             >
                                 <Phone size={22} color="#EB1F26" />
-                                +977-01-5260103
+                                +977-01-5268103
                             </a>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Play, Star, ShieldCheck, Globe, Users, Heart, Trophy, Building, PartyPopper } from 'lucide-react';
+import { ArrowRight, Play, Star, ShieldCheck, Globe, Users, Heart, Trophy, Building, PartyPopper, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './Hero.module.css';
@@ -64,7 +64,9 @@ const Hero = ({ partners, partnerLogos, slides }) => {
         capacity: s.capacity || "Handling events up to 10k guests.",
         capacityLabel: s.capacityLabel || "Capacity",
         capacityIcon: s.capacityIcon || "Users",
-        showStats: s.showStats
+        showStats: s.showStats,
+        status: s.status,
+        eventDate: s.eventDate
     })) : defaultImages;
 
     const activeSlide = heroContent[currentIndex];
@@ -163,32 +165,17 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                                 ))}
                             </div>
 
-
-                            {/* Floating Elements */}
-                            {activeSlide.showStats !== false && (
-                                <>
-                                    <div className={styles.floatingCard1}>
-                                        <div className={styles.starIconWrapper}>
-                                            {(() => {
-                                                const IconComponent = ICON_MAP[activeSlide.ratingIcon] || Star;
-                                                return <IconComponent className={styles.highlightBlue} size={20} fill="#064EA1" />;
-                                            })()}
-                                        </div>
-                                        <p className={styles.ratingNumber}>{activeSlide.rating}</p>
-                                        <p className={styles.ratingLabel}>{activeSlide.ratingLabel}</p>
+                            {/* Floating Elements - Status Card */}
+                            {(activeSlide.status || activeSlide.eventDate) && (
+                                <div className={styles.statusFloatCard}>
+                                    <div className={`${styles.statusPill} ${activeSlide.status === 'UPCOMING' ? styles.pillUpcoming : styles.pillCompleted}`}>
+                                        <span className={styles.statusDot}></span>
+                                        {activeSlide.status || "EVENT"}
                                     </div>
-
-                                    <div className={styles.floatingCard2}>
-                                        <div className={styles.cardHeader}>
-                                            {(() => {
-                                                const IconComponent = ICON_MAP[activeSlide.capacityIcon] || Users;
-                                                return <IconComponent size={20} color="white" style={{ opacity: 0.8 }} />;
-                                            })()}
-                                            <span className={styles.cardLabel}>{activeSlide.capacityLabel}</span>
-                                        </div>
-                                        <p className={styles.cardText}>{activeSlide.capacity}</p>
+                                    <div className={styles.dateLarge}>
+                                        {activeSlide.eventDate || "Date TBA"}
                                     </div>
-                                </>
+                                </div>
                             )}
                         </div>
                         {/* Decorative Circle Behind */}

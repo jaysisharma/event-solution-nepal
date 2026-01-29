@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toggleFeatured } from './actions';
-import { useToast } from '@/components/admin/ToastContext';
+import { useToast } from '@/context/ToastContext';
 import { Star } from 'lucide-react';
 
 export default function FeaturedToggle({ eventId, isFeatured }) {
