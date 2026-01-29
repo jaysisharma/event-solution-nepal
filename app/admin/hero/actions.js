@@ -123,13 +123,7 @@ export async function updateHeroSlide(id, formData) {
         const image = formData.get('image'); // Optional if not changing
         const label = formData.get('label');
         const title = formData.get('title');
-        const rating = formData.get('rating');
-        const ratingLabel = formData.get('ratingLabel');
-        const ratingIcon = formData.get('ratingIcon');
-        const capacity = formData.get('capacity');
-        const capacityLabel = formData.get('capacityLabel');
-        const capacityIcon = formData.get('capacityIcon');
-        const showStats = formData.get('showStats') === 'true';
+
         const isFeatured = formData.get('isFeatured') === 'true';
         const eventDate = formData.get('eventDate');
         const status = determineStatus(eventDate);
@@ -137,17 +131,21 @@ export async function updateHeroSlide(id, formData) {
         const dataToUpdate = {
             label,
             title,
-            rating,
-            ratingLabel,
-            ratingIcon,
-            capacity,
-            capacityLabel,
-            capacityIcon,
-            showStats,
             isFeatured,
             status,
             eventDate
         };
+
+        // Conditionally update other fields only if present in formData
+        if (formData.has('rating')) dataToUpdate.rating = formData.get('rating');
+        if (formData.has('ratingLabel')) dataToUpdate.ratingLabel = formData.get('ratingLabel');
+        if (formData.has('ratingIcon')) dataToUpdate.ratingIcon = formData.get('ratingIcon');
+
+        if (formData.has('capacity')) dataToUpdate.capacity = formData.get('capacity');
+        if (formData.has('capacityLabel')) dataToUpdate.capacityLabel = formData.get('capacityLabel');
+        if (formData.has('capacityIcon')) dataToUpdate.capacityIcon = formData.get('capacityIcon');
+
+        if (formData.has('showStats')) dataToUpdate.showStats = formData.get('showStats') === 'true';
 
         if (image) {
             if (typeof image === 'object' && image.size > 0) {

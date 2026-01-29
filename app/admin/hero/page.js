@@ -362,7 +362,7 @@ export default function HeroAdminPage() {
                 type: 'success'
             });
         } else {
-            setSnackbar({ message: 'Operation failed', type: 'error' });
+            setSnackbar({ message: res.error || 'Operation failed', type: 'error' });
         }
         setIsSubmitting(false);
     };
