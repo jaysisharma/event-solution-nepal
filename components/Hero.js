@@ -32,6 +32,42 @@ const TrustBadge = ({ icon: Icon, text }) => (
 
 const PARTNERS = ["TEDx", "CocaCola", "Samsung", "United Nations", "World Bank", "Red Cross"];
 
+// Helper to determine status from date string
+const calculateEventStatus = (dateStr, currentStatus) => {
+    if (!dateStr) return currentStatus;
+
+    try {
+        // Try to find a year
+        const yearMatch = dateStr.match(/\d{4}/);
+        if (yearMatch) {
+            const year = parseInt(yearMatch[0]);
+            const now = new Date();
+            const currentYear = now.getFullYear();
+
+            if (year < currentYear) return 'COMPLETED';
+            if (year > currentYear) return 'UPCOMING';
+
+            // Same year, check full date
+            // Handle ranges "Jan 17 - Jan 19 2026" -> take "Jan 19 2026"
+            const parts = dateStr.split('-');
+            const datePart = parts[parts.length - 1].trim();
+
+            const eventDate = new Date(datePart);
+            if (!isNaN(eventDate.getTime())) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // If event date is strictly before today, it's completed
+                if (eventDate < today) return 'COMPLETED';
+            }
+        }
+    } catch (e) {
+        console.error("Date parse error", e);
+    }
+
+    return currentStatus;
+};
+
 const Hero = ({ partners, partnerLogos, slides }) => {
     const { theme } = useTheme();
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,7 +101,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
         capacityLabel: s.capacityLabel || "Capacity",
         capacityIcon: s.capacityIcon || "Users",
         showStats: s.showStats,
-        status: s.status,
+        status: calculateEventStatus(s.eventDate, s.status),
         eventDate: s.eventDate
     })) : defaultImages;
 

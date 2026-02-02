@@ -393,6 +393,67 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         }
     }
 
+    // Date Range Logic
+    const [fromDate, setFromDate] = useState('');
+    const [toDate, setToDate] = useState('');
+
+    useEffect(() => {
+        if (fromDate) {
+            const start = new Date(fromDate);
+            const end = toDate ? new Date(toDate) : start;
+
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+            const startDay = start.getDate();
+            const startMonth = months[start.getMonth()];
+            const startYear = start.getFullYear();
+
+            const endDay = end.getDate();
+            const endMonth = months[end.getMonth()];
+            const endYear = end.getFullYear();
+
+            let finalMonth = startMonth;
+            let finalDate = startDay.toString();
+            let finalYear = startYear.toString();
+
+            if (toDate && fromDate !== toDate) {
+                if (startYear !== endYear) {
+                    finalYear = `${startYear}-${endYear}`;
+                    finalMonth = `${startMonth}-${endMonth}`;
+                    finalDate = `${startDay}-${endDay}`;
+                } else if (startMonth !== endMonth) {
+                    finalMonth = `${startMonth}-${endMonth}`;
+                    finalDate = `${startDay}-${endDay}`;
+                } else {
+                    // Same month and year
+                    finalDate = `${startDay}-${endDay}`;
+                }
+            }
+
+            // Update form fields directly if using refs or state, 
+            // but since we use uncontrolled inputs with defaultValues, we might need to force update 
+            // or switch to controlled inputs.
+            // Switching to controlled inputs for these 3 fields for better UX.
+            setFormData(prev => ({
+                ...prev,
+                month: finalMonth,
+                date: finalDate,
+                year: finalYear
+            }));
+        }
+    }, [fromDate, toDate]);
+
+    const [formData, setFormData] = useState({
+        month: initialData?.month || '',
+        date: initialData?.date || '',
+        year: initialData?.year || new Date().getFullYear(),
+        time: initialData?.time || ''
+    });
+
+    const handleManualChange = (field, val) => {
+        setFormData(prev => ({ ...prev, [field]: val }));
+    };
+
     return (
         <div>
             {!isInline && (
@@ -505,22 +566,38 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Time</label>
-                        <input name="time" defaultValue={initialData?.time} placeholder="e.g. 06:00 PM" required className={styles.input} />
+                        <input name="time" value={formData.time} onChange={e => handleManualChange('time', e.target.value)} placeholder="e.g. 06:00 PM" required className={styles.input} />
                     </div>
 
+                    {/* Date Range Generator */}
+                    <div className={styles.fullWidth} style={{ background: '#f1f5f9', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '0.5rem' }}>Auto-Generate Date</span>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div>
+                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>From Date</label>
+                                <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} className={styles.input} />
+                            </div>
+                            <div>
+                                <label className={styles.label} style={{ fontSize: '0.8rem' }}>To Date (Optional)</label>
+                                <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className={styles.input} />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Manual Override Fields */}
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Month</label>
-                        <input name="month" defaultValue={initialData?.month} placeholder="e.g. MAY" required className={styles.input} />
+                        <input name="month" value={formData.month} onChange={e => handleManualChange('month', e.target.value)} placeholder="e.g. MAY" required className={styles.input} />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Date</label>
-                        <input name="date" defaultValue={initialData?.date} placeholder="e.g. 14" required className={styles.input} />
+                        <input name="date" value={formData.date} onChange={e => handleManualChange('date', e.target.value)} placeholder="e.g. 14" required className={styles.input} />
                     </div>
 
                     <div className={styles.formGroup}>
                         <label className={styles.label}>Year</label>
-                        <input name="year" defaultValue={initialData?.year || new Date().getFullYear()} placeholder="e.g. 2025" required className={styles.input} />
+                        <input name="year" value={formData.year} onChange={e => handleManualChange('year', e.target.value)} placeholder="e.g. 2025" required className={styles.input} />
                     </div>
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
