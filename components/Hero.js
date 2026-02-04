@@ -37,29 +37,50 @@ const calculateEventStatus = (dateStr, currentStatus) => {
     if (!dateStr) return currentStatus;
 
     try {
-        // Try to find a year
-        const yearMatch = dateStr.match(/\d{4}/);
-        if (yearMatch) {
-            const year = parseInt(yearMatch[0]);
-            const now = new Date();
-            const currentYear = now.getFullYear();
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Compare against start of today
 
-            if (year < currentYear) return 'COMPLETED';
-            if (year > currentYear) return 'UPCOMING';
+        // 1. Strict ISO Date check (YYYY-MM-DD) - Works everywhere if parsed manually
+        const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (isoMatch) {
+            const [_, y, m, d] = isoMatch;
+            const eventDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+            if (eventDate < now) return 'COMPLETED';
+            return 'UPCOMING';
+        }
 
-            // Same year, check full date
-            // Handle ranges "Jan 17 - Jan 19 2026" -> take "Jan 19 2026"
+        // 2. Handle ranges or other formats
+        let datePart = dateStr;
+
+        // processing logic: if it contains " - " (range), take the last part
+        if (dateStr.includes(' - ')) {
+            const parts = dateStr.split(' - ');
+            datePart = parts[parts.length - 1].trim();
+        }
+        // fallback for other hyphenated ranges that are NOT ISO dates
+        else if (dateStr.includes('-') && !isoMatch) {
             const parts = dateStr.split('-');
-            const datePart = parts[parts.length - 1].trim();
-
-            const eventDate = new Date(datePart);
-            if (!isNaN(eventDate.getTime())) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                // If event date is strictly before today, it's completed
-                if (eventDate < today) return 'COMPLETED';
+            // Check if the split destroyed a date (e.g. Jan 12-15).
+            // If the last part is just a number (e.g. "15"), we need more context.
+            // But if specific format "Jan 12-Jan 15", it works.
+            const lastPart = parts[parts.length - 1].trim();
+            if (!lastPart.match(/^\d+$/)) {
+                datePart = lastPart;
             }
+        }
+
+        // 3. Try parsing
+        // Replace hyphens in non-ISO strings with slashes for Safari compatibility (e.g. "05-12-2025")
+        // though usually "Month DD YYYY" is best.
+        let safeDateStr = datePart;
+        // If it looks like MM-DD-YYYY or DD-MM-YYYY using hyphens, swap to slashes
+        if (safeDateStr.match(/^\d{1,2}-\d{1,2}-\d{4}$/)) {
+            safeDateStr = safeDateStr.replace(/-/g, '/');
+        }
+
+        const eventDate = new Date(safeDateStr);
+        if (!isNaN(eventDate.getTime())) {
+            if (eventDate < now) return 'COMPLETED';
         }
     } catch (e) {
         console.error("Date parse error", e);
