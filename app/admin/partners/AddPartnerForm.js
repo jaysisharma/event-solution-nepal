@@ -6,6 +6,7 @@ import { Plus, Loader2, X, CheckCircle, Upload } from 'lucide-react';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
+
 export default function AddPartnerForm() {
     const [uploadTime, setUploadTime] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);

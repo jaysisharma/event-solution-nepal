@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { createGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction, getGalleryCategories } from './actions';
 import styles from '../admin.module.css';
-import { compressImage } from '@/lib/compress';
 
 const Snackbar = ({ message, type, onClose }) => {
     useEffect(() => {
@@ -90,9 +89,8 @@ export default function AdminGallery() {
                 if (uploadedImageUrl) {
                     await deleteGalleryImageAction(uploadedImageUrl);
                 }
-                const compressed = await compressImage(f);
                 const formData = new FormData();
-                formData.append('image', compressed);
+                formData.append('image', f);
                 formData.append('folder', 'gallery');
                 const res = await uploadGalleryImage(formData);
                 if (res.success && res.url) {
