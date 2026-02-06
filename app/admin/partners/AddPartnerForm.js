@@ -88,7 +88,7 @@ export default function AddPartnerForm() {
     return (
         <form onSubmit={handleSubmit} id="add-partner-form" className={styles.formGrid} style={{ gridTemplateColumns: 'minmax(200px, 1fr) auto', alignItems: 'end', gap: '1rem' }}>
             <div className={styles.formGroup} style={{ marginBottom: 0 }}>
-                <label className={styles.label} style={{ display: 'block', marginBottom: '0.5rem' }}>Partner Logo (Required)</label>
+                <label className={styles.label} style={{ display: 'block', marginBottom: '0.5rem' }}>Partner Logo (Required) <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 400 }}>(Ratio 1:1)</span></label>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     {/* Preview Box */}

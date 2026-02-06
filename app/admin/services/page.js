@@ -232,7 +232,7 @@ export default function AdminServices() {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label className={styles.label}>Service Image</label>
+                        <label className={styles.label}>Service Image <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 400 }}>(Ratio 1:1)</span></label>
                         <input
                             onChange={handleFileChange}
                             type="file"

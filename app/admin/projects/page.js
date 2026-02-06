@@ -360,7 +360,7 @@ export default function ProjectAdminPage() {
 
                     <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                         <label className={styles.label}>
-                            {editingId ? 'Add More Images (Optional)' : 'Project Images'}
+                            {editingId ? 'Add More Images (Optional)' : 'Project Images'} <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 400 }}>(Ratio 16:9)</span>
                         </label>
                         <input
                             onChange={handleFileChange}

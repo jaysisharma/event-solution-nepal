@@ -421,7 +421,7 @@ export default function HeroAdminPage() {
                             image={cropImageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={500 / 425}
+                            aspect={16 / 9}
                             onCropChange={setCrop}
                             onZoomChange={setZoom}
                             onCropComplete={onCropComplete}
@@ -507,7 +507,7 @@ export default function HeroAdminPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                             <div className={styles.heroFormLayout}>
                                 <div className={styles.formGroup}>
-                                    <label className={styles.label}>Slide Image</label>
+                                    <label className={styles.label}>Slide Image <span style={{ fontSize: '0.8em', color: '#64748b', fontWeight: 400 }}>(Ratio 16:9)</span></label>
                                     <div
                                         onClick={() => document.getElementById('slideImageInput').click()}
                                         className={styles.imageUploadBox}

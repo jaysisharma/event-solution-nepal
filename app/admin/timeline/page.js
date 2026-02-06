@@ -274,6 +274,7 @@ export default function TimelineAdminPage() {
                                     Est: {uploadTime}
                                 </div>
                             )}
+                            <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>(Ratio 1:1)</div>
                         </div>
 
                         {/* Fields */}
