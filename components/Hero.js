@@ -198,28 +198,40 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                     <div className={styles.rightContent} ref={rightContentRef}>
                         <div className={styles.imageContainer}>
                             <div className={styles.mainImageWrapper}>
-                                {heroContent.map((img, index) => (
-                                    <div
-                                        key={index}
-                                        className={`${styles.fadingSlide} ${index === currentIndex ? styles.activeSlide : ''}`}
-                                    >
-                                        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                            <Image
-                                                src={img.src}
-                                                alt={img.title}
-                                                fill
-                                                priority={index === 0}
-                                                className={styles.mainImage}
-                                                quality={90}
-                                            />
+                                {heroContent.map((img, index) => {
+                                    // Optimization: Only render the current, previous, and next slides
+                                    // This prevents loading all 9+ high-res images at once which crashes iOS
+                                    const len = heroContent.length;
+                                    const isCurrent = index === currentIndex;
+                                    const isNext = index === (currentIndex + 1) % len;
+                                    const isPrev = index === (currentIndex - 1 + len) % len;
+                                    const shouldRender = isCurrent || isNext || isPrev;
+
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`${styles.fadingSlide} ${index === currentIndex ? styles.activeSlide : ''}`}
+                                        >
+                                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                {shouldRender && (
+                                                    <Image
+                                                        src={img.src}
+                                                        alt={img.title}
+                                                        fill
+                                                        priority={index === 0}
+                                                        className={styles.mainImage}
+                                                        quality={90}
+                                                    />
+                                                )}
+                                            </div>
+                                            <div className={styles.imageOverlay}></div>
+                                            <div className={styles.imageText}>
+                                                <p className={styles.imageLabel}>{img.label}</p>
+                                                <p className={styles.imageTitle}>{img.title}</p>
+                                            </div>
                                         </div>
-                                        <div className={styles.imageOverlay}></div>
-                                        <div className={styles.imageText}>
-                                            <p className={styles.imageLabel}>{img.label}</p>
-                                            <p className={styles.imageTitle}>{img.title}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
                             {/* Floating Elements - Status Card */}
