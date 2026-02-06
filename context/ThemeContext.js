@@ -12,9 +12,8 @@ export const ThemeProvider = ({ children }) => {
         const storedTheme = localStorage.getItem('theme');
         if (storedTheme === 'dark' || storedTheme === 'light') {
             setTheme(storedTheme);
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            setTheme('dark');
         }
+        // Removed system preference check to force default light mode
         setMounted(true);
     }, []);
 

@@ -249,35 +249,23 @@ Please provide availability and pricing details.`;
                                     ))}
                                 </div>
 
-                                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                                    <div style={{ flex: 1 }}>
-                                        <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>From Date</label>
+                                <div className={styles.dateInputsContainer}>
+                                    <div className={styles.dateField}>
+                                        <label className={styles.dateLabel}>From Date</label>
                                         <input
                                             type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.6rem',
-                                                borderRadius: '8px',
-                                                border: '1px solid #e2e8f0',
-                                                fontSize: '0.9rem'
-                                            }}
+                                            className={styles.dateInput}
                                         />
                                     </div>
-                                    <div style={{ flex: 1 }}>
-                                        <label style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>To Date</label>
+                                    <div className={styles.dateField}>
+                                        <label className={styles.dateLabel}>To Date</label>
                                         <input
                                             type="date"
                                             value={endDate}
                                             onChange={(e) => setEndDate(e.target.value)}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.6rem',
-                                                borderRadius: '8px',
-                                                border: '1px solid #e2e8f0',
-                                                fontSize: '0.9rem'
-                                            }}
+                                            className={styles.dateInput}
                                         />
                                     </div>
                                 </div>

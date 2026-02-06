@@ -279,3 +279,47 @@ a.infoValue:hover {
         height: 350px;
     }
 }
+
+/* Mobile Responsiveness Updates */
+@media (max-width: 768px) {
+    .headerSection {
+        padding: 6rem 1.5rem 3rem;
+        /* Reduced padding */
+    }
+
+    .title {
+        font-size: 2.5rem;
+        /* Smaller title on mobile */
+    }
+
+    .container {
+        padding: 0 1.5rem 4rem;
+        /* Reduced side padding */
+        gap: 3rem;
+        /* Reduced vertical gap between sections */
+    }
+
+    .infoColumn {
+        padding-right: 0;
+        /* Remove desktop-only padding */
+    }
+
+    .infoValue {
+        font-size: 1.15rem;
+        /* slightly smaller to fit screen */
+        word-break: break-word;
+        /* Prevent email overflow */
+    }
+
+    .formColumn {
+        padding: 2rem 1.5rem;
+        /* Less padding in form container */
+    }
+
+    .submitBtn {
+        width: 100%;
+        /* Explicit full width */
+        padding: 1rem 2rem;
+        /* Comfortable touch target */
+    }
+}

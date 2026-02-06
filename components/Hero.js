@@ -30,7 +30,8 @@ const TrustBadge = ({ icon: Icon, text }) => (
     </div>
 );
 
-const PARTNERS = ["TEDx", "CocaCola", "Samsung", "United Nations", "World Bank", "Red Cross"];
+// PARTNERS constant removed
+
 
 // Helper to determine status from date string
 const calculateEventStatus = (dateStr, currentStatus) => {
@@ -99,17 +100,14 @@ const Hero = ({ partners, partnerLogos, slides }) => {
     const buttonsRef = useRef(null);
     const rightContentRef = useRef(null);
 
-    const partnerList = (partners && partners.length > 0) ? partners.map(p => p.name) : PARTNERS;
+    const partnerList = (partners && partners.length > 0) ? partners.map(p => p.name) : [];
     const dbImages = partners?.filter(p => p.image).map(p => p.image) || [];
     const allLogos = [...dbImages, ...(partnerLogos || [])];
     const hasLogos = allLogos.length > 0;
     const itemsToRender = hasLogos ? allLogos : partnerList;
 
-    const defaultImages = [
-        { src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1000&auto=format&fit=crop", label: "Latest Project", title: "Tech Innovators Summit 2024", rating: "4.9", ratingLabel: "Average Rating", ratingIcon: "Star", capacity: "Handling events up to 10k guests.", capacityLabel: "Capacity", capacityIcon: "Users" },
-        { src: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop", label: "Wedding Series", title: "Royal Palace Celebration", rating: "5.0", ratingLabel: "Client Satisfaction", ratingIcon: "Heart", capacity: "500+ Guests", capacityLabel: "Attendance", capacityIcon: "Users" },
-        { src: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000&auto=format&fit=crop", label: "Concert Tour", title: "Neon Nights Festival", rating: "4.8", ratingLabel: "Fan Rating", ratingIcon: "Star", capacity: "25k+ Attendees", capacityLabel: "Crowd Size", capacityIcon: "PartyPopper" }
-    ];
+    // defaultImages removed
+
 
     const heroContent = (slides && slides.length > 0) ? slides.map(s => ({
         src: s.image,
@@ -124,7 +122,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
         showStats: s.showStats,
         status: calculateEventStatus(s.eventDate, s.status),
         eventDate: s.eventDate
-    })) : defaultImages;
+    })) : [];
 
     const activeSlide = heroContent[currentIndex];
 
