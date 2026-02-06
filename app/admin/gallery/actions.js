@@ -87,3 +87,15 @@ export async function deleteGalleryItem(id) {
         return { success: false, error: 'Failed to delete gallery item.' };
     }
 }
+
+export async function getGalleryCategories() {
+    try {
+        const categories = await prisma.galleryItem.findMany({
+            select: { category: true },
+            distinct: ['category'],
+        });
+        return { success: true, data: categories.map(c => c.category) };
+    } catch (e) {
+        return { success: false, error: 'Failed to fetch categories' };
+    }
+}

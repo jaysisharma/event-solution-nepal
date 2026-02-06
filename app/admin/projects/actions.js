@@ -186,3 +186,15 @@ export async function toggleFeaturedProject(id) {
         return { success: false, error: 'Failed to toggle featured status.' };
     }
 }
+
+export async function getProjectCategories() {
+    try {
+        const categories = await prisma.workProject.findMany({
+            select: { category: true },
+            distinct: ['category'],
+        });
+        return { success: true, data: categories.map(c => c.category) };
+    } catch (e) {
+        return { success: false, error: 'Failed to fetch categories' };
+    }
+}

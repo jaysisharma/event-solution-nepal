@@ -230,3 +230,15 @@ export async function getRentals() {
         return { success: false, error: "Failed to fetch rentals" };
     }
 }
+
+export async function getRentalCategories() {
+    try {
+        const categories = await prisma.rentalItem.findMany({
+            select: { category: true },
+            distinct: ['category'],
+        });
+        return { success: true, data: categories.map(c => c.category) };
+    } catch (e) {
+        return { success: false, error: 'Failed to fetch categories' };
+    }
+}

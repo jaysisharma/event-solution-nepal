@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { getRentals, deleteRental, addRental, updateRental } from './actions';
+import { getRentals, deleteRental, addRental, updateRental, getRentalCategories } from './actions';
 import { Plus, Edit, Trash2, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import styles from '../admin.module.css';
 import Link from 'next/link';
@@ -41,13 +41,16 @@ export default function RentalsPage() {
 
     const fetchData = React.useCallback(async () => {
         setIsLoading(true);
-        const res = await getRentals();
-        if (res.success) {
-            setRentals(res.data);
+        const [rentalsRes, categoriesRes] = await Promise.all([
+            getRentals(),
+            getRentalCategories()
+        ]);
 
-            // Extract unique categories
-            const cats = Array.from(new Set(res.data.map(r => r.category)));
-            setExistingCategories(cats);
+        if (rentalsRes.success) {
+            setRentals(rentalsRes.data);
+        }
+        if (categoriesRes.success) {
+            setExistingCategories(categoriesRes.data);
         }
         setIsLoading(false);
     }, []);

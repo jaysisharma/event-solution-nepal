@@ -1,13 +1,10 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star, Upload } from 'lucide-react';
-import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction } from './actions';
+import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction, getProjectCategories } from './actions';
 import styles from '../admin.module.css';
-
-
 import { compressImage } from '@/lib/compress';
-// --- Snippets ---
+
 const Snackbar = ({ message, type, onClose }) => {
     useEffect(() => {
         const timer = setTimeout(onClose, 3000);
@@ -29,6 +26,7 @@ const Snackbar = ({ message, type, onClose }) => {
 
 export default function ProjectAdminPage() {
     const [projects, setProjects] = useState([]);
+    const [categoriesList, setCategoriesList] = useState(['Wedding', 'Corporate', 'Concert', 'Social', 'Expo']);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
@@ -39,15 +37,25 @@ export default function ProjectAdminPage() {
     const [title, setTitle] = useState('');
     const [year, setYear] = useState('');
     const [category, setCategory] = useState('Wedding');
-    const [customCategory, setCustomCategory] = useState(''); // For "Other" logic
-    const [isFeatured, setIsFeatured] = useState(false); // New state
+    const [customCategory, setCustomCategory] = useState('');
+    const [isFeatured, setIsFeatured] = useState(false);
     const [files, setFiles] = useState(null);
-    const [previews, setPreviews] = useState([]); // New: Previews for selected files
-    const [existingImagesState, setExistingImagesState] = useState([]); // For edit mode
+    const [previews, setPreviews] = useState([]);
+    const [existingImagesState, setExistingImagesState] = useState([]);
 
     useEffect(() => {
         fetchProjects();
+        fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        const res = await getProjectCategories();
+        if (res.success) {
+            const defaults = ['Wedding', 'Corporate', 'Concert', 'Social', 'Expo'];
+            const merged = Array.from(new Set([...defaults, ...res.data])).sort();
+            setCategoriesList(merged);
+        }
+    };
 
     const fetchProjects = async () => {
         setIsLoading(true);
@@ -56,9 +64,7 @@ export default function ProjectAdminPage() {
         setIsLoading(false);
     };
 
-    // --- Validation ---
     const validateYear = (val) => {
-        // Formats: 2024 or 2024-2025
         const regex = /^\d{4}(-\d{4})?$/;
         return regex.test(val);
     };
@@ -69,9 +75,7 @@ export default function ProjectAdminPage() {
         setYear(project.year);
         setIsFeatured(project.isFeatured || false);
 
-        // Category logic
-        const defaultCats = ['Wedding', 'Corporate', 'Concert', 'Social', 'Expo'];
-        if (defaultCats.includes(project.category)) {
+        if (categoriesList.includes(project.category)) {
             setCategory(project.category);
             setCustomCategory('');
         } else {
@@ -93,11 +97,11 @@ export default function ProjectAdminPage() {
         setEditingId(null);
         setTitle('');
         setYear('');
-        setCategory('Wedding');
+        setCategory(categoriesList[0] || 'Wedding');
         setCustomCategory('');
         setIsFeatured(false);
         setFiles(null);
-        setPreviews([]); // Clear previews
+        setPreviews([]);
         setUploadedUrls([]);
         setExistingImagesState([]);
     };
@@ -108,7 +112,6 @@ export default function ProjectAdminPage() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this project?')) return;
-
         setDeletingId(id);
         try {
             const res = await deleteProject(id);
@@ -126,26 +129,19 @@ export default function ProjectAdminPage() {
         }
     };
 
-    // New: Handle File Change & Generate Previews & Upload
     const [uploadedUrls, setUploadedUrls] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0); // Optional: if we want to show count 
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const handleFileChange = async (e) => {
         if (e.target.files && e.target.files.length > 0) {
-
-            // Start Background Upload
             setIsUploading(true);
             setUploadProgress(0);
-
             const newFiles = Array.from(e.target.files);
             const total = newFiles.length;
             let completed = 0;
-
             const newUrls = [];
-
             try {
-                // Upload files concurrently
                 const uploadPromises = newFiles.map(async (file) => {
                     if (file && file.size > 0) {
                         try {
@@ -153,7 +149,6 @@ export default function ProjectAdminPage() {
                             const formData = new FormData();
                             formData.append('image', compressed);
                             formData.append('folder', 'projects');
-
                             const res = await uploadProjectImage(formData);
                             if (res.success && res.url) {
                                 completed++;
@@ -166,26 +161,21 @@ export default function ProjectAdminPage() {
                     }
                     return null;
                 });
-
                 const results = await Promise.all(uploadPromises);
                 const successfulUrls = results.filter(u => u !== null);
-
-                // Append to existing uploadedUrls (allows adding more batches)
                 setUploadedUrls(prev => [...prev, ...successfulUrls]);
-
                 if (successfulUrls.length < total) {
                     setSnackbar({ message: `${total - successfulUrls.length} images failed to upload`, type: 'warning' });
                 } else {
                     setSnackbar({ message: 'All images uploaded ready for save', type: 'success' });
                 }
-
             } catch (err) {
                 console.error("Upload error", err);
                 setSnackbar({ message: 'Error uploading images', type: 'error' });
             } finally {
                 setIsUploading(false);
                 setUploadProgress(0);
-                e.target.value = ''; // Reset input to allow selecting same files again if needed
+                e.target.value = '';
             }
         }
     };
@@ -193,32 +183,26 @@ export default function ProjectAdminPage() {
     const handleRemoveNewImage = async (index) => {
         const urlToRemove = uploadedUrls[index];
         if (urlToRemove) {
-            await deleteProjectImageAction(urlToRemove); // Auto-cleanup
+            await deleteProjectImageAction(urlToRemove);
         }
         setUploadedUrls(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (isUploading) {
             setSnackbar({ message: 'Please wait for images to finish uploading', type: 'warning' });
             return;
         }
-
-        // 1. Validate Year
         if (!validateYear(year)) {
             setSnackbar({ message: 'Invalid Year format. Use "2024" or "2024-2025".', type: 'error' });
             return;
         }
-
-        // 2. Final Category
         const finalCategory = category === 'Other' ? customCategory.trim() : category;
         if (!finalCategory) {
             setSnackbar({ message: 'Please specify a category.', type: 'error' });
             return;
         }
-
         setIsSubmitting(true);
         try {
             const formData = new FormData();
@@ -226,37 +210,29 @@ export default function ProjectAdminPage() {
             formData.append('year', year);
             formData.append('category', finalCategory);
             formData.append('isFeatured', isFeatured);
-
-            // Use uploaded URLs
             if (uploadedUrls.length > 0) {
-                // Use 'images' for Create, 'newImages' for Update
                 const fieldName = editingId ? 'newImages' : 'images';
                 uploadedUrls.forEach(url => {
                     formData.append(fieldName, url);
                 });
             } else if (files && files.length > 0) {
-                // Fallback (shouldn't happen if isUploading check passes, unless upload failed completely)
-                // Just in case, we try to send files, but we removed compression here to keep it simple
                 const fieldName = editingId ? 'newImages' : 'images';
                 for (let i = 0; i < files.length; i++) {
                     formData.append(fieldName, files[i]);
                 }
             }
-
             let res;
             if (editingId) {
-                // Pass existing images
                 formData.append('existingImages', JSON.stringify(existingImagesState));
                 res = await updateProject(editingId, formData);
             } else {
                 res = await createProject(formData);
             }
-
             if (res.success) {
                 setSnackbar({ message: editingId ? 'Project updated successfully!' : 'Project created successfully!', type: 'success' });
-                // Cleanup only on success
                 handleCancelEdit();
                 fetchProjects();
+                fetchCategories();
             } else {
                 setSnackbar({ message: res.error || 'Operation failed', type: 'error' });
             }
@@ -311,11 +287,9 @@ export default function ProjectAdminPage() {
                                 className={styles.select}
                                 style={{ flex: 1 }}
                             >
-                                <option value="Wedding">Wedding</option>
-                                <option value="Corporate">Corporate</option>
-                                <option value="Concert">Concert</option>
-                                <option value="Social">Social</option>
-                                <option value="Expo">Expo</option>
+                                {categoriesList.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
                                 <option value="Other">Other (Add New)</option>
                             </select>
                             {category === 'Other' && (
@@ -369,12 +343,9 @@ export default function ProjectAdminPage() {
                             accept="image/*"
                             className={styles.input}
                             style={{ paddingTop: '0.7rem' }}
-                            required={!editingId && uploadedUrls.length === 0} // Required only on create and if no images uploaded yet
+                            required={!editingId && uploadedUrls.length === 0}
                         />
 
-                        {/* Preview Area */}
-
-                        {/* 1. Existing Images (Edit Mode) */}
                         {editingId && existingImagesState.length > 0 && (
                             <div style={{ marginTop: '1rem' }}>
                                 <label className={styles.label} style={{ fontSize: '0.8rem', color: '#64748b' }}>Current Images:</label>
@@ -386,20 +357,8 @@ export default function ProjectAdminPage() {
                                                 type="button"
                                                 onClick={() => handleRemoveImage(i)}
                                                 style={{
-                                                    position: 'absolute',
-                                                    top: -5,
-                                                    right: -5,
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '50%',
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    cursor: 'pointer',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: 'none', borderRadius: '50%',
+                                                    width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                                 }}
                                             >
                                                 <X size={12} />
@@ -410,7 +369,6 @@ export default function ProjectAdminPage() {
                             </div>
                         )}
 
-                        {/* 2. New Selected Previews */}
                         {uploadedUrls.length > 0 && (
                             <div style={{ marginTop: '1rem' }}>
                                 <label className={styles.label} style={{ fontSize: '0.8rem', color: '#64748b' }}>New Selection Preview:</label>
@@ -422,20 +380,8 @@ export default function ProjectAdminPage() {
                                                 type="button"
                                                 onClick={() => handleRemoveNewImage(i)}
                                                 style={{
-                                                    position: 'absolute',
-                                                    top: -5,
-                                                    right: -5,
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    border: '1px solid white',
-                                                    borderRadius: '50%',
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    cursor: 'pointer',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    position: 'absolute', top: -5, right: -5, background: '#ef4444', color: 'white', border: '1px solid white', borderRadius: '50%',
+                                                    width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                                                 }}
                                                 title="Remove Image"
                                             >
@@ -508,25 +454,11 @@ export default function ProjectAdminPage() {
                                                 fetchProjects();
                                             }}
                                             title={project.isFeatured ? "Unmark as Featured" : "Mark as Featured"}
-                                            style={{
-                                                background: 'none',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                padding: '4px',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                transition: 'transform 0.2s'
-                                            }}
+                                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s' }}
                                             onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                                             onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                         >
-                                            <Star
-                                                size={20}
-                                                fill={project.isFeatured ? "#f59e0b" : "transparent"}
-                                                color={project.isFeatured ? "#f59e0b" : "#cbd5e1"}
-                                                strokeWidth={2}
-                                            />
+                                            <Star size={20} fill={project.isFeatured ? "#f59e0b" : "transparent"} color={project.isFeatured ? "#f59e0b" : "#cbd5e1"} strokeWidth={2} />
                                         </button>
                                     </td>
                                     <td>
@@ -537,32 +469,15 @@ export default function ProjectAdminPage() {
                                     <td>{project.year}</td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                                            <button
-                                                onClick={() => handleEdit(project)}
-                                                className={styles.btnIcon}
-                                                title="Edit"
-                                                disabled={deletingId === project.id}
-                                            >
-                                                <Pencil size={18} />
-                                            </button>
+                                            <button onClick={() => handleEdit(project)} className={styles.btnIcon} title="Edit" disabled={deletingId === project.id}><Pencil size={18} /></button>
                                             <button
                                                 onClick={() => handleDelete(project.id)}
                                                 className={styles.btnIconDanger}
                                                 title="Delete"
                                                 disabled={deletingId === project.id}
-                                                style={{
-                                                    cursor: deletingId === project.id ? 'not-allowed' : 'pointer',
-                                                    opacity: deletingId === project.id ? 0.7 : 1,
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
+                                                style={{ cursor: deletingId === project.id ? 'not-allowed' : 'pointer', opacity: deletingId === project.id ? 0.7 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                             >
-                                                {deletingId === project.id ? (
-                                                    <Loader2 size={18} className="animate-spin" />
-                                                ) : (
-                                                    <Trash2 size={18} />
-                                                )}
+                                                {deletingId === project.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                                             </button>
                                         </div>
                                     </td>
@@ -572,9 +487,7 @@ export default function ProjectAdminPage() {
                     </table>
                 )}
                 {!isLoading && projects.length === 0 && (
-                    <div className={styles.emptyState} style={{ border: 'none' }}>
-                        No projects found.
-                    </div>
+                    <div className={styles.emptyState} style={{ border: 'none' }}>No projects found.</div>
                 )}
             </div>
         </div>

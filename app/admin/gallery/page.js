@@ -1,8 +1,7 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
-import { createGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction } from './actions';
+import { createGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction, getGalleryCategories } from './actions';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
@@ -27,6 +26,7 @@ const Snackbar = ({ message, type, onClose }) => {
 
 export default function AdminGallery() {
     const [galleryItems, setGalleryItems] = useState([]);
+    const [categoriesList, setCategoriesList] = useState(['Wedding', 'Corporate', 'Concert', 'Party', 'Decoration']);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
@@ -39,14 +39,22 @@ export default function AdminGallery() {
     const [category, setCategory] = useState('Wedding');
     const [customCategory, setCustomCategory] = useState('');
     const [size, setSize] = useState('normal');
-    // const [file, setFile] = useState(null); // No longer needed
-    // const [preview, setPreview] = useState(null); // No longer needed
 
     const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         fetchGallery();
+        fetchCategories();
     }, []);
+
+    const fetchCategories = async () => {
+        const res = await getGalleryCategories();
+        if (res.success) {
+            const defaults = ['Wedding', 'Corporate', 'Concert', 'Party', 'Decoration'];
+            const merged = Array.from(new Set([...defaults, ...res.data])).sort();
+            setCategoriesList(merged);
+        }
+    };
 
     const fetchGallery = async () => {
         setIsLoading(true);
@@ -56,13 +64,10 @@ export default function AdminGallery() {
     };
 
     const handleAddNew = () => {
-        // Reset form
         setTitle('');
-        setCategory('Wedding');
+        setCategory(categoriesList[0] || 'Wedding');
         setCustomCategory('');
         setSize('normal');
-        // setFile(null);
-        // setPreview(null);
         setUploadedImageUrl(null);
         setIsUploading(false);
         setShowForm(true);
@@ -70,7 +75,6 @@ export default function AdminGallery() {
     };
 
     const handleCancel = async () => {
-        // Clean up any uploaded but unsaved image
         if (uploadedImageUrl) {
             await deleteGalleryImageAction(uploadedImageUrl);
         }
@@ -81,25 +85,18 @@ export default function AdminGallery() {
     const handleFileChange = async (e) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
-
-            // Start background upload
             setIsUploading(true);
             try {
-                // Delete old image if new one selected
                 if (uploadedImageUrl) {
                     await deleteGalleryImageAction(uploadedImageUrl);
                 }
-
                 const compressed = await compressImage(f);
-
                 const formData = new FormData();
-                formData.append('image', compressed); // Use 'image' key
+                formData.append('image', compressed);
                 formData.append('folder', 'gallery');
-
                 const res = await uploadGalleryImage(formData);
-
                 if (res.success && res.url) {
-                    setUploadedImageUrl(res.url); // Use returned URL
+                    setUploadedImageUrl(res.url);
                     setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
                 } else {
                     setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
@@ -120,17 +117,13 @@ export default function AdminGallery() {
         }
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!uploadedImageUrl) {
             setSnackbar({ message: 'Please wait for image to finish uploading', type: 'error' });
             return;
         }
-
         setIsSubmitting(true);
-
         try {
             const formData = new FormData();
             formData.append('title', title);
@@ -142,13 +135,13 @@ export default function AdminGallery() {
             const res = await createGalleryItem(formData);
             if (res.success) {
                 setSnackbar({ message: 'Item added successfully!', type: 'success' });
-                // Reset form
                 setTitle('');
-                setCategory('Wedding');
+                setCategory(categoriesList[0] || 'Wedding');
                 setSize('normal');
                 setUploadedImageUrl(null);
-                setShowForm(false); // Close form
+                setShowForm(false);
                 fetchGallery();
+                fetchCategories();
             } else {
                 setSnackbar({ message: res.error || 'Failed to add item', type: 'error' });
             }
@@ -162,10 +155,8 @@ export default function AdminGallery() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this image?')) return;
-
         setDeletingId(id);
         const res = await deleteGalleryItem(id);
-
         if (res.success) {
             setSnackbar({ message: 'Image deleted', type: 'success' });
             fetchGallery();
@@ -221,11 +212,9 @@ export default function AdminGallery() {
                                         className={styles.select}
                                         style={{ flex: 1 }}
                                     >
-                                        <option value="Wedding">Wedding</option>
-                                        <option value="Corporate">Corporate</option>
-                                        <option value="Concert">Concert</option>
-                                        <option value="Party">Party</option>
-                                        <option value="Decoration">Decoration</option>
+                                        {categoriesList.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
                                         <option value="Other">Other (Add New)</option>
                                     </select>
                                     {category === 'Other' && (
@@ -278,38 +267,19 @@ export default function AdminGallery() {
                                                 <img
                                                     src={uploadedImageUrl}
                                                     alt="Preview"
-                                                    style={{
-                                                        width: '100%',
-                                                        display: 'block'
-                                                    }}
+                                                    style={{ width: '100%', display: 'block' }}
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
                                                     style={{
-                                                        position: 'absolute',
-                                                        top: '8px',
-                                                        right: '8px',
-                                                        background: 'rgba(0,0,0,0.5)',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '50%',
-                                                        width: '24px',
-                                                        height: '24px',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        cursor: 'pointer',
-                                                        transition: 'background 0.2s',
-                                                        zIndex: 20
+                                                        position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%',
+                                                        width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s', zIndex: 20
                                                     }}
                                                     title="Remove Selection"
                                                 >
                                                     <X size={14} />
                                                 </button>
-                                            </div>
-                                            <div style={{ fontSize: '0.8rem', color: '#10b981', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                <CheckCircle size={14} /> Ready to save
                                             </div>
                                         </div>
                                     ) : (
@@ -328,9 +298,8 @@ export default function AdminGallery() {
                             </div>
                         </form>
                     </div>
-                </div >
-            )
-            }
+                </div>
+            )}
 
             <div className={styles.tableContainer}>
                 {isLoading ? (
@@ -368,33 +337,20 @@ export default function AdminGallery() {
                                             className={`${styles.btnIcon} delete`}
                                             title="Delete"
                                             disabled={deletingId === item.id}
-                                            style={{
-                                                cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
-                                                opacity: deletingId === item.id ? 0.7 : 1
-                                            }}
+                                            style={{ cursor: deletingId === item.id ? 'not-allowed' : 'pointer', opacity: deletingId === item.id ? 0.7 : 1 }}
                                         >
-                                            {deletingId === item.id ? (
-                                                <Loader2 size={18} className="animate-spin" />
-                                            ) : (
-                                                <Trash2 size={18} />
-                                            )}
+                                            {deletingId === item.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
                                         </button>
                                     </td>
-
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                )
-                }
-                {
-                    !isLoading && galleryItems.length === 0 && (
-                        <div className={styles.emptyState} style={{ border: 'none' }}>
-                            No images found.
-                        </div>
-                    )
-                }
-            </div >
-        </div >
+                )}
+                {!isLoading && galleryItems.length === 0 && (
+                    <div className={styles.emptyState} style={{ border: 'none' }}>No images found.</div>
+                )}
+            </div>
+        </div>
     );
 }
