@@ -69,6 +69,7 @@ export default async function EventDetailsPage({ params }) {
                                     className={styles.heroImage}
                                     style={{ objectFit: 'cover' }}
                                     priority
+                                    sizes="(max-width: 1200px) 100vw, 1200px"
                                 />
                             </div>
                         )}

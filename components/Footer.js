@@ -53,9 +53,8 @@ const Footer = () => {
                                     <Image
                                         src="/logo/es_logo_white.png"
                                         alt="Event Solution"
-                                        width={0}
-                                        height={0}
-                                        sizes="100vw"
+                                        width={240}
+                                        height={80}
                                         style={{ height: '80px', width: 'auto' }}
                                     />
                                 </Link>

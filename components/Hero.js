@@ -219,6 +219,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                                                         alt={img.title}
                                                         fill
                                                         priority={index === 0}
+                                                        sizes="100vw"
                                                         className={styles.mainImage}
                                                         quality={90}
                                                     />

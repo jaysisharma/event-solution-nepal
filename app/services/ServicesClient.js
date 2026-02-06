@@ -185,6 +185,7 @@ const ServicesClient = ({ initialServices }) => {
                                             src={service.image}
                                             alt={service.title}
                                             fill
+                                            sizes="(max-width: 1024px) 100vw, 50vw"
                                             className={styles.serviceImage}
                                         />
                                     </div>
@@ -207,6 +208,7 @@ const ServicesClient = ({ initialServices }) => {
                                         alt={service.title}
                                         fill
                                         priority={index === 0}
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
                                         className={styles.serviceImage}
                                     />
                                 </div>

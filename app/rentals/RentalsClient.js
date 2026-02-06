@@ -201,6 +201,7 @@ Please provide availability and pricing details.`;
                                             alt={selectedItem.title}
                                             fill
                                             className={styles.modalImage}
+                                            sizes="90vw"
                                         />
                                     </motion.div>
                                 </AnimatePresence>
