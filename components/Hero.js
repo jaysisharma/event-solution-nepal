@@ -127,6 +127,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
     const activeSlide = heroContent[currentIndex];
 
     useEffect(() => {
+        if (heroContent.length === 0) return;
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % heroContent.length);
         }, 4000);
@@ -234,7 +235,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                             </div>
 
                             {/* Floating Elements - Status Card */}
-                            {(activeSlide.status || activeSlide.eventDate) && (
+                            {(activeSlide?.status || activeSlide?.eventDate) && (
                                 <div className={styles.statusFloatCard}>
                                     <div className={`${styles.statusPill} ${activeSlide.status === 'UPCOMING' ? styles.pillUpcoming : styles.pillCompleted}`}>
                                         <span className={styles.statusDot}></span>
