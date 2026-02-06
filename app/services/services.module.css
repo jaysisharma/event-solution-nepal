@@ -118,7 +118,10 @@
 .serviceBlockMobileImage {
     position: relative;
     width: 100%;
-    height: 250px;
+    /* height: 250px; Removed fixed height */
+    aspect-ratio: 1 / 1;
+    /* Match the Admin Panel 1:1 requirement */
+    height: auto;
     margin: 2rem 0;
     overflow: hidden;
     border-radius: 4px;
