@@ -106,10 +106,17 @@ export default function AdminGallery() {
                         await deleteGalleryImageAction(uploadedImageUrl);
                     }
                     const formData = new FormData();
-                    formData.append('image', f);
+                    formData.append('file', f); // API route expects 'file', not 'image'
                     formData.append('folder', 'gallery');
-                    const res = await uploadGalleryImage(formData);
-                    if (res.success && res.url) {
+
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const res = await response.json();
+
+                    if (response.ok && res.url) {
                         setUploadedImageUrl(res.url);
                         setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
                     } else {
