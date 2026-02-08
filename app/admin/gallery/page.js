@@ -84,6 +84,8 @@ export default function AdminGallery() {
     const handleFileChange = async (e) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
+            e.target.value = ''; // Reset input to allow re-selecting same file
+
 
             // Validate Image Dimensions
             const img = new Image();
@@ -93,8 +95,31 @@ export default function AdminGallery() {
                 const height = img.naturalHeight;
                 URL.revokeObjectURL(img.src);
 
-                if (width < 800) {
-                    if (!confirm(`Warning: This image is low resolution (${width}x${height}px). It may appear blurry in the gallery. Recommended width is at least 800px.\n\nDo you still want to upload?`)) {
+                // Dynamic Resolution Check based on selected size
+                let minWidth = 800;
+                let minHeight = 600;
+                let warningMsg = `Warning: This image is low resolution (${width}x${height}px).`;
+
+                if (size === 'wide') {
+                    minWidth = 1200;
+                    warningMsg += ` For 'Wide' layout, recommended width is at least 1200px.`;
+                } else if (size === 'tall') {
+                    minWidth = 600;
+                    minHeight = 900;
+                    warningMsg += ` For 'Tall' layout, recommended size is 600x900px.`;
+                } else if (size === 'large') {
+                    minWidth = 1200;
+                    minHeight = 900;
+                    warningMsg += ` For 'Large' layout, recommended size is 1200x900px.`;
+                } else {
+                    warningMsg += ` Recommended width is at least 800px.`;
+                }
+
+                // Check condition: if width is less than required OR (for tall/large) height is insufficient
+                const isLowRes = width < minWidth || (size === 'tall' && height < minHeight) || (size === 'large' && height < minHeight);
+
+                if (isLowRes) {
+                    if (!confirm(`${warningMsg}\n\nDo you still want to upload?`)) {
                         e.target.value = ''; // Clear selection
                         return; // Stop upload
                     }
@@ -130,7 +155,7 @@ export default function AdminGallery() {
                         } catch (e) {
                             // If response is not JSON (e.g. 413 HTML page), manually handle it
                             if (response.status === 413) {
-                                throw new Error(`File is too large (${(f.size / 1024 / 1024).toFixed(2)}MB). Server limit is ~4.5MB.`);
+                                throw new Error(`Server rejected file (${(f.size / 1024 / 1024).toFixed(2)}MB). Limit is likely 1MB (Nginx default). Check server config.`);
                             }
                             if (!response.ok) {
                                 throw new Error(`Server Error: ${response.status} ${response.statusText}`);
