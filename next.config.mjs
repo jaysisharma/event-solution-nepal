@@ -3,6 +3,7 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
+      allowedOrigins: ['eventsolutionnepal.com.np', 'www.eventsolutionnepal.com.np'],
     },
   },
   output: 'standalone',
