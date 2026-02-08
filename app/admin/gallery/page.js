@@ -97,282 +97,311 @@ export default function AdminGallery() {
                     if (!confirm(`Warning: This image is low resolution (${width}x${height}px). It may appear blurry in the gallery. Recommended width is at least 800px.\n\nDo you still want to upload?`)) {
                         e.target.value = ''; // Clear selection
                         return; // Stop upload
+                        if (!confirm(`Warning: This image is low resolution (${width}x${height}px). It may appear blurry in the gallery. Recommended width is at least 800px.\n\nDo you still want to upload?`)) {
+                            e.target.value = ''; // Clear selection
+                            return; // Stop upload
+                        }
+                    }
+
+                    // Check file size (max 4.5MB to avoid Vercel/Server limits)
+                    const MAX_SIZE = 4.5 * 1024 * 1024; // 4.5MB
+                    if (f.size > MAX_SIZE) {
+                        alert(`File is too large (${(f.size / 1024 / 1024).toFixed(2)}MB). Maximum allowed size is 4.5MB.`);
+                        e.target.value = '';
+                        return;
+                    }
+
+                    setIsUploading(true);
+                    try {
+                        if (uploadedImageUrl) {
+                            await deleteGalleryImageAction(uploadedImageUrl);
+                        }
+                        const formData = new FormData();
+                        formData.append('file', f); // API route expects 'file', not 'image'
+                        formData.append('folder', 'gallery');
+
+                        const response = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: formData,
+                        });
+
+                        let res;
+                        try {
+                            const text = await response.text();
+                            try {
+                                res = JSON.parse(text);
+                            } catch (e) {
+                                // If response is not JSON (e.g. 413 HTML page), manually handle it
+                                if (response.status === 413) {
+                                    throw new Error("File is too large for the server (Max 4.5MB).");
+                                }
+                                if (!response.ok) {
+                                    throw new Error(`Server Error: ${response.status} ${response.statusText}`);
+                                }
+                                throw new Error("Invalid server response");
+                            }
+                        } catch (e) {
+                            throw typeof e === 'string' ? new Error(e) : e;
+                        }
+
+                        if (response.ok && res.url) {
+                            setUploadedImageUrl(res.url);
+                            setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
+                        } else {
+                            setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
+                        }
+                    } catch (err) {
+                        console.error("Upload error:", err);
+                        setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
+                    } finally {
+                        setIsUploading(false);
                     }
                 }
+            };
+        };
 
-                setIsUploading(true);
-                try {
-                    if (uploadedImageUrl) {
-                        await deleteGalleryImageAction(uploadedImageUrl);
-                    }
-                    const formData = new FormData();
-                    formData.append('file', f); // API route expects 'file', not 'image'
-                    formData.append('folder', 'gallery');
-
-                    const response = await fetch('/api/upload', {
-                        method: 'POST',
-                        body: formData,
-                    });
-
-                    const res = await response.json();
-
-                    if (response.ok && res.url) {
-                        setUploadedImageUrl(res.url);
-                        setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
-                    } else {
-                        setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
-                    }
-                } catch (err) {
-                    console.error("Upload error:", err);
-                    setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
-                } finally {
-                    setIsUploading(false);
-                }
+        const handleRemoveImage = async () => {
+            if (uploadedImageUrl) {
+                await deleteGalleryImageAction(uploadedImageUrl);
+                setUploadedImageUrl(null);
             }
         };
-    };
 
-    const handleRemoveImage = async () => {
-        if (uploadedImageUrl) {
-            await deleteGalleryImageAction(uploadedImageUrl);
-            setUploadedImageUrl(null);
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!uploadedImageUrl) {
-            setSnackbar({ message: 'Please wait for image to finish uploading', type: 'error' });
-            return;
-        }
-        setIsSubmitting(true);
-        try {
-            const formData = new FormData();
-            formData.append('title', title);
-            const finalCategory = category === 'Other' ? customCategory : category;
-            formData.append('category', finalCategory);
-            formData.append('size', size);
-            formData.append('src', uploadedImageUrl);
-
-            const res = await createGalleryItem(formData);
-            if (res.success) {
-                setSnackbar({ message: 'Item added successfully!', type: 'success' });
-                setTitle('');
-                setCategory(categoriesList[0] || 'Wedding');
-                setSize('normal');
-                setUploadedImageUrl(null);
-                setShowForm(false);
-                fetchGallery();
-                fetchCategories();
-            } else {
-                setSnackbar({ message: res.error || 'Failed to add item', type: 'error' });
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!uploadedImageUrl) {
+                setSnackbar({ message: 'Please wait for image to finish uploading', type: 'error' });
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            setSnackbar({ message: 'Unexpected error', type: 'error' });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+            setIsSubmitting(true);
+            try {
+                const formData = new FormData();
+                formData.append('title', title);
+                const finalCategory = category === 'Other' ? customCategory : category;
+                formData.append('category', finalCategory);
+                formData.append('size', size);
+                formData.append('src', uploadedImageUrl);
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this image?')) return;
-        setDeletingId(id);
-        const res = await deleteGalleryItem(id);
-        if (res.success) {
-            setSnackbar({ message: 'Image deleted', type: 'success' });
-            fetchGallery();
-        } else {
-            setSnackbar({ message: res.error || 'Failed to delete', type: 'error' });
-        }
-        setDeletingId(null);
-    };
+                const res = await createGalleryItem(formData);
+                if (res.success) {
+                    setSnackbar({ message: 'Item added successfully!', type: 'success' });
+                    setTitle('');
+                    setCategory(categoriesList[0] || 'Wedding');
+                    setSize('normal');
+                    setUploadedImageUrl(null);
+                    setShowForm(false);
+                    fetchGallery();
+                    fetchCategories();
+                } else {
+                    setSnackbar({ message: res.error || 'Failed to add item', type: 'error' });
+                }
+            } catch (err) {
+                console.error(err);
+                setSnackbar({ message: 'Unexpected error', type: 'error' });
+            } finally {
+                setIsSubmitting(false);
+            }
+        };
 
-    return (
-        <div>
-            {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
+        const handleDelete = async (id) => {
+            if (!confirm('Are you sure you want to delete this image?')) return;
+            setDeletingId(id);
+            const res = await deleteGalleryItem(id);
+            if (res.success) {
+                setSnackbar({ message: 'Image deleted', type: 'success' });
+                fetchGallery();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to delete', type: 'error' });
+            }
+            setDeletingId(null);
+        };
 
-            <div className={styles.pageHeader}>
-                <div>
-                    <h1 className={styles.pageTitle}>Gallery</h1>
-                    <p className={styles.pageSubtitle}>Manage your image gallery</p>
+        return (
+            <div>
+                {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
+
+                <div className={styles.pageHeader}>
+                    <div>
+                        <h1 className={styles.pageTitle}>Gallery</h1>
+                        <p className={styles.pageSubtitle}>Manage your image gallery</p>
+                    </div>
+                    {!showForm && (
+                        <button onClick={handleAddNew} className={styles.btnAddNew}>
+                            <Plus size={18} /> Add New Image
+                        </button>
+                    )}
                 </div>
-                {!showForm && (
-                    <button onClick={handleAddNew} className={styles.btnAddNew}>
-                        <Plus size={18} /> Add New Image
-                    </button>
-                )}
-            </div>
 
-            {showForm && (
-                <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
-                    <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
-                            <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>Add Gallery Item</h3>
-                            <button onClick={handleCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className={styles.formGrid}>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Title</label>
-                                <input
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    type="text"
-                                    required
-                                    placeholder="Image Title"
-                                    className={styles.input}
-                                />
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Category</label>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        className={styles.select}
-                                        style={{ flex: 1 }}
-                                    >
-                                        {categoriesList.map(cat => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
-                                        <option value="Other">Other (Add New)</option>
-                                    </select>
-                                    {category === 'Other' && (
-                                        <input
-                                            value={customCategory}
-                                            onChange={(e) => setCustomCategory(e.target.value)}
-                                            type="text"
-                                            placeholder="Enter Category"
-                                            className={styles.input}
-                                            style={{ flex: 1 }}
-                                            required
-                                        />
-                                    )}
-                                </div>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Size</label>
-                                <select value={size} onChange={(e) => setSize(e.target.value)} className={styles.select}>
-                                    <option value="normal">Normal</option>
-                                    <option value="wide">Wide</option>
-                                    <option value="tall">Tall</option>
-                                    <option value="large">Large</option>
-                                </select>
-                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
-                                    {size === 'normal' && 'Recommended: 800x600px'}
-                                    {size === 'wide' && 'Recommended: 1200x600px'}
-                                    {size === 'tall' && 'Recommended: 600x900px'}
-                                    {size === 'large' && 'Recommended: 1200x900px'}
-                                </div>
-                            </div>
-                            <div className={styles.formGroup}>
-                                <label className={styles.label}>Gallery Image</label>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        disabled={isUploading}
-                                        style={{ position: 'absolute', inset: 0, opacity: 0, cursor: isUploading ? 'not-allowed' : 'pointer', zIndex: 10, width: '100%', height: '100%' }}
-                                    />
-
-                                    {isUploading ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: '#f8fafc', color: '#64748b' }}>
-                                            <Loader2 size={24} className="animate-spin" />
-                                            <span style={{ fontSize: '0.8rem', marginTop: '8px' }}>Uploading...</span>
-                                        </div>
-                                    ) : uploadedImageUrl ? (
-                                        <div style={{ position: 'relative', marginTop: '0.5rem', display: 'inline-block', maxWidth: '300px', width: '100%' }}>
-                                            <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
-                                                <img
-                                                    src={uploadedImageUrl}
-                                                    alt="Preview"
-                                                    style={{ width: '100%', display: 'block' }}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
-                                                    style={{
-                                                        position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%',
-                                                        width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s', zIndex: 20
-                                                    }}
-                                                    title="Remove Selection"
-                                                >
-                                                    <X size={14} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div style={{ padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-                                            <Plus size={24} />
-                                            <span style={{ fontSize: '0.9rem', marginTop: '4px' }}>Click to Upload</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className={styles.fullWidth}>
-                                <button type="submit" disabled={isSubmitting || isUploading || !uploadedImageUrl} className={styles.btnAddNew} style={{ opacity: (isSubmitting || isUploading || !uploadedImageUrl) ? 0.7 : 1, display: 'flex', gap: '8px' }}>
-                                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                                    {isSubmitting ? 'Saving...' : 'Add Item'}
+                {showForm && (
+                    <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
+                        <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
+                                <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>Add Gallery Item</h3>
+                                <button onClick={handleCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
+                                    <X size={20} />
                                 </button>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            <div className={styles.tableContainer}>
-                {isLoading ? (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading gallery...</div>
-                ) : (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Size</th>
-                                <th style={{ textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {galleryItems.map(item => (
-                                <tr key={item.id}>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            {item.src && (
-                                                <img src={item.src} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
-                                            )}
-                                            <span style={{ fontWeight: 500 }}>{item.title}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span style={{ fontSize: '0.8rem', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px' }}>
-                                            {item.category}
-                                        </span>
-                                    </td>
-                                    <td>{item.size}</td>
-                                    <td style={{ textAlign: 'right' }}>
-                                        <button
-                                            onClick={() => handleDelete(item.id)}
-                                            className={`${styles.btnIcon} delete`}
-                                            title="Delete"
-                                            disabled={deletingId === item.id}
-                                            style={{ cursor: deletingId === item.id ? 'not-allowed' : 'pointer', opacity: deletingId === item.id ? 0.7 : 1 }}
+                            <form onSubmit={handleSubmit} className={styles.formGrid}>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Title</label>
+                                    <input
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        type="text"
+                                        required
+                                        placeholder="Image Title"
+                                        className={styles.input}
+                                    />
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Category</label>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <select
+                                            value={category}
+                                            onChange={(e) => setCategory(e.target.value)}
+                                            className={styles.select}
+                                            style={{ flex: 1 }}
                                         >
-                                            {deletingId === item.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
-                                        </button>
-                                    </td>
+                                            {categoriesList.map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                            <option value="Other">Other (Add New)</option>
+                                        </select>
+                                        {category === 'Other' && (
+                                            <input
+                                                value={customCategory}
+                                                onChange={(e) => setCustomCategory(e.target.value)}
+                                                type="text"
+                                                placeholder="Enter Category"
+                                                className={styles.input}
+                                                style={{ flex: 1 }}
+                                                required
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Size</label>
+                                    <select value={size} onChange={(e) => setSize(e.target.value)} className={styles.select}>
+                                        <option value="normal">Normal</option>
+                                        <option value="wide">Wide</option>
+                                        <option value="tall">Tall</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px', fontStyle: 'italic' }}>
+                                        {size === 'normal' && 'Recommended: 800x600px'}
+                                        {size === 'wide' && 'Recommended: 1200x600px'}
+                                        {size === 'tall' && 'Recommended: 600x900px'}
+                                        {size === 'large' && 'Recommended: 1200x900px'}
+                                    </div>
+                                </div>
+                                <div className={styles.formGroup}>
+                                    <label className={styles.label}>Gallery Image</label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            disabled={isUploading}
+                                            style={{ position: 'absolute', inset: 0, opacity: 0, cursor: isUploading ? 'not-allowed' : 'pointer', zIndex: 10, width: '100%', height: '100%' }}
+                                        />
+
+                                        {isUploading ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: '#f8fafc', color: '#64748b' }}>
+                                                <Loader2 size={24} className="animate-spin" />
+                                                <span style={{ fontSize: '0.8rem', marginTop: '8px' }}>Uploading...</span>
+                                            </div>
+                                        ) : uploadedImageUrl ? (
+                                            <div style={{ position: 'relative', marginTop: '0.5rem', display: 'inline-block', maxWidth: '300px', width: '100%' }}>
+                                                <div style={{ position: 'relative', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+                                                    <img
+                                                        src={uploadedImageUrl}
+                                                        alt="Preview"
+                                                        style={{ width: '100%', display: 'block' }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => { e.preventDefault(); handleRemoveImage(); }}
+                                                        style={{
+                                                            position: 'absolute', top: '8px', right: '8px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%',
+                                                            width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'background 0.2s', zIndex: 20
+                                                        }}
+                                                        title="Remove Selection"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div style={{ padding: '2rem', border: '2px dashed #e2e8f0', borderRadius: '8px', background: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                                                <Plus size={24} />
+                                                <span style={{ fontSize: '0.9rem', marginTop: '4px' }}>Click to Upload</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className={styles.fullWidth}>
+                                    <button type="submit" disabled={isSubmitting || isUploading || !uploadedImageUrl} className={styles.btnAddNew} style={{ opacity: (isSubmitting || isUploading || !uploadedImageUrl) ? 0.7 : 1, display: 'flex', gap: '8px' }}>
+                                        {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
+                                        {isSubmitting ? 'Saving...' : 'Add Item'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+
+                <div className={styles.tableContainer}>
+                    {isLoading ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Loading gallery...</div>
+                    ) : (
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Size</th>
+                                    <th style={{ textAlign: 'right' }}>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-                {!isLoading && galleryItems.length === 0 && (
-                    <div className={styles.emptyState} style={{ border: 'none' }}>No images found.</div>
-                )}
+                            </thead>
+                            <tbody>
+                                {galleryItems.map(item => (
+                                    <tr key={item.id}>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                {item.src && (
+                                                    <img src={item.src} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                )}
+                                                <span style={{ fontWeight: 500 }}>{item.title}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span style={{ fontSize: '0.8rem', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px' }}>
+                                                {item.category}
+                                            </span>
+                                        </td>
+                                        <td>{item.size}</td>
+                                        <td style={{ textAlign: 'right' }}>
+                                            <button
+                                                onClick={() => handleDelete(item.id)}
+                                                className={`${styles.btnIcon} delete`}
+                                                title="Delete"
+                                                disabled={deletingId === item.id}
+                                                style={{ cursor: deletingId === item.id ? 'not-allowed' : 'pointer', opacity: deletingId === item.id ? 0.7 : 1 }}
+                                            >
+                                                {deletingId === item.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                    {!isLoading && galleryItems.length === 0 && (
+                        <div className={styles.emptyState} style={{ border: 'none' }}>No images found.</div>
+                    )}
+                </div>
             </div>
-        </div>
-    );
+        );
+    }
 }
