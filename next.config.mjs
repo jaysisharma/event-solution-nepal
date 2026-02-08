@@ -6,6 +6,10 @@ const nextConfig = {
       allowedOrigins: ['eventsolutionnepal.com.np', 'www.eventsolutionnepal.com.np'],
     },
   },
+  serverActions: {
+    bodySizeLimit: '10mb',
+    allowedOrigins: ['eventsolutionnepal.com.np', 'www.eventsolutionnepal.com.np'],
+  },
   output: 'standalone',
   images: {
     qualities: [75, 80, 90, 100],
