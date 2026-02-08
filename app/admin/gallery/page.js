@@ -84,28 +84,45 @@ export default function AdminGallery() {
     const handleFileChange = async (e) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
-            setIsUploading(true);
-            try {
-                if (uploadedImageUrl) {
-                    await deleteGalleryImageAction(uploadedImageUrl);
+
+            // Validate Image Dimensions
+            const img = new Image();
+            img.src = URL.createObjectURL(f);
+            img.onload = async () => {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                URL.revokeObjectURL(img.src);
+
+                if (width < 800) {
+                    if (!confirm(`Warning: This image is low resolution (${width}x${height}px). It may appear blurry in the gallery. Recommended width is at least 800px.\n\nDo you still want to upload?`)) {
+                        e.target.value = ''; // Clear selection
+                        return; // Stop upload
+                    }
                 }
-                const formData = new FormData();
-                formData.append('image', f);
-                formData.append('folder', 'gallery');
-                const res = await uploadGalleryImage(formData);
-                if (res.success && res.url) {
-                    setUploadedImageUrl(res.url);
-                    setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
-                } else {
-                    setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
+
+                setIsUploading(true);
+                try {
+                    if (uploadedImageUrl) {
+                        await deleteGalleryImageAction(uploadedImageUrl);
+                    }
+                    const formData = new FormData();
+                    formData.append('image', f);
+                    formData.append('folder', 'gallery');
+                    const res = await uploadGalleryImage(formData);
+                    if (res.success && res.url) {
+                        setUploadedImageUrl(res.url);
+                        setSnackbar({ message: 'Image uploaded successfully', type: 'success' });
+                    } else {
+                        setSnackbar({ message: res.error || 'Upload failed', type: 'error' });
+                    }
+                } catch (err) {
+                    console.error("Upload error:", err);
+                    setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
+                } finally {
+                    setIsUploading(false);
                 }
-            } catch (err) {
-                console.error("Upload error:", err);
-                setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
-            } finally {
-                setIsUploading(false);
             }
-        }
+        };
     };
 
     const handleRemoveImage = async () => {
