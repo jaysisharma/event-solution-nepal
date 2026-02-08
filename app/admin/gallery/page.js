@@ -100,10 +100,10 @@ export default function AdminGallery() {
                     }
                 }
 
-                // Check file size (max 4.5MB to avoid Vercel/Server limits)
-                const MAX_SIZE = 4.5 * 1024 * 1024; // 4.5MB
+                // Check file size (max 4.0MB to be safe)
+                const MAX_SIZE = 4.0 * 1024 * 1024; // 4.0MB
                 if (f.size > MAX_SIZE) {
-                    alert(`File is too large (${(f.size / 1024 / 1024).toFixed(2)}MB). Maximum allowed size is 4.5MB.`);
+                    alert(`File is too large (${(f.size / 1024 / 1024).toFixed(2)}MB). Maximum allowed size is 4.0MB.`);
                     e.target.value = '';
                     return;
                 }
@@ -130,7 +130,7 @@ export default function AdminGallery() {
                         } catch (e) {
                             // If response is not JSON (e.g. 413 HTML page), manually handle it
                             if (response.status === 413) {
-                                throw new Error("File is too large for the server (Max 4.5MB).");
+                                throw new Error(`File is too large (${(f.size / 1024 / 1024).toFixed(2)}MB). Server limit is ~4.5MB.`);
                             }
                             if (!response.ok) {
                                 throw new Error(`Server Error: ${response.status} ${response.statusText}`);
@@ -149,7 +149,7 @@ export default function AdminGallery() {
                     }
                 } catch (err) {
                     console.error("Upload error:", err);
-                    setSnackbar({ message: 'Upload failed due to network error', type: 'error' });
+                    setSnackbar({ message: err.message || 'Upload failed', type: 'error' });
                 } finally {
                     setIsUploading(false);
                 }
