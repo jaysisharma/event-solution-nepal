@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import styles from './GalleryGrid.module.css';
@@ -108,7 +109,7 @@ const GalleryGrid = ({ initialItems }) => {
                 </div>
 
                 {/* Lightbox */}
-                {lightboxOpen && (
+                {lightboxOpen && typeof document !== 'undefined' && createPortal(
                     <div className={styles.lightbox} onClick={closeLightbox}>
                         <button className={styles.closeBtn} onClick={closeLightbox}>
                             <X size={32} />
@@ -134,7 +135,8 @@ const GalleryGrid = ({ initialItems }) => {
                         <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={nextImage}>
                             <ChevronRight size={32} />
                         </button>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
         </section>

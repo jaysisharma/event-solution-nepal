@@ -1,6 +1,7 @@
 
 "use client";
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './projects.module.css';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -93,7 +94,9 @@ const Lightbox = ({ project, onClose }) => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [project.images.length, onClose]);
 
-    return (
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
         <motion.div
             className={styles.lightboxOverlay}
             initial={{ opacity: 0 }}
@@ -135,7 +138,8 @@ const Lightbox = ({ project, onClose }) => {
                     <p>{currentIndex + 1} / {project.images.length}</p>
                 </div>
             </div>
-        </motion.div>
+        </motion.div>,
+        document.body
     );
 };
 
