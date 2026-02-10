@@ -67,6 +67,52 @@
     }
 }
 
+@media (max-width: 1024px) {
+    .storyGrid {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .storyImageWrapper {
+        order: -1;
+        /* Image first */
+        height: 400px;
+    }
+}
+
+/* Marquee Styles Mobile Override */
+@media (max-width: 768px) {
+    .marqueeTrack {
+        animation: none;
+        /* Disable auto-scroll */
+        overflow-x: auto;
+        /* Enable horizontal scroll */
+        scroll-snap-type: x mandatory;
+        /* Optional: snap to cards */
+        width: 100%;
+        padding-bottom: 1rem;
+        /* Space for scrollbar if any */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .teamCard {
+        scroll-snap-align: center;
+        /* Snap card to center */
+        margin-right: 1rem;
+    }
+
+    /* Hide scrollbar for cleaner look but still scrollable */
+    .marqueeTrack::-webkit-scrollbar {
+        display: none;
+    }
+
+    .marqueeTrack {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
 .storyText {
     font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 400;
@@ -262,9 +308,7 @@
 }
 
 @media (max-width: 768px) {
-    .marqueeTrack {
-        animation-duration: 3s;
-    }
+    /* Removed redundant animation-duration: 3s override since we disable animation now */
 }
 
 .teamCard {
