@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
-import { createGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction, getGalleryCategories } from './actions';
+import { createGalleryItem, updateGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction, getGalleryCategories } from './actions';
+import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X, Edit } from 'lucide-react';
 import styles from '../admin.module.css';
 
 const Snackbar = ({ message, type, onClose }) => {
@@ -30,6 +30,7 @@ export default function AdminGallery() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
+    const [editingItem, setEditingItem] = useState(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -38,6 +39,7 @@ export default function AdminGallery() {
     const [category, setCategory] = useState('Wedding');
     const [customCategory, setCustomCategory] = useState('');
     const [size, setSize] = useState('normal');
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
     const [showForm, setShowForm] = useState(false);
 
@@ -63,21 +65,44 @@ export default function AdminGallery() {
     };
 
     const handleAddNew = () => {
+        setEditingItem(null);
         setTitle('');
         setCategory(categoriesList[0] || 'Wedding');
         setCustomCategory('');
         setSize('normal');
+        setDate(new Date().toISOString().split('T')[0]);
         setUploadedImageUrl(null);
         setIsUploading(false);
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const handleEdit = (item) => {
+        setEditingItem(item);
+        setTitle(item.title);
+        // Check if category is in categoriesList, else set to Other
+        if (categoriesList.includes(item.category)) {
+            setCategory(item.category);
+            setCustomCategory('');
+        } else {
+            setCategory('Other');
+            setCustomCategory(item.category);
+        }
+        setSize(item.size);
+        setDate(item.date ? new Date(item.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+        setUploadedImageUrl(item.src);
+        setIsUploading(false);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleCancel = async () => {
-        if (uploadedImageUrl) {
+        // If we were uploading a new image but cancelled, we should clean it up ONLY if it wasn't the original item image
+        if (uploadedImageUrl && (!editingItem || uploadedImageUrl !== editingItem.src)) {
             await deleteGalleryImageAction(uploadedImageUrl);
         }
         setShowForm(false);
+        setEditingItem(null);
         setUploadedImageUrl(null);
     };
 
@@ -198,19 +223,25 @@ export default function AdminGallery() {
         setIsSubmitting(true);
         try {
             const formData = new FormData();
+            if (editingItem) {
+                formData.append('id', editingItem.id);
+            }
             formData.append('title', title);
             const finalCategory = category === 'Other' ? customCategory : category;
             formData.append('category', finalCategory);
             formData.append('size', size);
+            formData.append('date', date);
             formData.append('src', uploadedImageUrl);
 
-            const res = await createGalleryItem(formData);
+            const res = editingItem ? await updateGalleryItem(formData) : await createGalleryItem(formData);
             if (res.success) {
-                setSnackbar({ message: 'Item added successfully!', type: 'success' });
+                setSnackbar({ message: editingItem ? 'Item updated successfully!' : 'Item added successfully!', type: 'success' });
                 setTitle('');
                 setCategory(categoriesList[0] || 'Wedding');
                 setSize('normal');
+                setDate(new Date().toISOString().split('T')[0]);
                 setUploadedImageUrl(null);
+                setEditingItem(null);
                 setShowForm(false);
                 fetchGallery();
                 fetchCategories();
@@ -258,7 +289,7 @@ export default function AdminGallery() {
                 <div style={{ marginBottom: '2rem', animation: 'slideDown 0.3s ease-out' }}>
                     <div className={styles.card} style={{ border: '1px solid #3b82f6', boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.1)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', flexWrap: 'wrap', gap: '10px' }}>
-                            <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>Add Gallery Item</h3>
+                            <h3 className={styles.cardTitle} style={{ margin: 0, color: '#3b82f6' }}>{editingItem ? 'Edit Gallery Item' : 'Add Gallery Item'}</h3>
                             <button onClick={handleCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}>
                                 <X size={20} />
                             </button>
@@ -272,6 +303,16 @@ export default function AdminGallery() {
                                     type="text"
                                     required
                                     placeholder="Image Title"
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Date</label>
+                                <input
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    type="date"
+                                    required
                                     className={styles.input}
                                 />
                             </div>
@@ -364,8 +405,8 @@ export default function AdminGallery() {
                             </div>
                             <div className={styles.fullWidth}>
                                 <button type="submit" disabled={isSubmitting || isUploading || !uploadedImageUrl} className={styles.btnAddNew} style={{ opacity: (isSubmitting || isUploading || !uploadedImageUrl) ? 0.7 : 1, display: 'flex', gap: '8px' }}>
-                                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Plus size={18} />}
-                                    {isSubmitting ? 'Saving...' : 'Add Item'}
+                                    {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : (editingItem ? <Edit size={18} /> : <Plus size={18} />)}
+                                    {isSubmitting ? 'Saving...' : (editingItem ? 'Update Item' : 'Add Item')}
                                 </button>
                             </div>
                         </form>
@@ -382,6 +423,7 @@ export default function AdminGallery() {
                             <tr>
                                 <th>Title</th>
                                 <th>Category</th>
+                                <th>Date</th>
                                 <th>Size</th>
                                 <th style={{ textAlign: 'right' }}>Actions</th>
                             </tr>
@@ -392,7 +434,7 @@ export default function AdminGallery() {
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             {item.src && (
-                                                <img src={item.src} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                <img src={item.src} alt={item.title} className={styles.thumbnailSm} />
                                             )}
                                             <span style={{ fontWeight: 500 }}>{item.title}</span>
                                         </div>
@@ -402,8 +444,17 @@ export default function AdminGallery() {
                                             {item.category}
                                         </span>
                                     </td>
+                                    <td>{item.date ? new Date(item.date).toLocaleDateString() : 'N/A'}</td>
                                     <td>{item.size}</td>
                                     <td style={{ textAlign: 'right' }}>
+                                        <button
+                                            onClick={() => handleEdit(item)}
+                                            className={styles.btnIcon}
+                                            title="Edit"
+                                            style={{ marginRight: '8px' }}
+                                        >
+                                            <Edit size={18} />
+                                        </button>
                                         <button
                                             onClick={() => handleDelete(item.id)}
                                             className={`${styles.btnIcon} delete`}

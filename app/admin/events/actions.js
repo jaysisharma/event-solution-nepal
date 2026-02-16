@@ -52,6 +52,22 @@ function resolveEntityFields(formData) {
     return { organizer, managedBy };
 }
 
+function parseEventDate(monthStr, dateStr, yearStr) {
+    const monthMap = {
+        "JAN": 0, "FEB": 1, "MAR": 2, "APR": 3, "MAY": 4, "JUN": 5,
+        "JUL": 6, "AUG": 7, "SEP": 8, "OCT": 9, "NOV": 10, "DEC": 11,
+        "JANUARY": 0, "FEBRUARY": 1, "MARCH": 2, "APRIL": 3, "MAY": 4, "JUNE": 5,
+        "JULY": 6, "AUGUST": 7, "SEPTEMBER": 8, "OCTOBER": 9, "NOVEMBER": 10, "DECEMBER": 11
+    };
+    if (!monthStr || !dateStr) return null;
+    const mStr = monthStr.split('-').pop().toUpperCase().trim().substring(0, 3);
+    const dStr = dateStr.includes('-') ? dateStr.split('-').pop().trim() : dateStr;
+    const d = parseInt(dStr);
+    const y = yearStr ? parseInt(yearStr) : new Date().getFullYear();
+    if (monthMap[mStr] === undefined || isNaN(d)) return null;
+    return new Date(y, monthMap[mStr], d);
+}
+
 import { isEventCompleted } from '@/lib/eventUtils';
 
 export async function addEvent(formData) {
@@ -127,6 +143,7 @@ export async function addEvent(formData) {
                 status: isEventCompleted(month, date, year) ? 'COMPLETED' : 'UPCOMING',
                 organizer,
                 managedBy,
+                eventDate: parseEventDate(month, date, year),
                 description: description || '',
                 isFeatured: formData.get('isFeatured') === 'on',
             },
@@ -212,6 +229,7 @@ export async function updateEvent(formData) {
             status: isEventCompleted(month, date, year) ? 'COMPLETED' : 'UPCOMING',
             organizer,
             managedBy,
+            eventDate: parseEventDate(month, date, year),
             description: description || '',
             isFeatured: formData.get('isFeatured') === 'on',
             ticketPrice: ticketPrice || "0",
@@ -278,7 +296,7 @@ export async function toggleFeatured(id, currentStatus) {
 export async function getEvents() {
     try {
         const events = await prisma.event.findMany({
-            orderBy: { createdAt: 'desc' },
+            orderBy: { eventDate: 'desc' },
         });
         return { success: true, data: events };
     } catch (error) {

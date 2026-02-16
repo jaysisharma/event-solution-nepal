@@ -47,20 +47,26 @@ const Navbar = () => {
                             { name: 'Projects', path: '/projects' },
                             { name: 'Gallery', path: '/gallery' },
                             { name: 'Contact Us', path: '/contact' }
-                        ].map((item) => (
-                            <MagneticButton key={item.name}>
-                                <Link href={item.path} className={styles.menuLink}>
-                                    {item.name}
-                                </Link>
-                            </MagneticButton>
-                        ))}
+                        ].map((item) => {
+                            const isActive = pathname === item.path;
+                            return (
+                                <MagneticButton key={item.name}>
+                                    <Link
+                                        href={item.path}
+                                        className={`${styles.menuLink} ${isActive ? styles.active : ''}`}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                </MagneticButton>
+                            );
+                        })}
                     </div>
 
                     {/* CTA Buttons */}
                     <div className={styles.ctaWrapper}>
                         {/* Theme Switch Toggle */}
-                        <label className={styles.switch}>
-                            <input type="checkbox" checked={theme === 'dark'} onChange={toggleTheme} />
+                        <label className={styles.switch} aria-label="Toggle Dark Mode">
+                            <input type="checkbox" checked={theme === 'dark'} onChange={toggleTheme} aria-label="Switch Theme" />
                             <span className={styles.slider}>
                                 <span className={styles.iconSun}><Sun size={14} color="#f59e0b" /></span>
                                 <span className={styles.iconMoon}><Moon size={14} color="#f59e0b" /></span>
@@ -68,7 +74,7 @@ const Navbar = () => {
                         </label>
 
                         <MagneticButton>
-                            <Link href="https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en" target="_blank" className={styles.btnApp}>
+                            <Link href="https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en" target="_blank" className={styles.btnApp} aria-label="Get the Event Solution App on Google Play">
                                 <FaGooglePlay style={{ marginRight: '8px' }} /> Get <br /> Event Solution App
                             </Link>
                         </MagneticButton>
@@ -81,7 +87,7 @@ const Navbar = () => {
 
                     {/* Mobile Menu Button */}
                     <div className={styles.mobileNav}>
-                        <button onClick={() => setIsOpen(!isOpen)} className={styles.mobileToggle}>
+                        <button onClick={() => setIsOpen(!isOpen)} className={styles.mobileToggle} aria-label="Toggle Mobile Menu">
                             {isOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
@@ -108,11 +114,19 @@ const Navbar = () => {
                             { name: 'Projects', path: '/projects' },
                             { name: 'Gallery', path: '/gallery' },
                             { name: 'Contact Us', path: '/contact' }
-                        ].map((item) => (
-                            <Link key={item.name} href={item.path} className={styles.mobileLink} onClick={() => setIsOpen(false)}>
-                                {item.name}
-                            </Link>
-                        ))}
+                        ].map((item) => {
+                            const isActive = pathname === item.path;
+                            return (
+                                <Link
+                                    key={item.name}
+                                    href={item.path}
+                                    className={`${styles.mobileLink} ${isActive ? styles.active : ''}`}
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    {item.name}
+                                </Link>
+                            );
+                        })}
                         <div className={styles.mobileBtnWrapper}>
                             <Link href="https://play.google.com/store/apps/details?id=com.nepatronix.eventsolutions&hl=en" target="_blank" className={styles.btnAppMobile} onClick={() => setIsOpen(false)}>
                                 <FaGooglePlay style={{ marginRight: '8px' }} /> Get Event Solution App

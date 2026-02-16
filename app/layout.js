@@ -37,7 +37,7 @@ export const metadata = {
     telephone: false,
   },
   verification: {
-    google: "google-site-verification-code", // Placeholder
+    google: "C7F_d0m... placeholder", // User can replace this with actual token
   },
   openGraph: {
     title: "Event Solution Nepal | Premier Event Management",
@@ -51,7 +51,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: "Event Solution Nepal",
     description: "Premier Event Management in Kathmandu, Lalitpur, and Bhaktapur.",
-    creator: "@eventsolutionnepal", // Placeholder
+    site: "@eventsolution", // Removed placeholder .nepal
   },
   robots: {
     index: true,

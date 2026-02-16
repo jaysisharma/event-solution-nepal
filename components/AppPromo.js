@@ -100,6 +100,9 @@ const AppPromo = () => {
                         width={600}
                         height={600}
                         className={styles.mockupImage}
+                        quality={80}
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority={false}
                     />
                 </div>
             </div>

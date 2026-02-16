@@ -11,7 +11,7 @@ import prisma from "@/lib/db";
 
 export default async function RentalsPage() {
     const rawItems = await prisma.rentalItem.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: { order: 'asc' },
     });
 
     const items = rawItems.map(item => ({

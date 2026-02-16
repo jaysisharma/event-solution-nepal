@@ -3,17 +3,35 @@
 import { PrismaClient } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { saveFile } from '@/lib/upload';
+import { parseSortDate } from '@/lib/dateUtils';
 
 const prisma = new PrismaClient();
 
 export async function getHeroSlides() {
     try {
-        const slides = await prisma.heroSlide.findMany({
-            orderBy: {
-                order: 'asc',
-            },
+        const slides = await prisma.heroSlide.findMany();
+
+        // Custom sort: Featured First, then Upcoming (ASC), then Completed (DESC)
+        const sortedSlides = slides.sort((a, b) => {
+            // Featured comes first
+            if (a.isFeatured && !b.isFeatured) return -1;
+            if (!a.isFeatured && b.isFeatured) return 1;
+
+            // Then Upcoming before Completed
+            if (a.status === 'UPCOMING' && b.status === 'COMPLETED') return -1;
+            if (a.status === 'COMPLETED' && b.status === 'UPCOMING') return 1;
+
+            const dateA = a.eventDate ? new Date(a.eventDate) : new Date(0);
+            const dateB = b.eventDate ? new Date(b.eventDate) : new Date(0);
+
+            if (a.status === 'UPCOMING') {
+                return dateA - dateB; // ASC (closer first)
+            } else {
+                return dateB - dateA; // DESC (most recent first)
+            }
         });
-        return { success: true, data: slides };
+
+        return { success: true, data: sortedSlides };
     } catch (error) {
         console.error('Failed to fetch hero slides:', error);
         return { success: false, error: 'Failed to fetch slides' };
@@ -22,15 +40,12 @@ export async function getHeroSlides() {
 
 // Helper to determine status from date
 function determineStatus(dateString) {
-    console.log("determineStatus called with:", dateString);
     if (!dateString) return "UPCOMING";
-    const eventDate = new Date(dateString);
+    const eventDate = parseSortDate(dateString);
+    if (!eventDate) return "UPCOMING"; // Default if unparseable
+
     const today = new Date();
-    // Reset time part for accurate date comparison
     today.setHours(0, 0, 0, 0);
-    console.log("Event Date:", eventDate.toString());
-    console.log("Today:", today.toString());
-    console.log("Comparison result:", eventDate < today);
     return eventDate < today ? "COMPLETED" : "UPCOMING";
 }
 
@@ -49,8 +64,9 @@ export async function createHeroSlide(formData) {
         const showStats = formData.get('showStats') === 'true';
         const isFeatured = formData.get('isFeatured') === 'true';
 
-        const eventDate = formData.get('eventDate') || null;
-        const status = determineStatus(eventDate);
+        const eventDateStr = formData.get('eventDate');
+        const eventDate = eventDateStr ? new Date(eventDateStr) : null;
+        const status = determineStatus(eventDateStr);
 
         if (!image || !label || !title) {
             return { success: false, error: 'Missing required fields' };
@@ -89,7 +105,8 @@ export async function createHeroSlide(formData) {
                 showStats,
                 isFeatured,
                 status,
-                eventDate
+                eventDate,
+                sortDate
             }
         });
 
@@ -124,16 +141,18 @@ export async function updateHeroSlide(id, formData) {
         const label = formData.get('label');
         const title = formData.get('title');
 
-        const isFeatured = formData.get('isFeatured') === 'true';
-        const eventDate = formData.get('eventDate');
+        const eventDate = formData.get('eventDate') || '';
+        const sortDate = parseSortDate(eventDate);
         const status = determineStatus(eventDate);
+        const isFeatured = formData.get('isFeatured') === 'true';
 
         const dataToUpdate = {
             label,
             title,
             isFeatured,
             status,
-            eventDate
+            eventDate,
+            sortDate
         };
 
         // Conditionally update other fields only if present in formData

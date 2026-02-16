@@ -1,0 +1,334 @@
+.wrapper {
+    padding: 10rem 0;
+    position: relative;
+    background: var(--background);
+    color: var(--foreground);
+    overflow: hidden;
+    transition: background 0.3s ease;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+}
+
+.highlight {
+    color: var(--secondary);
+}
+
+/* Filters Section */
+.filtersSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    margin-bottom: 8rem;
+}
+
+.filterGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.filterLabel {
+    display: none;
+    /* User removed Category label manually in JS, so hide it here too if needed */
+}
+
+.pillContainer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.pillBtn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 2rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.categoryPill {
+    padding: 0.45rem 1.5rem;
+    font-size: 0.95rem;
+}
+
+.yearPill:hover {
+    border-color: var(--secondary);
+    color: var(--secondary);
+    transform: translateY(-2px);
+    background: rgba(235, 31, 40, 0.05);
+}
+
+.categoryPill:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+    background: rgba(5, 79, 158, 0.05);
+}
+
+.activeYear {
+    background: var(--secondary) !important;
+    color: white !important;
+    border-color: var(--secondary);
+    box-shadow: 0 10px 20px rgba(235, 31, 38, 0.3);
+    transform: translateY(-2px);
+}
+
+.activeCategory {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary);
+    box-shadow: 0 10px 20px rgba(5, 79, 158, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Timeline Body */
+.timelineBody {
+    position: relative;
+    padding: 4rem 0;
+}
+
+.mainLine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom,
+            transparent,
+            var(--primary) 15%,
+            var(--secondary) 50%,
+            var(--primary) 85%,
+            transparent);
+    transform: translateX(-50%);
+    transform-origin: top;
+    z-index: 1;
+}
+
+.itemsColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+}
+
+.timelineItem {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+/* Node on the line */
+.lineNode {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: var(--background);
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease;
+}
+
+.timelineItem.right .lineNode {
+    border-color: var(--secondary);
+}
+
+.nodeInner {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.timelineItem.right .nodeInner {
+    background: var(--secondary);
+}
+
+/* Card Content */
+.contentCard {
+    width: 45%;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 32px;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.timelineItem.left .contentCard {
+    margin-right: auto;
+    margin-left: 0;
+}
+
+.timelineItem.right .contentCard {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.contentCard:hover {
+    transform: translateY(-12px) scale(1.03);
+    border-color: rgba(5, 79, 158, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.timelineItem.right .contentCard:hover {
+    border-color: rgba(235, 31, 38, 0.4);
+}
+
+.imageBox {
+    position: relative;
+    height: 280px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.eventImage {
+    object-fit: cover;
+    transition: transform 1s ease;
+}
+
+.contentCard:hover .eventImage {
+    transform: scale(1.15);
+}
+
+.categoryBadge {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    z-index: 2;
+    transition: background 0.3s ease;
+}
+
+.timelineItem.right .categoryBadge {
+    background: var(--secondary);
+}
+
+.textContent {
+    padding: 2.5rem;
+}
+
+.eventTitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0 0 0.75rem 0;
+}
+
+.eventYear {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    opacity: 0.9;
+}
+
+.timelineItem.right .eventYear {
+    color: var(--secondary);
+}
+
+/* Dark mode adjustment */
+.dark .contentCard {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .contentCard {
+        width: 48%;
+    }
+}
+
+@media (max-width: 1024px) {
+    .contentCard {
+        width: 42%;
+    }
+}
+
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 6rem 0;
+    }
+
+    .mainLine {
+        left: 25px;
+    }
+
+    .lineNode {
+        left: 25px;
+    }
+
+    .contentCard {
+        width: calc(100% - 70px);
+        margin-left: 70px !important;
+        margin-right: 0 !important;
+    }
+
+    .imageBox {
+        height: 220px;
+    }
+
+    .filtersSection {
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .pillBtn {
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+    }
+}

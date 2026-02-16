@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import MagneticButton from './MagneticButton';
 import { useTheme } from '@/context/ThemeContext';
+import { formatDisplayDate, getHeroEffectiveStatus } from '@/lib/dateUtils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,64 +34,8 @@ const TrustBadge = ({ icon: Icon, text }) => (
 // PARTNERS constant removed
 
 
-// Helper to determine status from date string
-const calculateEventStatus = (dateStr, currentStatus) => {
-    if (!dateStr) return currentStatus;
 
-    try {
-        const now = new Date();
-        now.setHours(0, 0, 0, 0); // Compare against start of today
-
-        // 1. Strict ISO Date check (YYYY-MM-DD) - Works everywhere if parsed manually
-        const isoMatch = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-        if (isoMatch) {
-            const [_, y, m, d] = isoMatch;
-            const eventDate = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
-            if (eventDate < now) return 'COMPLETED';
-            return 'UPCOMING';
-        }
-
-        // 2. Handle ranges or other formats
-        let datePart = dateStr;
-
-        // processing logic: if it contains " - " (range), take the last part
-        if (dateStr.includes(' - ')) {
-            const parts = dateStr.split(' - ');
-            datePart = parts[parts.length - 1].trim();
-        }
-        // fallback for other hyphenated ranges that are NOT ISO dates
-        else if (dateStr.includes('-') && !isoMatch) {
-            const parts = dateStr.split('-');
-            // Check if the split destroyed a date (e.g. Jan 12-15).
-            // If the last part is just a number (e.g. "15"), we need more context.
-            // But if specific format "Jan 12-Jan 15", it works.
-            const lastPart = parts[parts.length - 1].trim();
-            if (!lastPart.match(/^\d+$/)) {
-                datePart = lastPart;
-            }
-        }
-
-        // 3. Try parsing
-        // Replace hyphens in non-ISO strings with slashes for Safari compatibility (e.g. "05-12-2025")
-        // though usually "Month DD YYYY" is best.
-        let safeDateStr = datePart;
-        // If it looks like MM-DD-YYYY or DD-MM-YYYY using hyphens, swap to slashes
-        if (safeDateStr.match(/^\d{1,2}-\d{1,2}-\d{4}$/)) {
-            safeDateStr = safeDateStr.replace(/-/g, '/');
-        }
-
-        const eventDate = new Date(safeDateStr);
-        if (!isNaN(eventDate.getTime())) {
-            if (eventDate < now) return 'COMPLETED';
-        }
-    } catch (e) {
-        console.error("Date parse error", e);
-    }
-
-    return currentStatus;
-};
-
-const Hero = ({ partners, partnerLogos, slides }) => {
+const Hero = ({ partners, partnerLogos, slides, serverTime }) => {
     const { theme } = useTheme();
     const [currentIndex, setCurrentIndex] = useState(0);
     const containerRef = useRef(null);
@@ -120,7 +65,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
         capacityLabel: s.capacityLabel || "Capacity",
         capacityIcon: s.capacityIcon || "Users",
         showStats: s.showStats,
-        status: calculateEventStatus(s.eventDate, s.status),
+        status: getHeroEffectiveStatus(s, serverTime ? new Date(serverTime) : new Date()),
         eventDate: s.eventDate
     })) : [];
 
@@ -218,9 +163,9 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                                                         alt={img.title}
                                                         fill
                                                         priority={index === 0}
-                                                        sizes="100vw"
+                                                        sizes="(max-width: 768px) 100vw, 80vw"
                                                         className={styles.mainImage}
-                                                        quality={90}
+                                                        quality={75}
                                                     />
                                                 )}
                                             </div>
@@ -242,7 +187,7 @@ const Hero = ({ partners, partnerLogos, slides }) => {
                                         {activeSlide.status || "EVENT"}
                                     </div>
                                     <div className={styles.dateLarge}>
-                                        {activeSlide.eventDate || "Date TBA"}
+                                        {formatDisplayDate(activeSlide.eventDate) || "Date TBA"}
                                     </div>
                                 </div>
                             )}

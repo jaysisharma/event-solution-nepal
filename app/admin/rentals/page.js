@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { getRentals, deleteRental, addRental, updateRental, getRentalCategories } from './actions';
-import { Plus, Edit, Trash2, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { getRentals, deleteRental, addRental, updateRental, getRentalCategories, reorderRentals } from './actions';
+import { Plus, Edit, Trash2, X, CheckCircle, AlertCircle, Loader2, GripVertical, Save } from 'lucide-react';
+import { motion, Reorder } from 'framer-motion';
 import styles from '../admin.module.css';
 import Link from 'next/link';
 import RentalForm from './RentalForm';
@@ -33,6 +34,8 @@ export default function RentalsPage() {
     const [showForm, setShowForm] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [snackbar, setSnackbar] = useState(null);
+    const [isReordered, setIsReordered] = useState(false);
+    const [isSavingOrder, setIsSavingOrder] = useState(false);
 
     const [deletingId, setDeletingId] = useState(null);
 
@@ -52,6 +55,7 @@ export default function RentalsPage() {
         if (categoriesRes.success) {
             setExistingCategories(categoriesRes.data);
         }
+        setIsReordered(false);
         setIsLoading(false);
     }, []);
 
@@ -115,6 +119,29 @@ export default function RentalsPage() {
         return res;
     };
 
+    const handleReorder = (newOrder) => {
+        setRentals(newOrder);
+        setIsReordered(true);
+    };
+
+    const handleSaveOrder = async () => {
+        setIsSavingOrder(true);
+        const orderedIds = rentals.map(r => r.id);
+        try {
+            const res = await reorderRentals(orderedIds);
+            if (res.success) {
+                setSnackbar({ message: 'Order updated!', type: 'success' });
+                setIsReordered(false);
+            } else {
+                setSnackbar({ message: res.message || 'Failed to update order', type: 'error' });
+            }
+        } catch (error) {
+            setSnackbar({ message: 'An error occurred', type: 'error' });
+        } finally {
+            setIsSavingOrder(false);
+        }
+    };
+
     return (
         <div>
             {snackbar && <Snackbar message={snackbar.message} type={snackbar.type} onClose={() => setSnackbar(null)} />}
@@ -125,9 +152,22 @@ export default function RentalsPage() {
                     <p className={styles.pageSubtitle} style={{ marginTop: '0.25rem' }}>Manage inventory and pricing</p>
                 </div>
                 {!showForm && (
-                    <button onClick={handleAddNew} className={styles.btnAddNew}>
-                        <Plus size={18} /> Add New Item
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        {isReordered && (
+                            <button
+                                onClick={handleSaveOrder}
+                                className={styles.btnAddNew}
+                                style={{ backgroundColor: '#10b981' }}
+                                disabled={isSavingOrder}
+                            >
+                                {isSavingOrder ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                                Save Order
+                            </button>
+                        )}
+                        <button onClick={handleAddNew} className={styles.btnAddNew}>
+                            <Plus size={18} /> Add New Item
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -163,6 +203,7 @@ export default function RentalsPage() {
                         <table className={styles.table}>
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Image</th>
                                     <th>Title</th>
                                     <th>Category</th>
@@ -170,10 +211,15 @@ export default function RentalsPage() {
                                     <th style={{ textAlign: 'right' }}>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <Reorder.Group
+                                as="tbody"
+                                axis="y"
+                                values={rentals}
+                                onReorder={handleReorder}
+                            >
                                 {rentals.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className={styles.emptyState}>No rental items found.</td>
+                                        <td colSpan="7" className={styles.emptyState}>No rental items found.</td>
                                     </tr>
                                 ) : (
                                     rentals.map((item) => {
@@ -189,7 +235,21 @@ export default function RentalsPage() {
                                         } catch (e) { }
 
                                         return (
-                                            <tr key={item.id}>
+                                            <Reorder.Item
+                                                key={item.id}
+                                                value={item}
+                                                as="tr"
+                                                className={styles.reorderItem}
+                                                style={{
+                                                    background: 'var(--card-bg)',
+                                                    cursor: 'grab'
+                                                }}
+                                            >
+                                                <td style={{ width: '40px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', color: '#94a3b8' }}>
+                                                        <GripVertical size={20} />
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     {imageSrc ? (
                                                         <img
@@ -224,11 +284,11 @@ export default function RentalsPage() {
                                                         </button>
                                                     </div>
                                                 </td>
-                                            </tr>
+                                            </Reorder.Item>
                                         );
                                     })
                                 )}
-                            </tbody>
+                            </Reorder.Group>
                         </table>
                     )}
                 </div>

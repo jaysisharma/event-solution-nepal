@@ -14,11 +14,13 @@ const CallToAction = () => {
             {/* Background Image */}
             <div className={styles.backgroundImageWrapper}>
                 <Image
-                    src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=70&w=1600&auto=format&fit=crop"
                     alt="Elegant Event Background"
                     fill
                     className={styles.backgroundImage}
-                    quality={80}
+                    quality={75}
+                    sizes="100vw"
+                    priority={false}
                 />
 
                 {/* Dark Overlay for Text Readability */}

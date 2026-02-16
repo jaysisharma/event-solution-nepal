@@ -44,7 +44,8 @@ export default function TimelineAdminPage() {
     // Form State
     const [alt, setAlt] = useState('');
     const [year, setYear] = useState('');
-    const [image, setImage] = useState(null); // Now holds URL string
+    const [category, setCategory] = useState('Expo');
+    const [image, setImage] = useState(null);
     const [preview, setPreview] = useState('');
     const [uploadTime, setUploadTime] = useState(null);
 
@@ -66,6 +67,7 @@ export default function TimelineAdminPage() {
         setEditingId(null);
         setAlt('');
         setYear('');
+        setCategory('Expo');
         setImage(null);
         setPreview('');
         setShowForm(true);
@@ -75,6 +77,7 @@ export default function TimelineAdminPage() {
         setEditingId(memory.id);
         setAlt(memory.alt);
         setYear(memory.year);
+        setCategory(memory.category || 'Expo');
         setPreview(memory.image);
         setImage(memory.image); // Pre-fill existing image URL
         setShowForm(true);
@@ -86,6 +89,7 @@ export default function TimelineAdminPage() {
         setEditingId(null);
         setAlt('');
         setYear('');
+        setCategory('Expo');
         setImage(null);
         setPreview('');
         setUploadTime(null);
@@ -162,6 +166,7 @@ export default function TimelineAdminPage() {
         formData.append('image', image); // Sending URL string now
         formData.append('alt', alt);
         formData.append('year', year);
+        formData.append('category', category);
         formData.append('size', 'normal');
 
         let res;
@@ -289,6 +294,16 @@ export default function TimelineAdminPage() {
                                     <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.5rem' }}>Year</label>
                                     <input type="text" value={year} onChange={(e) => setYear(e.target.value)} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }} placeholder="2024" />
                                 </div>
+                                <div style={{ flex: 2 }}>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 500, color: '#64748b', display: 'block', marginBottom: '0.5rem' }}>Category</label>
+                                    <select value={category} onChange={(e) => setCategory(e.target.value)} required style={{ width: '100%', padding: '0.75rem', border: '1px solid #cbd5e1', borderRadius: '6px' }}>
+                                        <option value="Expo">Expo</option>
+                                        <option value="Concert">Concert</option>
+                                        <option value="Wedding">Wedding</option>
+                                        <option value="Corporate">Corporate</option>
+                                        <option value="General">General</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -312,6 +327,7 @@ export default function TimelineAdminPage() {
                             <th style={{ width: '80px' }}>Image</th>
                             <th>Caption</th>
                             <th>Year</th>
+                            <th>Category</th>
                             <th style={{ textAlign: 'right' }}>Actions</th>
                         </tr>
                     </thead>
@@ -324,12 +340,23 @@ export default function TimelineAdminPage() {
                             memories.map((m) => (
                                 <tr key={m.id}>
                                     <td>
-                                        <div style={{ width: '48px', height: '48px', borderRadius: '4px', overflow: 'hidden', background: '#f1f5f9' }}>
+                                        <div style={{
+                                            width: '56px',
+                                            height: '56px',
+                                            borderRadius: '8px',
+                                            overflow: 'hidden',
+                                            background: '#f1f5f9',
+                                            border: '1px solid #e2e8f0',
+                                            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                        }}>
                                             <img src={m.image} alt={m.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </div>
                                     </td>
                                     <td style={{ fontWeight: 500 }}>{m.alt}</td>
                                     <td style={{ color: '#64748b' }}>{m.year}</td>
+                                    <td style={{ color: '#64748b' }}>
+                                        <span style={{ fontSize: '0.75rem', padding: '4px 8px', background: '#f1f5f9', borderRadius: '4px' }}>{m.category}</span>
+                                    </td>
                                     <td style={{ textAlign: 'right' }}>
                                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                                             <button onClick={() => handleEditClick(m)} className={styles.btnIcon} title="Edit">

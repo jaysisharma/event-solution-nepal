@@ -222,7 +222,7 @@ export async function deleteRental(formData) {
 export async function getRentals() {
     try {
         const rentals = await prisma.rentalItem.findMany({
-            orderBy: { createdAt: 'desc' },
+            orderBy: { order: 'asc' },
         });
         return { success: true, data: rentals };
     } catch (error) {
@@ -240,5 +240,26 @@ export async function getRentalCategories() {
         return { success: true, data: categories.map(c => c.category) };
     } catch (e) {
         return { success: false, error: 'Failed to fetch categories' };
+    }
+}
+export async function reorderRentals(orderedIds) {
+    if (!orderedIds || !Array.isArray(orderedIds)) return { success: false, message: "Invalid data" };
+
+    try {
+        await prisma.$transaction(
+            orderedIds.map((id, index) =>
+                prisma.rentalItem.update({
+                    where: { id: parseInt(id) },
+                    data: { order: index },
+                })
+            )
+        );
+
+        revalidatePath('/admin/rentals');
+        revalidatePath('/rentals');
+        return { success: true, message: "Order updated successfully" };
+    } catch (error) {
+        console.error("Error reordering rentals:", error);
+        return { success: false, message: "Failed to update order" };
     }
 }

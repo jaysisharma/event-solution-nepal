@@ -74,6 +74,7 @@ export async function createTimelineMemory(formData) {
                 image: imagePath,
                 alt,
                 year,
+                category: formData.get('category') || 'General',
                 size,
             },
         });
@@ -97,6 +98,7 @@ export async function updateTimelineMemory(id, formData) {
         const dataToUpdate = {
             alt,
             year,
+            category: formData.get('category') || 'General',
             size,
         };
 

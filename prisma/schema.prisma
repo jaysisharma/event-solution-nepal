@@ -20,6 +20,7 @@ model Event {
   date      String   
   month     String
   year      String   @default("2025")
+  eventDate DateTime?
   location  String
   time      String
   image     String
@@ -52,6 +53,7 @@ model WorkProject {
   year        String
   images      String   // Stored as JSON string of array
   isFeatured  Boolean  @default(false)
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -92,6 +94,7 @@ model GalleryItem {
   category    String
   size        String   // 'normal', 'wide', 'tall', 'large'
   src         String
+  date        DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -105,6 +108,7 @@ model RentalItem {
   size           String?  // General size description like "large", "standard"
   availableSizes String   // Stored as JSON string of array of string (Legacy/Simplified)
   variants       String?  // Stored as JSON string of array of objects { size, image }
+  order          Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
@@ -139,7 +143,8 @@ model HeroSlide {
   
   // New Fields
   status        String   @default("UPCOMING") // UPCOMING, COMPLETED
-  eventDate     String?  // e.g. "2025-10-24" or text
+  eventDate     String?   // User-facing text (e.g. "Jan 15 - Jan 19, 2026")
+  sortDate      DateTime? // Hidden field for actual sorting logic
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -167,6 +172,7 @@ model TimelineMemory {
   image     String
   alt       String
   year      String
+  category  String   @default("General")
   size      String   @default("normal")
   order     Int      @default(0)
   createdAt DateTime @default(now())

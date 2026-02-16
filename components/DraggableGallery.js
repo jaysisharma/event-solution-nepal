@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import styles from "./DraggableGallery.module.css";
 import { useTheme } from '@/context/ThemeContext';
+import Image from "next/image";
 
 const IMAGES = [
     { x: "50%", y: "50%", w: 300, h: 400, rot: -5, src: "/rentals/luxury_pandal.png", alt: " 2024 Luxury Pandal Setup" },
@@ -140,11 +141,20 @@ export default function DraggableGallery({ memories }) {
                                 left: img.x,
                                 top: img.y,
                                 width: `calc(${img.w}px * var(--card-scale, 1))`,
-                                height: img.h === 'auto' ? 'auto' : `calc(${img.h}px * var(--card-scale, 1))`,
+                                height: `calc(${img.h}px * var(--card-scale, 1))`,
                                 transform: `translate(-50%, -50%) rotate(${img.rot}deg)`
                             }}
                         >
-                            <img src={img.src} className={styles.photo} alt={img.alt} style={{ height: 'auto' }} />
+                            <div style={{ position: 'relative', width: '100%', flex: 1 }}>
+                                <Image
+                                    src={img.src}
+                                    alt={img.alt}
+                                    fill
+                                    sizes="(max-width: 768px) 200px, 400px"
+                                    className={styles.photo}
+                                    quality={70}
+                                />
+                            </div>
                             <div className={styles.caption}>{img.alt}</div>
                         </div>
                     ))}

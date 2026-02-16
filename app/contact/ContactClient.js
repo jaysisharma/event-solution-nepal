@@ -1,7 +1,7 @@
 "use client";
 
 import styles from './contact.module.css';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok, FaViber, FaWhatsapp } from 'react-icons/fa';
 import { useSettings } from '@/context/SettingsContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -10,8 +10,13 @@ export default function ContactClient() {
     const settings = useSettings();
     const { theme } = useTheme();
 
-    const handleSubmit = (e) => {
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [isSuccess, setIsSuccess] = React.useState(false);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+
         const formData = new FormData(e.target);
 
         const name = formData.get('name');
@@ -25,7 +30,18 @@ export default function ContactClient() {
 
         const phoneNumber = settings?.whatsappNumber || "9779851336342"; // Target WhatsApp Number
 
-        window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
+        // Artificial delay for feedback
+        setTimeout(() => {
+            setIsSubmitting(false);
+            setIsSuccess(true);
+
+            // Redirect after showing success
+            setTimeout(() => {
+                window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
+                setIsSuccess(false);
+                e.target.reset();
+            }, 1500);
+        }, 800);
     };
 
     return (
@@ -170,8 +186,18 @@ export default function ContactClient() {
                             <textarea name="message" className={styles.textarea} placeholder="Date, venue, estimated guests, or any specific ideas..." required></textarea>
                         </div>
 
-                        <button type="submit" className={styles.submitBtn}>
-                            Send via WhatsApp
+                        <button
+                            type="submit"
+                            className={`${styles.submitBtn} ${isSuccess ? styles.successBtn : ''}`}
+                            disabled={isSubmitting || isSuccess}
+                        >
+                            {isSubmitting ? (
+                                <><Loader2 size={20} className="animate-spin" /> Redirecting...</>
+                            ) : isSuccess ? (
+                                <><CheckCircle2 size={20} /> Opening WhatsApp...</>
+                            ) : (
+                                'Send via WhatsApp'
+                            )}
                         </button>
                     </form>
                 </div>

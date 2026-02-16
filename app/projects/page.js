@@ -12,7 +12,7 @@ import prisma from "@/lib/db";
 export default async function ProjectsPage() {
     // Fetch projects from DB
     const projectsRaw = await prisma.workProject.findMany({
-        orderBy: { createdAt: 'desc' }
+        orderBy: { order: 'asc' }
     });
 
     // Parse JSON images

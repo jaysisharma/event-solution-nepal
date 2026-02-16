@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star, Upload } from 'lucide-react';
-import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction, getProjectCategories } from './actions';
+import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star, Upload, GripVertical } from 'lucide-react';
+import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction, getProjectCategories, reorderProjects } from './actions';
+import { motion, Reorder } from 'framer-motion';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
@@ -32,6 +33,8 @@ export default function ProjectAdminPage() {
     const [snackbar, setSnackbar] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const [isReordered, setIsReordered] = useState(false);
+    const [isSavingOrder, setIsSavingOrder] = useState(false);
 
     // Form State
     const [title, setTitle] = useState('');
@@ -60,8 +63,34 @@ export default function ProjectAdminPage() {
     const fetchProjects = async () => {
         setIsLoading(true);
         const res = await getProjects();
-        if (res.success) setProjects(res.data);
+        if (res.success) {
+            setProjects(res.data);
+            setIsReordered(false);
+        }
         setIsLoading(false);
+    };
+
+    const handleReorder = (newOrder) => {
+        setProjects(newOrder);
+        setIsReordered(true);
+    };
+
+    const handleSaveOrder = async () => {
+        setIsSavingOrder(true);
+        const orderedIds = projects.map(p => p.id);
+        try {
+            const res = await reorderProjects(orderedIds);
+            if (res.success) {
+                setSnackbar({ message: 'Order saved successfully!', type: 'success' });
+                setIsReordered(false);
+            } else {
+                setSnackbar({ message: res.message || 'Failed to save order', type: 'error' });
+            }
+        } catch (error) {
+            setSnackbar({ message: 'An unexpected error occurred', type: 'error' });
+        } finally {
+            setIsSavingOrder(false);
+        }
     };
 
     const validateYear = (val) => {
@@ -253,6 +282,17 @@ export default function ProjectAdminPage() {
                     <h1 className={styles.pageTitle}>Projects</h1>
                     <p className={styles.pageSubtitle}>Showcase your portfolio</p>
                 </div>
+                {isReordered && (
+                    <button
+                        onClick={handleSaveOrder}
+                        className={styles.btnAddNew}
+                        style={{ backgroundColor: '#10b981' }}
+                        disabled={isSavingOrder}
+                    >
+                        {isSavingOrder ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                        Save Order
+                    </button>
+                )}
             </div>
 
             <div className={styles.card}>
@@ -417,6 +457,7 @@ export default function ProjectAdminPage() {
                     <table className={styles.table}>
                         <thead>
                             <tr>
+                                <th style={{ width: '40px' }}></th>
                                 <th>Title</th>
                                 <th style={{ textAlign: 'center' }}>Featured</th>
                                 <th>Category</th>
@@ -424,21 +465,37 @@ export default function ProjectAdminPage() {
                                 <th style={{ textAlign: 'right' }}>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <Reorder.Group
+                            as="tbody"
+                            axis="y"
+                            values={projects}
+                            onReorder={handleReorder}
+                        >
                             {projects.map(project => (
-                                <tr key={project.id}>
+                                <Reorder.Item
+                                    key={project.id}
+                                    value={project}
+                                    as="tr"
+                                    className={`${styles.reorderItem}`}
+                                    style={{
+                                        background: 'var(--card-bg)',
+                                        cursor: 'grab'
+                                    }}
+                                >
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', color: '#94a3b8' }}>
+                                            <GripVertical size={20} />
+                                        </div>
+                                    </td>
                                     <td>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             {(() => {
                                                 try {
                                                     const imgs = JSON.parse(project.images);
                                                     if (imgs && imgs.length > 0) {
+                                                        const firstImg = Array.isArray(imgs) ? imgs[0] : imgs;
                                                         return (
-                                                            <div style={{ display: 'flex', gap: '4px' }}>
-                                                                {imgs.slice(0, 3).map((img, i) => (
-                                                                    <img key={i} src={img} alt="Thumbnail" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
-                                                                ))}
-                                                            </div>
+                                                            <img src={firstImg} alt="Thumbnail" className={styles.thumbnailSm} />
                                                         );
                                                     }
                                                 } catch (e) { return null; }
@@ -481,9 +538,9 @@ export default function ProjectAdminPage() {
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
+                                </Reorder.Item>
                             ))}
-                        </tbody>
+                        </Reorder.Group>
                     </table>
                 )}
                 {!isLoading && projects.length === 0 && (

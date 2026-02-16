@@ -5,6 +5,8 @@ import { ArrowUpRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import styles from './rentals.module.css';
 import { useTheme } from '@/context/ThemeContext';
+import { useSettings } from '@/context/SettingsContext';
+import { useToast } from '@/context/ToastContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -13,6 +15,8 @@ const INVENTORY = [];
 
 export default function RentalsClient({ initialItems }) {
     const { theme } = useTheme();
+    const settings = useSettings();
+    const { showToast } = useToast();
     // Dynamically extract categories from items
     const dynamicCategories = ["ALL", ...Array.from(new Set(initialItems.map(item => item.category)))].sort();
 
@@ -57,7 +61,18 @@ export default function RentalsClient({ initialItems }) {
 
     const handleWhatsappInquiry = () => {
         if (!selectedItem) return;
-        const phoneNumber = "+9779703606342"; // Replace with actual number
+
+        if (!startDate || !endDate) {
+            showToast("Please select both From and To dates", "error");
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            showToast("From date cannot be after To date", "error");
+            return;
+        }
+
+        const phoneNumber = settings?.whatsappNumber || "9779851336342"; // Target WhatsApp Number
 
         const messageText = `Hello, I'm interested in renting the ${selectedItem.title}.
         
@@ -255,6 +270,7 @@ Please provide availability and pricing details.`;
                                         <input
                                             type="date"
                                             value={startDate}
+                                            min={new Date().toISOString().split('T')[0]}
                                             onChange={(e) => setStartDate(e.target.value)}
                                             className={styles.dateInput}
                                         />
@@ -264,6 +280,7 @@ Please provide availability and pricing details.`;
                                         <input
                                             type="date"
                                             value={endDate}
+                                            min={startDate || new Date().toISOString().split('T')[0]}
                                             onChange={(e) => setEndDate(e.target.value)}
                                             className={styles.dateInput}
                                         />

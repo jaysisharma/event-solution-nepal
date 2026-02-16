@@ -18,11 +18,7 @@ export default async function EventsPage() {
                 { status: 'COMPLETED' }
             ]
         },
-        orderBy: [
-            { year: 'desc' },
-            { month: 'desc' },
-            { date: 'desc' }
-        ],
+        orderBy: { eventDate: 'desc' },
     });
 
     return (

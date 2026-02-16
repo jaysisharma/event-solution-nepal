@@ -101,16 +101,16 @@ export default function EventsPage() {
                                     <tr key={event.id}>
                                         <td>
                                             <div className={styles.itemContent}>
-                                                <div className={styles.itemImage} style={{ width: '60px', height: '45px', overflow: 'hidden', borderRadius: '4px', background: '#f1f5f9' }}>
+                                                <div className={styles.thumbnailMd}>
                                                     {event.image ? (
                                                         <img src={event.image} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                                     ) : (
                                                         <ImageIcon size={20} style={{ margin: 'auto', display: 'block', height: '100%', opacity: 0.3 }} />
                                                     )}
                                                 </div>
-                                                <div>
-                                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>{event.title}</h4>
-                                                    <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{event.time}</span>
+                                                <div style={{ marginLeft: '12px' }}>
+                                                    <h4 style={{ fontSize: '1rem', fontWeight: 600, margin: 0, color: '#0f172a' }}>{event.title}</h4>
+                                                    <span style={{ fontSize: '0.85rem', color: '#64748b' }}>{event.time}</span>
                                                 </div>
                                             </div>
                                         </td>

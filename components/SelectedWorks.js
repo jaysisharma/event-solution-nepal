@@ -173,7 +173,8 @@ const SelectedWorks = ({ projects: initialProjects }) => {
                         fill
                         sizes="30vw"
                         className={styles.floatingImage}
-                        priority
+                        quality={75}
+                        priority={false}
                     />
                 )}
             </div>

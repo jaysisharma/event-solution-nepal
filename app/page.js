@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { promises as fs } from 'fs';
 import path from 'path';
 import JsonLd from "@/components/JsonLd";
+import { parseSortDate, sortHeroSlides } from '@/lib/dateUtils';
 
 export const metadata = {
   title: "Event Solution Nepal | Best Event Management Company in Nepal",
@@ -55,7 +56,7 @@ export default async function Home() {
         orderBy: { createdAt: 'desc' }
       }),
       prisma.testimonial.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.heroSlide.findMany({ where: { isFeatured: true }, orderBy: { order: 'asc' } }),
+      prisma.heroSlide.findMany({ where: { isFeatured: true } }),
       prisma.heroSettings.findFirst(),
       prisma.timelineMemory.findMany({ orderBy: { createdAt: 'desc' }, take: 10 }),
       prisma.workProject.findMany({ where: { isFeatured: true }, orderBy: { createdAt: 'desc' }, take: 6 }),
@@ -93,6 +94,11 @@ export default async function Home() {
     capacityLabel: "Capacity"
   };
 
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  const sortedHeroSlides = sortHeroSlides(heroSlides, now);
+
   return (
     <>
       <HomeClient
@@ -100,7 +106,8 @@ export default async function Home() {
         initialEvents={events}
         partnerLogos={partnerLogos}
         initialTestimonials={testimonials}
-        heroSlides={heroSlides}
+        heroSlides={sortedHeroSlides}
+        serverTime={now.getTime()}
         heroSettings={heroSettings}
         initialTimeline={timelineMemories}
         initialProjects={projects}

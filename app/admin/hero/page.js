@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Star, Users, Globe, Building, Heart, Trophy, ShieldCheck, PartyPopper, Loader2, Crop } from 'lucide-react';
 import { getHeroSlides, createHeroSlide, deleteHeroSlide, updateHeroSlide } from './actions';
 import styles from '../admin.module.css';
+import { formatDisplayDate } from '@/lib/dateUtils';
 
 // --- Icon Mapping ---
 const IconMap = {
@@ -183,6 +184,9 @@ export default function HeroAdminPage() {
     // Slide-Specific Stats State
     const [isFeatured, setIsFeatured] = useState(false);
     const [eventDate, setEventDate] = useState('');
+    const [isMultiDay, setIsMultiDay] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const [uploadTime, setUploadTime] = useState(null);
 
     const fetchSlides = React.useCallback(async () => {
@@ -197,6 +201,13 @@ export default function HeroAdminPage() {
     useEffect(() => {
         fetchSlides();
     }, [fetchSlides]);
+
+    // Sync multi-day dates
+    useEffect(() => {
+        if (isMultiDay && startDate && endDate) {
+            syncRangeString(startDate, endDate);
+        }
+    }, [startDate, endDate, isMultiDay]);
 
     // Upload State
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
@@ -299,7 +310,33 @@ export default function HeroAdminPage() {
         // ... rest of handleEdit
         // ... rest of handleEdit
         setIsFeatured(slide.isFeatured || false);
-        setEventDate(slide.eventDate || '');
+        if (slide.eventDate) {
+            setEventDate(slide.eventDate);
+            // Detect if it's a range to set the toggle correctly
+            const isRange = slide.eventDate.includes(' - ') ||
+                slide.eventDate.includes(' to ') ||
+                slide.eventDate.toLowerCase().startsWith('from ') ||
+                (!slide.eventDate.match(/^\d{4}-\d{2}-\d{2}$/) && isNaN(new Date(slide.eventDate).getTime()) === false);
+
+            // Try to extract start/end dates for the range pickers if it's a range
+            if (isRange) {
+                const parts = slide.eventDate.split(/\s*[-–]\s*|(?:\s+to\s+)/i);
+                if (parts.length >= 2) {
+                    const d1 = new Date(parts[0].trim());
+                    const d2 = new Date(parts[parts.length - 1].trim());
+                    if (!isNaN(d1.getTime())) setStartDate(d1.toISOString().split('T')[0]);
+                    if (!isNaN(d2.getTime())) setEndDate(d2.toISOString().split('T')[0]);
+                }
+            }
+
+            const isISO = !!slide.eventDate.match(/^\d{4}-\d{2}-\d{2}$/);
+            setIsMultiDay(!isISO);
+        } else {
+            setEventDate('');
+            setIsMultiDay(false);
+            setStartDate('');
+            setEndDate('');
+        }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -311,10 +348,39 @@ export default function HeroAdminPage() {
         setImage(null);
         setPreview('');
         setUploadedImageUrl(null);
-        setUploadedImageUrl(null);
         setIsFeatured(false);
         setEventDate('');
+        setIsMultiDay(false);
+        setStartDate('');
+        setEndDate('');
         setUploadTime(null);
+    };
+
+    // Helper to format range string from calendars
+    const syncRangeString = (start, end) => {
+        if (!start || !end) return;
+
+        const d1 = new Date(start);
+        const d2 = new Date(end);
+
+        if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return;
+
+        const options1 = { month: 'short', day: 'numeric' };
+        const options2 = { month: 'short', day: 'numeric', year: 'numeric' };
+
+        let rangeStr = '';
+        if (d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth()) {
+            // Same month/year: "Jan 12 - 15, 2026"
+            rangeStr = `${d1.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${d2.getDate()}, ${d2.getFullYear()}`;
+        } else if (d1.getFullYear() === d2.getFullYear()) {
+            // Same year: "Jan 12 - Feb 15, 2026"
+            rangeStr = `${d1.toLocaleDateString('en-US', options1)} - ${d2.toLocaleDateString('en-US', options2)}`;
+        } else {
+            // Different year: "Dec 30, 2025 - Jan 5, 2026"
+            rangeStr = `${d1.toLocaleDateString('en-US', options2)} - ${d2.toLocaleDateString('en-US', options2)}`;
+        }
+
+        setEventDate(rangeStr);
     };
 
     const handleSubmit = async (e) => {
@@ -635,21 +701,99 @@ export default function HeroAdminPage() {
                                     </div>
 
                                     <div className={styles.formGroup} style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-soft)', paddingTop: '1.5rem' }}>
-                                        <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '1rem' }}>Event Details</h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-                                            <div className={styles.formGroup}>
-                                                <label className={styles.label}>Event Date (Text or Date)</label>
-                                                <input
-                                                    type="text"
-                                                    value={eventDate}
-                                                    onChange={(e) => setEventDate(e.target.value)}
-                                                    className={styles.input}
-                                                    placeholder="Oct 24, 2025"
-                                                />
-                                                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
-                                                    Status (Upcoming/Completed) will be automatically set based on this date.
-                                                </p>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Event Timing</h3>
+                                            <div style={{ display: 'flex', background: '#f1f5f9', padding: '4px', borderRadius: '8px' }}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setIsMultiDay(false);
+                                                        if (!eventDate.match(/^\d{4}-\d{2}-\d{2}$/)) setEventDate('');
+                                                    }}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 600,
+                                                        borderRadius: '6px',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        background: !isMultiDay ? 'white' : 'transparent',
+                                                        color: !isMultiDay ? '#0f172a' : '#64748b',
+                                                        boxShadow: !isMultiDay ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                >
+                                                    Single Day
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsMultiDay(true)}
+                                                    style={{
+                                                        padding: '6px 12px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 600,
+                                                        borderRadius: '6px',
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        background: isMultiDay ? 'white' : 'transparent',
+                                                        color: isMultiDay ? '#0f172a' : '#64748b',
+                                                        boxShadow: isMultiDay ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                >
+                                                    Multi Day / Range
+                                                </button>
                                             </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: isMultiDay ? '1fr 1fr' : '1fr', gap: '1rem' }}>
+                                            {!isMultiDay ? (
+                                                <div className={styles.formGroup}>
+                                                    <label className={styles.label}>Event Date</label>
+                                                    <input
+                                                        type="date"
+                                                        value={eventDate}
+                                                        onChange={(e) => setEventDate(e.target.value)}
+                                                        className={styles.input}
+                                                    />
+                                                    <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
+                                                        Pick the date from the calendar.
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label}>Start Date</label>
+                                                        <input
+                                                            type="date"
+                                                            value={startDate}
+                                                            onChange={(e) => setStartDate(e.target.value)}
+                                                            className={styles.input}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup}>
+                                                        <label className={styles.label}>End Date</label>
+                                                        <input
+                                                            type="date"
+                                                            value={endDate}
+                                                            onChange={(e) => setEndDate(e.target.value)}
+                                                            className={styles.input}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.formGroup} style={{ gridColumn: 'span 2' }}>
+                                                        <label className={styles.label}>Generated Range String</label>
+                                                        <input
+                                                            type="text"
+                                                            value={eventDate}
+                                                            onChange={(e) => setEventDate(e.target.value)}
+                                                            className={styles.input}
+                                                            placeholder="Resulting range text..."
+                                                        />
+                                                        <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
+                                                            Constructed from the calendars above. You can still tweak this manually if needed.
+                                                        </p>
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
@@ -713,7 +857,7 @@ export default function HeroAdminPage() {
 
                                     {slide.eventDate && (
                                         <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#64748b' }}>
-                                            Date: {slide.eventDate}
+                                            Date: {formatDisplayDate(slide.eventDate)}
                                         </div>
                                     )}
                                 </div>

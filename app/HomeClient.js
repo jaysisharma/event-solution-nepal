@@ -14,6 +14,7 @@ import SelectedWorks from "@/components/SelectedWorks";
 import CallToAction from "@/components/CallToAction";
 import AppPromo from "@/components/AppPromo";
 import DraggableGallery from "@/components/DraggableGallery";
+import Timeline from "@/components/Timeline";
 import styles from "./page.module.css";
 
 import Button from "@/components/Button";
@@ -22,11 +23,9 @@ import UpcomingEvents from "@/components/UpcomingEvents";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function HomeClient({ initialPartners, initialEvents, partnerLogos, initialTestimonials, heroSlides, heroSettings, initialTimeline, initialProjects }) {
+export default function HomeClient({ initialPartners, initialEvents, partnerLogos, initialTestimonials, heroSlides, serverTime, heroSettings, initialTimeline, initialProjects }) {
     const container = useRef();
-    // ... code ...
-    // Testimonials Section
-    <Testimonials reviews={initialTestimonials} />
+
     useGSAP(() => {
         // Services Animation
         gsap.utils.toArray(".service-card").forEach((card, i) => {
@@ -88,7 +87,13 @@ export default function HomeClient({ initialPartners, initialEvents, partnerLogo
     return (
         <div ref={container} className={styles.page}>
             {/* New Hero Section */}
-            <Hero partners={initialPartners} partnerLogos={partnerLogos} slides={heroSlides} settings={heroSettings} />
+            <Hero
+                partners={initialPartners}
+                partnerLogos={partnerLogos}
+                slides={heroSlides}
+                settings={heroSettings}
+                serverTime={serverTime}
+            />
 
             {/* Services Section - Glassmorphism */}
             {/* Services Section - Glassmorphism */}
@@ -114,8 +119,8 @@ export default function HomeClient({ initialPartners, initialEvents, partnerLogo
             {/* App Promotion Section */}
             <AppPromo />
 
-            {/* Draggable Gallery */}
-            <DraggableGallery memories={initialTimeline} />
+            {/* Structured Timeline */}
+            <Timeline memories={initialTimeline} />
 
 
             {/* CTA Section - High Impact */}

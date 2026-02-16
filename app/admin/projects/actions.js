@@ -35,11 +35,33 @@ export async function deleteProjectImageAction(url) {
 export async function getProjects() {
     try {
         const projects = await prisma.workProject.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { order: 'asc' }
         });
         return { success: true, data: projects };
     } catch (e) {
         return { success: false, error: 'Failed to fetch projects' };
+    }
+}
+
+export async function reorderProjects(orderedIds) {
+    if (!orderedIds || !Array.isArray(orderedIds)) return { success: false, message: "Invalid data" };
+
+    try {
+        await prisma.$transaction(
+            orderedIds.map((id, index) =>
+                prisma.workProject.update({
+                    where: { id: parseInt(id) },
+                    data: { order: index },
+                })
+            )
+        );
+
+        revalidatePath('/projects');
+        revalidatePath('/admin/projects');
+        return { success: true, message: "Order updated successfully" };
+    } catch (error) {
+        console.error("Error reordering projects:", error);
+        return { success: false, message: "Failed to update order" };
     }
 }
 

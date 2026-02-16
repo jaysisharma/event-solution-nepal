@@ -66,7 +66,8 @@ const Expertise = () => {
     useGSAP(() => {
         let mm = gsap.matchMedia();
 
-        mm.add("(min-width: 0px)", () => {
+        // Desktop only pinning
+        mm.add("(min-width: 769px)", () => {
             const cards = cardsRef.current;
             const totalCards = cards.length;
 
@@ -87,7 +88,7 @@ const Expertise = () => {
                     const nextCard = cards[index + 1];
                     gsap.to(card, {
                         scale: 0.95,
-                        filter: "brightness(0.5)", // Darken previous cards more for this design
+                        filter: "brightness(0.5)",
                         scrollTrigger: {
                             trigger: nextCard,
                             start: "top top+=200",
@@ -96,6 +97,26 @@ const Expertise = () => {
                         }
                     });
                 }
+            });
+        });
+
+        // Mobile/Tablet: Basic fade-up instead of pinning
+        mm.add("(max-width: 768px)", () => {
+            cardsRef.current.forEach((card, index) => {
+                if (!card) return;
+                gsap.fromTo(card,
+                    { y: 50, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 90%",
+                        }
+                    }
+                );
             });
         });
 
