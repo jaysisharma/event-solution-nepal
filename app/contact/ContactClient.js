@@ -1,5 +1,7 @@
 "use client";
 
+import React from 'react';
+
 import styles from './contact.module.css';
 import { Mail, Phone, MapPin, Loader2, CheckCircle2 } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaTiktok, FaViber, FaWhatsapp } from 'react-icons/fa';
