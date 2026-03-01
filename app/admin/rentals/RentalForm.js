@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/context/ToastContext';
 import imageCompression from 'browser-image-compression';
-import { uploadRentalImage, deleteRentalImageAction } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 
 // Default categories to bootstrap
 const DEFAULT_CATEGORIES = ["HANGERS", "STALLS", "PANDALS", "STAGE", "LED", "AUDIO", "FURNITURE"];
@@ -95,7 +95,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             // Auto-cleanup old image if exists for this variant
             const currentVariant = variants[index];
             if (currentVariant.uploadedUrl) {
-                await deleteRentalImageAction(currentVariant.uploadedUrl);
+                await deleteImageAction(currentVariant.uploadedUrl);
             }
 
             const options = {
@@ -118,7 +118,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
             formData.append('image', compressedFile);
             formData.append('folder', 'rentals');
 
-            const res = await uploadRentalImage(formData);
+            const res = await uploadImageAction(formData);
 
             if (res.success && res.url) {
                 setVariants(prev => {
@@ -145,7 +145,7 @@ export default function RentalForm({ initialData, action, mode = 'create', exist
     const handleRemoveVariantImage = async (index) => {
         const v = variants[index];
         if (v.uploadedUrl) {
-            await deleteRentalImageAction(v.uploadedUrl);
+            await deleteImageAction(v.uploadedUrl);
         }
 
         const newVariants = [...variants];

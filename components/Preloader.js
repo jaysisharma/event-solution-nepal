@@ -39,7 +39,6 @@ export default function Preloader() {
         // 0. Initial States
         tl.set(logoRef.current, {
             scale: 1.5,
-            filter: "blur(10px)",
             opacity: 0
         });
         tl.set(counterRef.current, {
@@ -50,7 +49,6 @@ export default function Preloader() {
         // 1. Logo Reveal (Zoom In + Blur Out)
         tl.to(logoRef.current, {
             scale: 1,
-            filter: "blur(0px)",
             opacity: 1,
             duration: 0.8, // Reduced from 1.5
             ease: "power3.out"
@@ -84,7 +82,6 @@ export default function Preloader() {
         tl.to(logoRef.current, {
             scale: 0.8,
             opacity: 0,
-            filter: "blur(5px)",
             duration: 0.4, // Reduced from 0.5
             ease: "power2.in"
         }, "+=0.2"); // Small pause after count
@@ -99,7 +96,7 @@ export default function Preloader() {
 
         // 6. Shutter Reveal
         tl.to(`.${styles.shutter}`, {
-            height: 0,
+            scaleY: 0,
             duration: 0.6, // Reduced from 1
             stagger: 0.05, // Faster stagger
             ease: "power3.inOut",

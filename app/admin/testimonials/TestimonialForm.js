@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { uploadTestimonialImage, deleteTestimonialImageAction, addTestimonial, updateTestimonial } from './actions';
+import { addTestimonial, updateTestimonial } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 import { Loader2, Upload, MessageSquare, User, Briefcase, Star, X, CheckCircle } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import styles from '../admin.module.css';
@@ -29,7 +30,7 @@ export default function TestimonialForm({ testimonial = null }) {
             try {
                 // Auto Cleanup
                 if (uploadedImageUrl && uploadedImageUrl !== testimonial?.avatar) {
-                    await deleteTestimonialImageAction(uploadedImageUrl);
+                    await deleteImageAction(uploadedImageUrl);
                 }
 
                 const compressed = await compressImage(file);
@@ -38,7 +39,7 @@ export default function TestimonialForm({ testimonial = null }) {
                 formData.append('image', compressed);
                 formData.append('folder', 'testimonials');
 
-                const res = await uploadTestimonialImage(formData);
+                const res = await uploadImageAction(formData);
 
                 if (res.success && res.url) {
                     setUploadedImageUrl(res.url);
@@ -58,7 +59,7 @@ export default function TestimonialForm({ testimonial = null }) {
 
     const handleRemoveImage = async () => {
         if (uploadedImageUrl && uploadedImageUrl !== testimonial?.avatar) {
-            await deleteTestimonialImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
         }
         setUploadedImageUrl(null);
         setUploadTime(null);

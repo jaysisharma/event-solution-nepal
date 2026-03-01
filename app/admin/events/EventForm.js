@@ -8,7 +8,7 @@ import Link from 'next/link';
 import TicketCanvas from '@/components/admin/TicketCanvas';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/context/ToastContext';
-import { uploadEventImage, deleteEventImageAction } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 
 export default function EventForm({ initialData, action, mode = 'create', isInline = false }) {
     const { showToast } = useToast();
@@ -89,7 +89,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
     // --- Actions Import ---
     // Assuming you import these at the top:
-    // import { uploadEventImage, deleteEventImageAction } from './actions';
+    // import { uploadImageAction, deleteImageAction } from '../shared/actions';
     // We need to actually import them in the file imports section first, 
     // but here I am replacing the body methods. I'll need to do the import separately or in one go if I replaced the whole file. 
     // Since this tool replaces a chunk, I'll replace the methods.
@@ -132,7 +132,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
 
             // DELETE OLD IF EXISTS (Auto Cleanup)
             if (uploadedImageUrl) {
-                await deleteEventImageAction(uploadedImageUrl);
+                await deleteImageAction(uploadedImageUrl);
             }
 
             // Compress
@@ -156,7 +156,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
                     formData.append('folder', 'events');
 
                     try {
-                        const result = await uploadEventImage(formData);
+                        const result = await uploadImageAction(formData);
 
                         if (result.success && result.url) {
                             setUploadedImageUrl(result.url);
@@ -188,7 +188,7 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         // Ideally we only delete new uploads or if user explicitly wants to remove saved image. 
         // For now, let's delete if it's in uploadedImageUrl which tracks the *current* form session upload.
         if (uploadedImageUrl) {
-            await deleteEventImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
         }
 
         setCompressedFile(null);
@@ -207,14 +207,14 @@ export default function EventForm({ initialData, action, mode = 'create', isInli
         try {
             // Delete old if exists
             if (uploadedTicketUrl) {
-                await deleteEventImageAction(uploadedTicketUrl);
+                await deleteImageAction(uploadedTicketUrl);
             }
 
             const formData = new FormData();
             formData.append('image', file);
             formData.append('folder', 'events/tickets'); // Helper supports folder param
 
-            const result = await uploadEventImage(formData);
+            const result = await uploadImageAction(formData);
 
             if (result.success && result.url) {
                 setUploadedTicketUrl(result.url);

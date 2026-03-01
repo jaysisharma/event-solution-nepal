@@ -2,7 +2,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Pencil, Save, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
-import { createTeamMember, updateTeamMember, deleteTeamMember, getTeamMembers, uploadTeamImage, deleteTeamImageAction } from './actions';
+import { createTeamMember, updateTeamMember, deleteTeamMember, getTeamMembers } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
@@ -83,7 +84,7 @@ export default function AdminTeam() {
     const handleCancelEdit = async () => {
         // Clean up uncommitted upload
         if (uploadedImageUrl) {
-            await deleteTeamImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
         }
         setShowForm(false);
         setEditingId(null);
@@ -105,7 +106,7 @@ export default function AdminTeam() {
             try {
                 // Auto Cleanup old upload if replacing before submit
                 if (uploadedImageUrl) {
-                    await deleteTeamImageAction(uploadedImageUrl);
+                    await deleteImageAction(uploadedImageUrl);
                 }
 
                 const compressed = await compressImage(f);
@@ -114,7 +115,7 @@ export default function AdminTeam() {
                 formData.append('image', compressed);
                 formData.append('folder', 'team');
 
-                const response = await uploadTeamImage(formData);
+                const response = await uploadImageAction(formData);
 
                 if (response.success && response.url) {
                     setUploadedImageUrl(response.url);
@@ -134,7 +135,7 @@ export default function AdminTeam() {
 
     const handleRemoveImage = async () => {
         if (uploadedImageUrl) {
-            await deleteTeamImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
             setUploadedImageUrl(null);
             setUploadTime(null);
         }

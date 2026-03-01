@@ -4,33 +4,7 @@ import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { saveFile, deleteFile } from '@/lib/upload';
 
-// Standalone actions for Auto-Upload
-export async function uploadRentalImage(formData) {
-    const image = formData.get("image");
-    const folder = formData.get("folder") || "rentals";
 
-    if (!image) return { success: false, error: "No image provided" };
-
-    try {
-        const imagePath = await saveFile(image, folder);
-        if (!imagePath) throw new Error("Upload failed");
-        return { success: true, url: imagePath };
-    } catch (error) {
-        console.error("Auto-upload failed:", error);
-        return { success: false, error: "Upload failed" };
-    }
-}
-
-export async function deleteRentalImageAction(url) {
-    if (!url) return { success: false };
-    try {
-        await deleteFile(url);
-        return { success: true };
-    } catch (error) {
-        console.error("Delete failed:", error);
-        return { success: false, error: "Delete failed" };
-    }
-}
 
 export async function addRental(formData) {
     const title = formData.get('title');

@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Pencil, X, Save, CheckCircle, AlertCircle, Loader2, Star, Upload, GripVertical } from 'lucide-react';
-import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, uploadProjectImage, deleteProjectImageAction, getProjectCategories, reorderProjects } from './actions';
+import { createProject, updateProject, deleteProject, getProjects, toggleFeaturedProject, getProjectCategories, reorderProjects } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 import { motion, Reorder } from 'framer-motion';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
@@ -178,7 +179,7 @@ export default function ProjectAdminPage() {
                             const formData = new FormData();
                             formData.append('image', compressed);
                             formData.append('folder', 'projects');
-                            const res = await uploadProjectImage(formData);
+                            const res = await uploadImageAction(formData);
                             if (res.success && res.url) {
                                 completed++;
                                 setUploadProgress(Math.floor((completed / total) * 100));
@@ -212,7 +213,7 @@ export default function ProjectAdminPage() {
     const handleRemoveNewImage = async (index) => {
         const urlToRemove = uploadedUrls[index];
         if (urlToRemove) {
-            await deleteProjectImageAction(urlToRemove);
+            await deleteImageAction(urlToRemove);
         }
         setUploadedUrls(prev => prev.filter((_, i) => i !== index));
     };

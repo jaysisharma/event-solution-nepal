@@ -1,11 +1,9 @@
 
 import { NextResponse } from 'next/server';
 import { verifyKhaltiPayment } from '@/lib/khalti';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { generateTicketImage } from '@/lib/ticketGenerator';
 import { sendTicketEmail } from '@/lib/email';
-
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 

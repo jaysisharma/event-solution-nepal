@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 import styles from './SelectedWorks.module.css';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -70,7 +71,7 @@ const SelectedWorks = ({ projects: initialProjects }) => {
             }
         ];
 
-    useEffect(() => {
+    useGSAP(() => {
         // Safe check for GSAP incase it's not loaded yet or ref is empty
         if (!imageContainerRef.current) return;
 
@@ -90,7 +91,7 @@ const SelectedWorks = ({ projects: initialProjects }) => {
 
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
+    }, { scope: sectionRef });
 
     return (
         <section className={`${styles.section} ${theme === 'dark' ? styles.dark : ''}`} id="portfolio" ref={sectionRef} suppressHydrationWarning>

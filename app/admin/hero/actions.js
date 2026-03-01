@@ -1,11 +1,9 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { saveFile } from '@/lib/upload';
 import { parseSortDate } from '@/lib/dateUtils';
-
-const prisma = new PrismaClient();
 
 export async function getHeroSlides() {
     try {

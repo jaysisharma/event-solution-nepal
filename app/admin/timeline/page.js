@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Image as ImageIcon, Pencil, X, Save, AlertTriangle, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
-import { getTimelineMemories, createTimelineMemory, updateTimelineMemory, deleteTimelineMemory, uploadTimelineImage, deleteTimelineImageAction } from './actions';
+import { getTimelineMemories, createTimelineMemory, updateTimelineMemory, deleteTimelineMemory } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
 
@@ -105,7 +106,7 @@ export default function TimelineAdminPage() {
         // Let's assume we delete if it's currently in the 'image' state to let user start over.
 
         if (image.includes('/uploads/') || image.includes('cloudinary')) {
-            await deleteTimelineImageAction(image);
+            await deleteImageAction(image);
         }
 
         setImage(null);
@@ -136,7 +137,7 @@ export default function TimelineAdminPage() {
             const formData = new FormData();
             formData.append('image', compressedFile);
 
-            const res = await uploadTimelineImage(formData);
+            const res = await uploadImageAction(formData);
             if (res.success) {
                 setImage(res.url); // Set URL
                 setPreview(res.url); // Update preview to robust URL

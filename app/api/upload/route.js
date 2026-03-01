@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { saveFile } from '@/lib/upload';
+import { getSession } from '@/lib/auth';
 
 export async function POST(request) {
     try {
+        const session = await getSession();
+        if (!session) {
+            return NextResponse.json(
+                { error: 'Unauthorized. Admin session required.' },
+                { status: 401 }
+            );
+        }
+
         const formData = await request.formData();
         const file = formData.get('file');
 

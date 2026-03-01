@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createGalleryItem, updateGalleryItem, deleteGalleryItem, getGalleryItems, uploadGalleryImage, deleteGalleryImageAction, getGalleryCategories } from './actions';
+import { createGalleryItem, updateGalleryItem, deleteGalleryItem, getGalleryItems, getGalleryCategories } from './actions';
+import { deleteImageAction } from '../shared/actions';
 import { Plus, Trash2, Loader2, CheckCircle, AlertCircle, X, Edit } from 'lucide-react';
 import styles from '../admin.module.css';
 
@@ -99,7 +100,7 @@ export default function AdminGallery() {
     const handleCancel = async () => {
         // If we were uploading a new image but cancelled, we should clean it up ONLY if it wasn't the original item image
         if (uploadedImageUrl && (!editingItem || uploadedImageUrl !== editingItem.src)) {
-            await deleteGalleryImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
         }
         setShowForm(false);
         setEditingItem(null);
@@ -161,7 +162,7 @@ export default function AdminGallery() {
                 setIsUploading(true);
                 try {
                     if (uploadedImageUrl) {
-                        await deleteGalleryImageAction(uploadedImageUrl);
+                        await deleteImageAction(uploadedImageUrl);
                     }
                     const formData = new FormData();
                     formData.append('file', f); // API route expects 'file', not 'image'
@@ -209,7 +210,7 @@ export default function AdminGallery() {
 
     const handleRemoveImage = async () => {
         if (uploadedImageUrl) {
-            await deleteGalleryImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
             setUploadedImageUrl(null);
         }
     };

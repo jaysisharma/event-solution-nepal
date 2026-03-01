@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { uploadPartnerImage, deletePartnerImageAction, addPartner } from './actions';
+import { addPartner } from './actions';
+import { uploadImageAction, deleteImageAction } from '../shared/actions';
 import { Plus, Loader2, X, CheckCircle, Upload } from 'lucide-react';
 import styles from '../admin.module.css';
 import { compressImage } from '@/lib/compress';
@@ -21,7 +22,7 @@ export default function AddPartnerForm() {
             try {
                 // Auto cleanup old image
                 if (uploadedImageUrl) {
-                    await deletePartnerImageAction(uploadedImageUrl);
+                    await deleteImageAction(uploadedImageUrl);
                 }
 
                 const compressed = await compressImage(file);
@@ -30,7 +31,7 @@ export default function AddPartnerForm() {
                 formData.append('image', compressed);
                 formData.append('folder', 'partners');
 
-                const response = await uploadPartnerImage(formData);
+                const response = await uploadImageAction(formData);
 
                 if (response.success && response.url) {
                     setUploadedImageUrl(response.url);
@@ -55,7 +56,7 @@ export default function AddPartnerForm() {
 
     const handleRemoveImage = async () => {
         if (uploadedImageUrl) {
-            await deletePartnerImageAction(uploadedImageUrl);
+            await deleteImageAction(uploadedImageUrl);
             setUploadedImageUrl(null);
             setUploadTime(null);
             // Reset file input value if possible, but React uncontrolled input... 
