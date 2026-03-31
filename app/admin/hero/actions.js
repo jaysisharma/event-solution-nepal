@@ -63,7 +63,7 @@ export async function createHeroSlide(formData) {
         const isFeatured = formData.get('isFeatured') === 'true';
 
         const eventDateStr = formData.get('eventDate');
-        const eventDate = eventDateStr ? new Date(eventDateStr) : null;
+        const eventDate = eventDateStr || null;
         const sortDate = parseSortDate(eventDateStr);
         const status = determineStatus(eventDateStr);
 
