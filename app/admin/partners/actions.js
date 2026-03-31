@@ -31,6 +31,7 @@ export async function addPartner(formData) {
 
     revalidatePath('/admin/partners');
     revalidatePath('/'); // Update homepage
+    return { success: true };
 }
 
 export async function deletePartner(id) {
@@ -57,7 +58,7 @@ export async function deletePartner(id) {
 export async function updatePartner(formData) {
     const id = formData.get('id');
     const name = formData.get('name');
-    if (!id || !name) return;
+    if (!id || !name) return { success: false, error: 'Missing required fields' };
 
     await prisma.partner.update({
         where: { id: parseInt(id) },
@@ -66,4 +67,5 @@ export async function updatePartner(formData) {
 
     revalidatePath('/admin/partners');
     revalidatePath('/');
+    return { success: true };
 }

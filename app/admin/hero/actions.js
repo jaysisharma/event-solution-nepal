@@ -19,8 +19,8 @@ export async function getHeroSlides() {
             if (a.status === 'UPCOMING' && b.status === 'COMPLETED') return -1;
             if (a.status === 'COMPLETED' && b.status === 'UPCOMING') return 1;
 
-            const dateA = a.eventDate ? new Date(a.eventDate) : new Date(0);
-            const dateB = b.eventDate ? new Date(b.eventDate) : new Date(0);
+            const dateA = parseSortDate(a.eventDate) || new Date(0);
+            const dateB = parseSortDate(b.eventDate) || new Date(0);
 
             if (a.status === 'UPCOMING') {
                 return dateA - dateB; // ASC (closer first)
@@ -64,6 +64,7 @@ export async function createHeroSlide(formData) {
 
         const eventDateStr = formData.get('eventDate');
         const eventDate = eventDateStr ? new Date(eventDateStr) : null;
+        const sortDate = parseSortDate(eventDateStr);
         const status = determineStatus(eventDateStr);
 
         if (!image || !label || !title) {
