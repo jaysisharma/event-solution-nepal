@@ -1,0 +1,481 @@
+/* ==========================================================================
+   EXHIBITOR EDITION PAGE
+   Clean, Awwwards-style editorial layout focused strictly on
+   Exhibitor Names & Logos with Telemetry Stats.
+   Padding strictly matched with About page (about.module.css).
+   ========================================================================== */
+
+.main {
+    min-height: 100vh;
+    padding: 12rem 0 8rem;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    font-family: var(--font-inter, sans-serif);
+}
+
+.dark.main,
+.dark .main,
+.main.dark {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+.container {
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* --- Minimal Header --- */
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dark .header {
+    border-bottom-color: #334155;
+}
+
+.topBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    width: fit-content;
+}
+
+.backLink:hover {
+    color: var(--primary, #EB1F26);
+    transform: translateX(-3px);
+}
+
+.applyLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.95rem;
+    background-color: var(--primary, #EB1F26);
+    color: #ffffff;
+    font-size: 0.825rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.applyLink:hover {
+    background-color: #c9141b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(235, 31, 38, 0.25);
+}
+
+.dark .backLink {
+    color: #94a3b8;
+}
+
+.dark .backLink:hover {
+    color: #f8fafc;
+}
+
+.headerTitleRow {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.titleWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.editionKicker {
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--secondary, #054F9E);
+}
+
+.dark .editionKicker {
+    color: #60a5fa;
+}
+
+.pageTitle {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: clamp(2.25rem, 4vw, 3.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin: 0;
+}
+
+.textRed {
+    color: var(--primary, #EB1F26);
+}
+
+.textBlue {
+    color: var(--secondary, #054F9E);
+}
+
+.dark .textBlue {
+    color: #60a5fa;
+}
+
+/* Story Telemetry Stats Strip */
+.statsStrip {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.65rem 1.25rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+}
+
+.dark .statsStrip {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.statValue {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.dark .statValue {
+    color: #f8fafc;
+}
+
+.statLabel {
+    font-size: 0.725rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dark .statLabel {
+    color: #94a3b8;
+}
+
+.statDivider {
+    color: #cbd5e1;
+    font-weight: 300;
+}
+
+.dark .statDivider {
+    color: #475569;
+}
+
+/* --- Exhibitor Section & Grid --- */
+.exhibitorSection {
+    margin-top: 2rem;
+}
+
+.emptyCard {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-radius: 0.75rem;
+    border: 1px dashed #cbd5e1;
+}
+
+.dark .emptyCard {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+/* Responsive Logo & Name Grid */
+.exhibitorsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 1200px) {
+    .exhibitorsGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.exhibitorCard {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+    cursor: default;
+}
+
+a.exhibitorCard {
+    cursor: pointer;
+}
+
+.dark .exhibitorCard {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+.exhibitorCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary, #EB1F26);
+}
+
+.dark .exhibitorCard:hover {
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    border-color: #f87171;
+}
+
+.cardTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.cardIndex {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #94a3b8;
+    letter-spacing: 0.08em;
+}
+
+.cardArrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.exhibitorCard:hover .cardArrow {
+    color: var(--primary, #EB1F26);
+    transform: translate(2px, -2px);
+}
+
+.dark .exhibitorCard:hover .cardArrow {
+    color: #f87171;
+}
+
+/* Logo Presentation Stage (Public Company Images) */
+.logoWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 140px;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.85rem;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    padding: 1rem;
+    transition: all 0.25s ease;
+}
+
+.dark .logoWrapper {
+    background-color: #0f172a;
+    border-color: #1e293b;
+}
+
+.exhibitorCard:hover .logoWrapper {
+    border-color: #e2e8f0;
+    background-color: #f8fafc;
+}
+
+.dark .exhibitorCard:hover .logoWrapper {
+    border-color: #334155;
+    background-color: #162032;
+}
+
+.companyLogoImg {
+    object-fit: contain;
+    padding: 0.5rem;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.exhibitorCard:hover .companyLogoImg {
+    transform: scale(1.08);
+}
+
+/* Card Content: Name & Link */
+.cardContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: auto;
+}
+
+.companyName {
+    font-family: var(--font-poppins, sans-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.dark .companyName {
+    color: #f8fafc;
+}
+
+.websiteTag {
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: #64748b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dark .websiteTag {
+    color: #94a3b8;
+}
+
+/* --- Edition Footer (Switcher) --- */
+.editionFooter {
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.dark .editionFooter {
+    border-top-color: #334155;
+}
+
+.editionSwitcher {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.switcherHeading {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.dark .switcherHeading {
+    color: #94a3b8;
+}
+
+.switcherList {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.switcherChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1.15rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.switcherChip:hover {
+    border-color: var(--primary, #EB1F26);
+    color: var(--primary, #EB1F26);
+}
+
+.dark .switcherChip {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.dark .switcherChip:hover {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+.switcherChipActive {
+    background-color: var(--primary, #EB1F26);
+    border-color: var(--primary, #EB1F26);
+    color: #ffffff !important;
+}
+
+.currentBadge {
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .main {
+        padding: 8rem 0 5rem;
+    }
+
+    .container {
+        padding: 0 1.25rem;
+    }
+
+    .headerTitleRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .statsStrip {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .exhibitorsGrid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+}

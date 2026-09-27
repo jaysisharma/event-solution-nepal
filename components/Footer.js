@@ -75,6 +75,7 @@ const Footer = () => {
                                 <h3 className={styles.heading}>Explore</h3>
                                 <ul className={styles.list}>
                                     <li><Link href="/about" className={styles.link}>About Us</Link></li>
+                                    <li><Link href="/exhibitors" className={styles.link}>Exhibitors</Link></li>
                                     <li><Link href="/services" className={styles.link}>Our Services</Link></li>
                                     <li><Link href="/projects" className={styles.link}>Portfolio</Link></li>
                                     <li><Link href="/contact" className={styles.link}>Contact</Link></li>

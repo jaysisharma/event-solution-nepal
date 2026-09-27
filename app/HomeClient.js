@@ -20,6 +20,7 @@ import styles from "./page.module.css";
 import Button from "@/components/Button";
 import Testimonials from "@/components/Testimonials";
 import UpcomingEvents from "@/components/UpcomingEvents";
+import HomeExhibitors from "@/components/HomeExhibitors";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -115,6 +116,9 @@ export default function HomeClient({ initialPartners, initialEvents, partnerLogo
 
             {/* Upcoming Events Section */}
             <UpcomingEvents events={initialEvents} />
+
+            {/* Exhibitors & Trade Shows Section */}
+            <HomeExhibitors />
 
             {/* App Promotion Section */}
             <AppPromo />

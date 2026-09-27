@@ -1,0 +1,357 @@
+/* ==========================================================================
+   PUBLIC EXHIBITOR APPLICATION FORM MODULE
+   Aligned with Event Solution Nepal public theme & About page padding.
+   ========================================================================== */
+
+.main {
+    min-height: 100vh;
+    padding: 12rem 0 8rem;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    font-family: var(--font-inter, sans-serif);
+}
+
+.dark.main,
+.dark .main,
+.main.dark {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 8rem 0 5rem;
+    }
+}
+
+.container {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1.25rem;
+    }
+}
+
+.header {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    width: fit-content;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.backLink:hover {
+    color: var(--primary, #EB1F26);
+    transform: translateX(-3px);
+}
+
+.dark .backLink {
+    color: #94a3b8;
+}
+
+.dark .backLink:hover {
+    color: #f8fafc;
+}
+
+.kicker {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--primary, #EB1F26);
+}
+
+.title {
+    font-family: var(--font-poppins, sans-serif);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: #0f172a;
+    margin: 0;
+}
+
+.dark .title {
+    color: #f8fafc;
+}
+
+.subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.6;
+    max-width: 680px;
+    margin: 0;
+}
+
+.dark .subtitle {
+    color: #94a3b8;
+}
+
+/* Form Container */
+.formCard {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 768px) {
+    .formCard {
+        padding: 1.5rem;
+    }
+}
+
+.dark .formCard {
+    background-color: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.sectionTitle {
+    font-family: var(--font-poppins, sans-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 2rem 0 1.25rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dark .sectionTitle {
+    color: #f8fafc;
+    border-bottom-color: #334155;
+}
+
+.sectionTitle:first-of-type {
+    margin-top: 0;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .grid2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.dark .label {
+    color: #cbd5e1;
+}
+
+.input,
+.select,
+.textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.65rem;
+    border: 1px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.dark .input,
+.dark .select,
+.dark .textarea {
+    background-color: #0f172a;
+    border-color: #475569;
+    color: #f8fafc;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+    border-color: var(--primary, #EB1F26);
+    box-shadow: 0 0 0 3px rgba(235, 31, 38, 0.12);
+}
+
+.textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.helpText {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* File Upload Box */
+.uploadBox {
+    border: 2px dashed #cbd5e1;
+    border-radius: 0.85rem;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.uploadBox:hover {
+    border-color: var(--primary, #EB1F26);
+    background-color: #fff1f2;
+}
+
+.dark .uploadBox {
+    background-color: #0f172a;
+    border-color: #475569;
+}
+
+.dark .uploadBox:hover {
+    border-color: #f87171;
+    background-color: #1e1b4b;
+}
+
+.previewThumb {
+    position: relative;
+    width: 100px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+    border: 1px solid #cbd5e1;
+}
+
+/* Submit Actions */
+.formActions {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.dark .formActions {
+    border-top-color: #334155;
+}
+
+.submitBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background-color: var(--primary, #EB1F26);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 0.65rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submitBtn:hover {
+    background-color: #c9141b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(235, 31, 38, 0.25);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Success Card */
+.successCard {
+    background-color: #ffffff;
+    border: 1px solid #bbf7d0;
+    border-radius: 1.5rem;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08);
+}
+
+.dark .successCard {
+    background-color: #064e3b;
+    border-color: #059669;
+}
+
+.successIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #dcfce7;
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.successTitle {
+    font-family: var(--font-poppins, sans-serif);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+.dark .successTitle {
+    color: #f8fafc;
+}
+
+.successMessage {
+    font-size: 1rem;
+    color: #475569;
+    max-width: 540px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.dark .successMessage {
+    color: #cbd5e1;
+}

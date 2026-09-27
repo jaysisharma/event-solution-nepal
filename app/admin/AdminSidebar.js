@@ -20,7 +20,8 @@ import {
     Activity,
     Ticket,
     X,
-    Info
+    Info,
+    Building2
 } from 'lucide-react';
 
 export default function AdminSidebar({ isOpen, onClose }) {
@@ -33,6 +34,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
         { name: 'About Page', path: '/admin/about', icon: Info },
         { name: 'Timeline', path: '/admin/timeline', icon: Clock },
         { name: 'Events', path: '/admin/events', icon: Calendar },
+        { name: 'Exhibitors', path: '/admin/exhibitors', icon: Building2 },
         { name: 'Rentals', path: '/admin/rentals', icon: Package },
         { name: 'Partners', path: '/admin/partners', icon: Users },
         { name: 'Projects', path: '/admin/projects', icon: Briefcase },

@@ -41,6 +41,7 @@ const Navbar = () => {
                     <div className={styles.desktopMenu}>
                         {[
                             { name: 'Home', path: '/' },
+                            { name: 'Exhibitors', path: '/exhibitors' },
                             { name: 'Services', path: '/services' },
                             { name: 'Rentals', path: '/rentals' },
                             { name: 'About', path: '/about' },
@@ -108,6 +109,8 @@ const Navbar = () => {
                             </label>
                         </div>
                         {[
+                            { name: 'Home', path: '/' },
+                            { name: 'Exhibitors', path: '/exhibitors' },
                             { name: 'Services', path: '/services' },
                             { name: 'Rentals', path: '/rentals' },
                             { name: 'About', path: '/about' },

@@ -1,0 +1,274 @@
+.section {
+    padding: 6rem 0;
+    background-color: var(--background);
+    position: relative;
+    overflow: hidden;
+}
+
+.dark {
+    --bg-section: #0f172a;
+    --foreground: #f8fafc;
+    --bg-card: #1e293b;
+    --border-color: #334155;
+}
+
+.container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+@media (min-width: 640px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding: 0 2rem;
+    }
+}
+
+/* Section Header matching UpcomingEvents / Expertise */
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 3.5rem;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .header {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+}
+
+.headerContent {
+    max-width: 44rem;
+}
+
+.label {
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--foreground);
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: 3rem;
+    }
+}
+
+.highlight {
+    color: var(--secondary);
+}
+
+.description {
+    color: var(--foreground);
+    opacity: 0.8;
+    font-size: 1.125rem;
+    line-height: 1.6;
+}
+
+.viewAllBtn {
+    background-color: var(--secondary);
+    color: #ffffff;
+    padding: 0.85rem 1.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.viewAllBtn:hover {
+    background-color: #c41921;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(235, 31, 40, 0.3);
+}
+
+/* Event Deck Grid */
+.eventsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .eventsGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.eventCard {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.35s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.eventCard:hover {
+    transform: translateY(-6px);
+    border-color: rgba(235, 31, 40, 0.4);
+    box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+}
+
+.imageWrapper {
+    position: relative;
+    height: 190px;
+    width: 100%;
+    overflow: hidden;
+    background-color: #111;
+}
+
+.eventImage {
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.eventCard:hover .eventImage {
+    transform: scale(1.06);
+}
+
+.badgeOverlay {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+}
+
+.categoryBadge {
+    background: rgba(5, 79, 158, 0.9);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.editionCountBadge {
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.cardContent {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.cardTitle {
+    font-family: var(--font-poppins), sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.cardTagline {
+    font-size: 0.875rem;
+    color: var(--foreground);
+    opacity: 0.75;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+}
+
+.editionsList {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.editionTag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    background-color: var(--bg-section);
+    border: 1px solid var(--border-color);
+    color: var(--foreground);
+}
+
+.editionTagActive {
+    background-color: rgba(235, 31, 40, 0.1);
+    border-color: rgba(235, 31, 40, 0.3);
+    color: var(--secondary);
+    font-weight: 700;
+}
+
+.cardFooter {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.exhibitorPreviewCount {
+    font-size: 0.8rem;
+    color: var(--foreground);
+    opacity: 0.7;
+    font-weight: 600;
+}
+
+.exploreLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--secondary);
+    transition: gap 0.2s ease;
+    text-decoration: none;
+}
+
+.eventCard:hover .exploreLink {
+    gap: 0.55rem;
+}

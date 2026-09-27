@@ -6,9 +6,8 @@ const nextConfig = {
       allowedOrigins: ['eventsolutionnepal.com.np', 'www.eventsolutionnepal.com.np'],
     },
   },
-  serverActions: {
-    bodySizeLimit: '10mb',
-    allowedOrigins: ['eventsolutionnepal.com.np', 'www.eventsolutionnepal.com.np'],
+  turbopack: {
+    root: process.cwd(),
   },
   output: 'standalone',
   images: {

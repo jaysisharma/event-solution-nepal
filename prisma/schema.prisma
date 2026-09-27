@@ -232,3 +232,62 @@ model AboutPage {
   stats       String?  // JSON string for stats: e.g. { "years": "10+", "events": "500+" }
   updatedAt   DateTime @updatedAt
 }
+
+model ExhibitorEvent {
+  id              Int                @id @default(autoincrement())
+  slug            String             @unique
+  title           String
+  chronicleNumber String?            @default("01")
+  description     String?
+  previewImage    String?
+  order           Int                @default(0)
+  editions        ExhibitorEdition[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model ExhibitorEdition {
+  id           Int              @id @default(autoincrement())
+  year         String
+  title        String?
+  dates        String?
+  venue        String?
+  attendees    String?          @default("100K+")
+  previewImage String?
+  order        Int              @default(0)
+  eventId      Int
+  event        ExhibitorEvent   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  exhibitors   Exhibitor[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@unique([eventId, year])
+}
+
+model Exhibitor {
+  id            Int              @id @default(autoincrement())
+  slug          String
+  name          String
+  logo          String?
+  contactPerson String?
+  contact       String?
+  email         String?
+  website       String?
+  booth         String?
+  category      String?
+  tagline       String?
+  description   String?
+  photos        String?          // JSON array of photo URLs
+  videoUrl      String?
+  videoPoster   String?
+  videoTitle    String?
+  order         Int              @default(0)
+  status        String           @default("APPROVED") // PENDING, APPROVED, REJECTED
+  editionId     Int
+  edition       ExhibitorEdition @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@unique([editionId, slug])
+}
+
