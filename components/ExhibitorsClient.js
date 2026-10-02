@@ -16,38 +16,9 @@ if (typeof window !== "undefined") {
 const PROCESS_SECTIONS = [
     {
         id: "01",
-        slug: "stock-clearance",
-        title: "Stock Clearance",
-        description: "Every successful website starts with a clear plan. Guided by this plan, I design websites that evoke emotions, build trust, and strategically turn visitors into customers.",
-        subItems: [
-            {
-                id: "01",
-                title: "Edition 2023",
-                year: "2023",
-                href: "/exhibitors/stock-clearance/2023",
-                image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "02",
-                title: "Edition 2024",
-                year: "2024",
-                href: "/exhibitors/stock-clearance/2024",
-                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "03",
-                title: "Edition 2025",
-                year: "2025",
-                href: "/exhibitors/stock-clearance/2025",
-                image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80"
-            },
-        ]
-    },
-    {
-        id: "02",
         slug: "family-baby-expo",
-        title: "Family Baby Expo",
-        description: "I transform the design into a living, fluid web experience. With Framer, I build everything to load fast, run stable, and allow you to update content yourself anytime.",
+        title: "Family & Baby Expo",
+        description: "A dedicated platform bringing together leading brands, businesses, and service providers focused on families, children, parenting, and everyday family needs. Explore the exhibitors and brands that have participated across previous editions.",
         subItems: [
             {
                 id: "01",
@@ -73,38 +44,96 @@ const PROCESS_SECTIONS = [
         ]
     },
     {
-        id: "03",
-        slug: "global-expo",
-        title: "Global Expo",
-        description: "Bringing your website to the world with precision. I handle performance tuning, technical SEO, and domain deployment so your digital presence makes an immediate impact.",
+        id: "02",
+        slug: "global-consumer-expo",
+        title: "Global Consumer Expo",
+        description: "A dynamic consumer exhibition connecting brands and businesses with a wide audience through products, services, innovations, and emerging market opportunities. Discover the companies that have showcased their offerings at the expo.",
         subItems: [
             {
                 id: "01",
                 title: "Edition 2022",
                 year: "2022",
-                href: "/exhibitors/global-expo/2022",
+                href: "/exhibitors/global-consumer-expo/2022",
                 image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80"
             },
             {
                 id: "02",
                 title: "Edition 2023",
                 year: "2023",
-                href: "/exhibitors/global-expo/2023",
+                href: "/exhibitors/global-consumer-expo/2023",
                 image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80"
             },
             {
                 id: "03",
                 title: "Edition 2024",
                 year: "2024",
-                href: "/exhibitors/global-expo/2024",
+                href: "/exhibitors/global-consumer-expo/2024",
                 image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80"
             },
             {
                 id: "04",
                 title: "Edition 2025",
                 year: "2025",
-                href: "/exhibitors/global-expo/2025",
+                href: "/exhibitors/global-consumer-expo/2025",
                 image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80"
+            },
+        ]
+    },
+    {
+        id: "03",
+        slug: "the-hotel-expo",
+        title: "The Hotel Expo",
+        description: "A dedicated platform for the hospitality and hotel industry, bringing together businesses, suppliers, manufacturers, and service providers. Explore the brands and companies showcasing solutions for hotels, restaurants, and the wider hospitality sector.",
+        subItems: [
+            {
+                id: "01",
+                title: "Edition 2023",
+                year: "2023",
+                href: "/exhibitors/the-hotel-expo/2023",
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
+            },
+            {
+                id: "02",
+                title: "Edition 2024",
+                year: "2024",
+                href: "/exhibitors/the-hotel-expo/2024",
+                image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
+            },
+            {
+                id: "03",
+                title: "Edition 2025",
+                year: "2025",
+                href: "/exhibitors/the-hotel-expo/2025",
+                image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
+            },
+        ]
+    },
+    {
+        id: "04",
+        slug: "stock-clearance",
+        title: "Stock Clearance",
+        description: "A premier consumer shopping and clearance festival connecting leading manufacturers, retail distributors, and domestic brands directly with shoppers. Discover the participating companies and outlets offering exceptional deals, seasonal clearances, and wholesale bargains across previous editions.",
+        subItems: [
+            {
+                id: "01",
+                title: "Edition 2023",
+                year: "2023",
+                href: "/exhibitors/stock-clearance/2023",
+                image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80"
+            },
+            {
+                id: "02",
+                title: "Edition 2024",
+                year: "2024",
+                href: "/exhibitors/stock-clearance/2024",
+                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
+            },
+            {
+                id: "03",
+                title: "Edition 2025",
+                year: "2025",
+                href: "/exhibitors/stock-clearance/2025",
+                image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80"
             },
         ]
     }
@@ -114,6 +143,31 @@ export default function ExhibitorsClient({ events }) {
     const { theme } = useTheme();
     const containerRef = useRef(null);
     const rowsRef = useRef([]);
+
+    // Normalize sections from database events if available, falling back to static PROCESS_SECTIONS
+    const sections = (events && events.length > 0)
+        ? events.map((ev, eIdx) => {
+            const fallbackSection = PROCESS_SECTIONS.find(s => s.slug === ev.slug || s.id === ev.chronicleNumber) || PROCESS_SECTIONS[eIdx];
+            return {
+                id: ev.chronicleNumber || `0${eIdx + 1}`,
+                slug: ev.slug,
+                title: ev.title || fallbackSection?.title,
+                description: ev.description || fallbackSection?.description,
+                subItems: (ev.editions && ev.editions.length > 0)
+                    ? ev.editions.map((ed, edIdx) => {
+                        const fallbackSub = fallbackSection?.subItems?.find(s => s.year === ed.year) || fallbackSection?.subItems?.[edIdx];
+                        return {
+                            id: `0${edIdx + 1}`,
+                            title: ed.title || `Edition ${ed.year}`,
+                            year: ed.year,
+                            href: `/exhibitors/${ev.slug}/${ed.year}`,
+                            image: ed.previewImage || fallbackSub?.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80"
+                        };
+                    })
+                    : (fallbackSection?.subItems || [])
+            };
+        })
+        : PROCESS_SECTIONS;
 
     // Floating Image on Hover State
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -189,7 +243,7 @@ export default function ExhibitorsClient({ events }) {
 
                 {/* Split Rows Container with Section Pinning */}
                 <div className={styles.rowsContainer} ref={containerRef}>
-                    {PROCESS_SECTIONS.map((section, index) => (
+                    {sections.map((section, index) => (
                         <div
                             key={section.id}
                             className={styles.splitRow}
