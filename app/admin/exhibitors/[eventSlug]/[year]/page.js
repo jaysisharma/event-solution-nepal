@@ -1,19 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getEditionData } from '@/lib/exhibitorService';
 import styles from '../../exhibitorsAdmin.module.css';
-import DeleteExhibitorButton from './DeleteExhibitorButton';
+import EditionExhibitorsTable from './EditionExhibitorsTable';
 import {
     ArrowLeft,
     Plus,
-    ExternalLink,
-    Pencil,
-    Globe,
-    Phone,
-    User,
-    Store
+    ExternalLink
 } from 'lucide-react';
 
 export async function generateMetadata({ params }) {
@@ -75,124 +69,12 @@ export default async function AdminEditionExhibitorsPage({ params }) {
                 </div>
             </div>
 
-            {/* Exhibitors Table */}
-            <div className={styles.tableContainer}>
-                {exhibitors.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <Store size={40} opacity={0.4} />
-                        <span>No exhibitors registered for this edition yet.</span>
-                        <Link
-                            href={`/admin/exhibitors/${event.slug}/${edition.year}/new`}
-                            className={styles.btnPrimary}
-                            style={{ marginTop: '0.5rem' }}
-                        >
-                            <Plus size={15} /> Add First Exhibitor
-                        </Link>
-                    </div>
-                ) : (
-                    <table className={styles.table}>
-                        <thead>
-                            <tr>
-                                <th style={{ width: '64px' }}>Logo</th>
-                                <th>Exhibitor Name & Category</th>
-                                <th>Contact Person</th>
-                                <th>Phone</th>
-                                <th>Website</th>
-                                <th>Booth / Stall</th>
-                                <th style={{ textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {exhibitors.map((company) => (
-                                <tr key={company.id}>
-                                    <td>
-                                        <div className={styles.logoThumb}>
-                                            {company.logo ? (
-                                                <Image
-                                                    src={company.logo}
-                                                    alt={company.name}
-                                                    fill
-                                                    sizes="52px"
-                                                    className={styles.logoImg}
-                                                />
-                                            ) : (
-                                                <Store size={18} color="#94a3b8" />
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <strong style={{ color: '#0f172a' }}>{company.name}</strong>
-                                            <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{company.category || 'Exhibition Showcase'}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
-                                            <User size={13} color="#94a3b8" />
-                                            {company.contactPerson || '—'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {company.contact ? (
-                                            <a
-                                                href={`tel:${company.contact}`}
-                                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#2563eb', textDecoration: 'none', fontWeight: 500, fontSize: '0.85rem' }}
-                                            >
-                                                <Phone size={13} />
-                                                {company.contact}
-                                            </a>
-                                        ) : '—'}
-                                    </td>
-                                    <td>
-                                        {company.website ? (
-                                            <a
-                                                href={company.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem' }}
-                                            >
-                                                <Globe size={13} />
-                                                Visit
-                                            </a>
-                                        ) : '—'}
-                                    </td>
-                                    <td>
-                                        <span style={{ fontSize: '0.85rem', color: '#475569' }}>
-                                            {company.booth || '—'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className={styles.actionsCell}>
-                                            <Link
-                                                href={`/admin/exhibitors/${event.slug}/${edition.year}/${company.id}`}
-                                                className={styles.btnIcon}
-                                                title="Edit Exhibitor"
-                                            >
-                                                <Pencil size={14} />
-                                            </Link>
-                                            <Link
-                                                href={`/exhibitors/${event.slug}/${edition.year}/${company.id}`}
-                                                target="_blank"
-                                                className={styles.btnIcon}
-                                                title="View Public Page"
-                                            >
-                                                <ExternalLink size={14} />
-                                            </Link>
-                                            <DeleteExhibitorButton
-                                                id={company.dbId || company.id}
-                                                name={company.name}
-                                                eventSlug={event.slug}
-                                                year={edition.year}
-                                                iconOnly={true}
-                                            />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+            {/* Interactive Exhibitors Table with Search & A-Z / Z-A Sorting */}
+            <EditionExhibitorsTable
+                initialExhibitors={exhibitors}
+                event={event}
+                edition={edition}
+            />
         </div>
     );
 }
