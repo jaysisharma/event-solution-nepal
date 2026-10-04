@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import styles from '../../exhibitorsAdmin.module.css';
 import DeleteExhibitorButton from './DeleteExhibitorButton';
+import { reorderEditionExhibitors } from '../../actions';
 import {
     ArrowUpDown,
     ArrowUpAZ,
@@ -18,12 +20,61 @@ import {
     ExternalLink,
     Plus,
     X,
-    Filter
+    Save,
+    Check,
+    Loader2
 } from 'lucide-react';
 
 export default function EditionExhibitorsTable({ initialExhibitors, event, edition }) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [sortMode, setSortMode] = useState('default'); // 'default', 'az', 'za', 'booth', 'category'
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    // 1. Get initial values from URL query params, falling back to localStorage
+    const storageKey = `exhibitor_sort_${event?.slug || ''}_${edition?.year || ''}`;
+    
+    const [searchQuery, setSearchQuery] = useState(() => {
+        return searchParams.get('q') || '';
+    });
+
+    const [sortMode, setSortMode] = useState(() => {
+        const fromUrl = searchParams.get('sort');
+        if (fromUrl) return fromUrl;
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) return saved;
+        }
+        return 'default';
+    });
+
+    const [isSavingDb, setIsSavingDb] = useState(false);
+    const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+    // Synchronize sort state to localStorage and update URL without full reload
+    const handleSortChange = (newMode) => {
+        setSortMode(newMode);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(storageKey, newMode);
+        }
+        const params = new URLSearchParams(searchParams.toString());
+        if (newMode === 'default') {
+            params.delete('sort');
+        } else {
+            params.set('sort', newMode);
+        }
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    const handleSearchChange = (val) => {
+        setSearchQuery(val);
+        const params = new URLSearchParams(searchParams.toString());
+        if (!val.trim()) {
+            params.delete('q');
+        } else {
+            params.set('q', val.trim());
+        }
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     const filteredAndSortedExhibitors = useMemo(() => {
         let list = [...initialExhibitors];
@@ -71,6 +122,52 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
         return list;
     }, [initialExhibitors, searchQuery, sortMode]);
 
+    // Permanently save the current sorted order to PostgreSQL Database
+    const handleSaveOrderToDb = async () => {
+        if (!edition?.id) return;
+        setIsSavingDb(true);
+        setSaveSuccessMsg('');
+        try {
+            // Sort full list according to sortMode
+            const fullSorted = [...initialExhibitors];
+            if (sortMode === 'az') {
+                fullSorted.sort((a, b) => (a.name || '').localeCompare(b.name || '', undefined, { sensitivity: 'base' }));
+            } else if (sortMode === 'za') {
+                fullSorted.sort((a, b) => (b.name || '').localeCompare(a.name || '', undefined, { sensitivity: 'base' }));
+            } else if (sortMode === 'booth') {
+                fullSorted.sort((a, b) => (a.booth || '').localeCompare(b.booth || '', undefined, { numeric: true, sensitivity: 'base' }));
+            } else if (sortMode === 'category') {
+                fullSorted.sort((a, b) => (a.category || '').localeCompare(b.category || '', undefined, { sensitivity: 'base' }));
+            }
+
+            const sortedIds = fullSorted.map((ex) => ({
+                id: ex.id,
+                dbId: ex.dbId,
+                slug: ex.slug
+            }));
+
+            const res = await reorderEditionExhibitors({
+                editionId: edition.id,
+                sortedIds,
+                eventSlug: event.slug,
+                year: edition.year
+            });
+
+            if (res.success) {
+                setSaveSuccessMsg('Order permanently saved to Database!');
+                router.refresh();
+                setTimeout(() => setSaveSuccessMsg(''), 4000);
+            } else {
+                alert(res.error || 'Failed to save order to database.');
+            }
+        } catch (err) {
+            console.error("Save order error:", err);
+            alert(err.message || 'Error saving order');
+        } finally {
+            setIsSavingDb(false);
+        }
+    };
+
     return (
         <div>
             {/* Filter & Sorting Toolbar */}
@@ -94,7 +191,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                         type="text"
                         placeholder="Search exhibitors, booths, or contact..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => handleSearchChange(e.target.value)}
                         style={{
                             width: '100%',
                             padding: '0.45rem 1.75rem 0.45rem 2rem',
@@ -108,7 +205,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     {searchQuery && (
                         <button
                             type="button"
-                            onClick={() => setSearchQuery('')}
+                            onClick={() => handleSearchChange('')}
                             style={{
                                 position: 'absolute',
                                 right: '8px',
@@ -135,16 +232,16 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     {/* A to Z button */}
                     <button
                         type="button"
-                        onClick={() => setSortMode(sortMode === 'az' ? 'default' : 'az')}
+                        onClick={() => handleSortChange(sortMode === 'az' ? 'default' : 'az')}
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '5px',
                             padding: '0.4rem 0.75rem',
                             fontSize: '0.8rem',
-                            fontWeight: 600,
+                            fontWeight: 700,
                             borderRadius: '6px',
-                            border: sortMode === 'az' ? '1px solid #2563eb' : '1px solid #cbd5e1',
+                            border: sortMode === 'az' ? '2px solid #2563eb' : '1px solid #cbd5e1',
                             backgroundColor: sortMode === 'az' ? '#eff6ff' : '#ffffff',
                             color: sortMode === 'az' ? '#1d4ed8' : '#475569',
                             cursor: 'pointer',
@@ -159,16 +256,16 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     {/* Z to A button */}
                     <button
                         type="button"
-                        onClick={() => setSortMode(sortMode === 'za' ? 'default' : 'za')}
+                        onClick={() => handleSortChange(sortMode === 'za' ? 'default' : 'za')}
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
                             gap: '5px',
                             padding: '0.4rem 0.75rem',
                             fontSize: '0.8rem',
-                            fontWeight: 600,
+                            fontWeight: 700,
                             borderRadius: '6px',
-                            border: sortMode === 'za' ? '1px solid #2563eb' : '1px solid #cbd5e1',
+                            border: sortMode === 'za' ? '2px solid #2563eb' : '1px solid #cbd5e1',
                             backgroundColor: sortMode === 'za' ? '#eff6ff' : '#ffffff',
                             color: sortMode === 'za' ? '#1d4ed8' : '#475569',
                             cursor: 'pointer',
@@ -183,7 +280,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     {/* Quick Select Dropdown for Extra Sorts */}
                     <select
                         value={sortMode}
-                        onChange={(e) => setSortMode(e.target.value)}
+                        onChange={(e) => handleSortChange(e.target.value)}
                         style={{
                             padding: '0.4rem 0.6rem',
                             fontSize: '0.8rem',
@@ -203,6 +300,42 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                         <option value="category">Category</option>
                     </select>
 
+                    {/* Save to Database Button when active sort differs from default */}
+                    {sortMode !== 'default' && (
+                        <button
+                            type="button"
+                            onClick={handleSaveOrderToDb}
+                            disabled={isSavingDb}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '0.4rem 0.75rem',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                borderRadius: '6px',
+                                border: '1px solid #10b981',
+                                backgroundColor: '#ecfdf5',
+                                color: '#047857',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease'
+                            }}
+                            title="Save this sorted order permanently into the Database"
+                        >
+                            {isSavingDb ? (
+                                <>
+                                    <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                                    <span>Saving...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Save size={13} />
+                                    <span>Save as DB Order</span>
+                                </>
+                            )}
+                        </button>
+                    )}
+
                     {/* Results count pill */}
                     <div style={{
                         padding: '0.35rem 0.65rem',
@@ -217,6 +350,26 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                 </div>
             </div>
 
+            {/* Save Confirmation Toast */}
+            {saveSuccessMsg && (
+                <div style={{
+                    padding: '0.6rem 1rem',
+                    background: '#ecfdf5',
+                    border: '1px solid #a7f3d0',
+                    borderRadius: '6px',
+                    color: '#065f46',
+                    fontSize: '0.825rem',
+                    fontWeight: 600,
+                    marginBottom: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                }}>
+                    <Check size={16} color="#10b981" />
+                    {saveSuccessMsg}
+                </div>
+            )}
+
             {/* Exhibitors Table */}
             <div className={styles.tableContainer}>
                 {filteredAndSortedExhibitors.length === 0 ? (
@@ -228,7 +381,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                         {searchQuery ? (
                             <button
                                 type="button"
-                                onClick={() => setSearchQuery('')}
+                                onClick={() => handleSearchChange('')}
                                 className={styles.btnSecondary}
                                 style={{ marginTop: '0.5rem' }}
                             >
@@ -249,7 +402,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                         <thead>
                             <tr>
                                 <th style={{ width: '64px' }}>Logo</th>
-                                <th style={{ cursor: 'pointer' }} onClick={() => setSortMode(sortMode === 'az' ? 'za' : 'az')} title="Click to toggle A-Z / Z-A">
+                                <th style={{ cursor: 'pointer' }} onClick={() => handleSortChange(sortMode === 'az' ? 'za' : 'az')} title="Click to toggle A-Z / Z-A">
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                         <span>Exhibitor Name & Category</span>
                                         {sortMode === 'az' && <ArrowUpAZ size={13} color="#2563eb" />}
@@ -259,7 +412,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                                 <th>Contact Person</th>
                                 <th>Phone</th>
                                 <th>Website</th>
-                                <th style={{ cursor: 'pointer' }} onClick={() => setSortMode(sortMode === 'booth' ? 'default' : 'booth')} title="Click to sort by Stall No">
+                                <th style={{ cursor: 'pointer' }} onClick={() => handleSortChange(sortMode === 'booth' ? 'default' : 'booth')} title="Click to sort by Stall No">
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                                         <span>Booth / Stall</span>
                                         {sortMode === 'booth' && <ArrowUpDown size={12} color="#2563eb" />}

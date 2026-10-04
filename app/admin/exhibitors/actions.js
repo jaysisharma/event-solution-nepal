@@ -718,3 +718,53 @@ export async function triggerSeedAction() {
         return { success: false, error: error.message };
     }
 }
+
+/* =========================================================================
+   PERSISTENT EXHIBITORS ORDERING (Save Sort Order in DB)
+   ========================================================================= */
+
+export async function reorderEditionExhibitors({ editionId, sortedIds, eventSlug, year }) {
+    try {
+        if (!editionId || !Array.isArray(sortedIds) || sortedIds.length === 0) {
+            return { success: false, error: 'Invalid reorder parameters' };
+        }
+
+        // Update each exhibitor's order in PostgreSQL transaction
+        await prisma.$transaction(
+            sortedIds.map((item, index) => {
+                const numericId = parseInt(item.dbId || item.id);
+                if (numericId && !isNaN(numericId)) {
+                    return prisma.exhibitor.update({
+                        where: { id: numericId },
+                        data: { order: index }
+                    });
+                } else if (item.slug) {
+                    return prisma.exhibitor.updateMany({
+                        where: {
+                            editionId: parseInt(editionId),
+                            slug: item.slug
+                        },
+                        data: { order: index }
+                    });
+                }
+                return prisma.exhibitor.updateMany({
+                    where: { editionId: parseInt(editionId) },
+                    data: { order: index }
+                });
+            })
+        );
+
+        if (eventSlug && year) {
+            revalidatePath(`/admin/exhibitors/${eventSlug}/${year}`);
+            revalidatePath(`/exhibitors/${eventSlug}/${year}`);
+        }
+        revalidatePath('/admin/exhibitors');
+        revalidatePath('/exhibitors');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Reorder Exhibitors Error:", error);
+        return { success: false, error: error.message || 'Failed to persist order' };
+    }
+}
+
