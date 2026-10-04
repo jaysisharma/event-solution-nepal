@@ -180,11 +180,26 @@ model TimelineMemory {
 }
 
 model SiteSettings {
-  id             Int      @id @default(autoincrement())
-  whatsappNumber String   @default("9779851336342")
-  contactEmail   String   @default("info@eventsolutionnepal.com.np")
-  contactAddress String   @default("Jwagal, Lalitpur, Nepal")
-  updatedAt      DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  whatsappNumber   String   @default("9779851336342")
+  contactEmail     String   @default("info@eventsolutionnepal.com.np")
+  contactAddress   String   @default("Jwagal, Lalitpur, Nepal")
+  phone1           String?  @default("+977-01-5260535")
+  phone2           String?  @default("+977-01-5260103")
+  footerAbout      String?  @default("Founded in 2014 A.D , Event Solution Nepal has been creating meaningful and memorable events for over a decade bringing your vision to life with care, creativity, and professionalism.")
+  facebookUrl      String?  @default("https://www.facebook.com/eventsolutionnepal/")
+  instagramUrl     String?  @default("https://www.instagram.com/eventsolutionnepal/")
+  tiktokUrl        String?  @default("https://www.tiktok.com/@eventsolutionnp")
+  linkedinUrl      String?  @default("https://np.linkedin.com/company/event-solution-np")
+  viberUrl         String?  @default("https://invite.viber.com/?g2=AQAxZOgB%2B7IeSktn9WPCFT5HGWrBuv%2FG4NoMztJCNGbEFghBBsF4feQQnwPWpAe3&lang=en")
+  servicesTitle    String?  @default("Services")
+  servicesLinks    String?  // JSON string: [{"label":"Expo Management","url":"/services"}, ...]
+  quickLinksTitle  String?  @default("Explore")
+  quickLinks       String?  // JSON string: [{"label":"About Us","url":"/about"}, ...]
+  copyrightText    String?  @default("Event Solution Nepal. All rights reserved.")
+  privacyPolicyUrl String?  @default("/privacy-policy")
+  termsOfServiceUrl String? @default("/terms-of-service")
+  updatedAt        DateTime @updatedAt
 }
 
 model PageView {

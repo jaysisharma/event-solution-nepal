@@ -21,7 +21,8 @@ import {
     Ticket,
     X,
     Info,
-    Building2
+    Building2,
+    PanelBottom
 } from 'lucide-react';
 
 export default function AdminSidebar({ isOpen, onClose }) {
@@ -43,6 +44,7 @@ export default function AdminSidebar({ isOpen, onClose }) {
         { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
         { name: 'Team', path: '/admin/team', icon: Users },
         { name: 'System Status', path: '/admin/system', icon: Activity },
+        { name: 'Footer', path: '/admin/footer', icon: PanelBottom },
         { name: 'Settings', path: '/admin/settings', icon: Settings },
     ];
 

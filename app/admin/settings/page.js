@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Trash2, UserPlus, Shield, CheckCircle, AlertCircle, Settings, Lock, Eye, EyeOff, Loader2, PanelBottom } from 'lucide-react';
 import { getAdminUsers, createAdminUser, deleteAdminUser, updateAdminPassword } from './actions';
 import { getSiteSettings, updateSiteSettings } from './siteActions';
 import styles from '../admin.module.css';
@@ -189,9 +190,18 @@ export default function SettingsPage() {
 
                 {/* General Site Settings Panel */}
                 <div className={styles.card} style={{ gridColumn: 'span 2' }}>
-                    <h2 className={styles.cardTitle} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Settings size={20} /> General Site Settings
-                    </h2>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                        <h2 className={styles.cardTitle} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+                            <Settings size={20} /> General Site Settings
+                        </h2>
+                        <Link
+                            href="/admin/footer"
+                            className={styles.btnSecondary}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', textDecoration: 'none', padding: '6px 14px' }}
+                        >
+                            <PanelBottom size={16} /> Manage Full Footer →
+                        </Link>
+                    </div>
                     <form onSubmit={handleUpdateSettings} className={styles.formGroup} style={{ gap: '1.5rem', marginTop: '1.5rem', display: 'grid', gridTemplateColumns: '1fr' }}>
                         <div className={styles.formGroup}>
                             <label className={styles.label}>WhatsApp Number <span style={{ fontSize: '0.8rem', color: '#666' }}>(e.g. 9779851336342)</span></label>
