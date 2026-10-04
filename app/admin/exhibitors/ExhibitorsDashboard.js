@@ -28,7 +28,9 @@ import {
     Layers,
     MapPin,
     Phone,
-    Globe
+    Globe,
+    ChevronUp,
+    ChevronDown
 } from 'lucide-react';
 import EventModal from './EventModal';
 import EditionModal from './EditionModal';
@@ -38,7 +40,8 @@ import {
     deleteEdition,
     deleteExhibitor,
     approveExhibitor,
-    rejectExhibitor
+    rejectExhibitor,
+    moveEventOrder
 } from './actions';
 
 const Snackbar = ({ message, type, onClose }) => {
@@ -159,6 +162,50 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
             return matchesStatus && matchesEvent && matchesSearch;
         });
     }, [allExhibitors, applicationStatusFilter, applicationEventFilter, applicationSearch]);
+
+    React.useEffect(() => {
+        setEvents(initialEvents);
+    }, [initialEvents]);
+
+    const [isReordering, setIsReordering] = useState(false);
+
+    // Handle Move Event Sequence (Up / Down)
+    const handleMoveEvent = async (id, direction) => {
+        if (isReordering) return;
+        setIsReordering(true);
+
+        // Optimistic UI update for instant feedback
+        setEvents((prev) => {
+            const next = [...prev];
+            const idx = next.findIndex((e) => e.id === id);
+            if (idx === -1) return prev;
+            const target = direction === 'up' ? idx - 1 : idx + 1;
+            if (target < 0 || target >= next.length) return prev;
+            const temp = next[idx];
+            next[idx] = next[target];
+            next[target] = temp;
+            return next.map((e, i) => ({
+                ...e,
+                chronicleNumber: String(i + 1).padStart(2, '0')
+            }));
+        });
+
+        try {
+            const res = await moveEventOrder(id, direction);
+            if (res.success) {
+                setSnackbar({ message: 'Event order updated successfully', type: 'success' });
+                router.refresh();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to reorder event', type: 'error' });
+                router.refresh();
+            }
+        } catch (err) {
+            setSnackbar({ message: err.message || 'Error reordering event', type: 'error' });
+            router.refresh();
+        } finally {
+            setIsReordering(false);
+        }
+    };
 
     // Handle Delete Event
     const handleDeleteEvent = async (id, title) => {
@@ -374,7 +421,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
 
                     {/* Event Series Cards Grid */}
                     <div className={styles.eventsHubGrid}>
-                        {events.map((ev) => {
+                        {events.map((ev, evIdx) => {
                             const eventEditions = ev.editions || [];
                             const totalStalls = eventEditions.reduce(
                                 (acc, cur) => acc + (cur.exhibitors ? cur.exhibitors.length : 0),
@@ -412,7 +459,37 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                 <button
                                                     type="button"
-                                                    title="Edit Event Title/Image"
+                                                    title="Move Earlier in Order (#01, #02...)"
+                                                    disabled={evIdx === 0 || isReordering}
+                                                    onClick={() => handleMoveEvent(ev.id, 'up')}
+                                                    className={styles.btnIcon}
+                                                    style={{
+                                                        width: '28px',
+                                                        height: '28px',
+                                                        opacity: evIdx === 0 ? 0.35 : 1,
+                                                        cursor: evIdx === 0 ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    <ChevronUp size={14} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="Move Later in Order"
+                                                    disabled={evIdx === events.length - 1 || isReordering}
+                                                    onClick={() => handleMoveEvent(ev.id, 'down')}
+                                                    className={styles.btnIcon}
+                                                    style={{
+                                                        width: '28px',
+                                                        height: '28px',
+                                                        opacity: evIdx === events.length - 1 ? 0.35 : 1,
+                                                        cursor: evIdx === events.length - 1 ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    <ChevronDown size={14} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="Edit Event Title/Image/Order"
                                                     onClick={() => {
                                                         setEditingEvent(ev);
                                                         setIsEventModalOpen(true);

@@ -155,11 +155,49 @@ export async function updateEvent(formData) {
 
         const updateData = {
             title,
-            chronicleNumber,
             description,
         };
         if (previewImage) updateData.previewImage = previewImage;
 
+        // If chronicleNumber is numeric (e.g. "01", "02", "1"), cleanly re-sequence events
+        const parsedOrder = parseInt(chronicleNumber.replace(/[^0-9]/g, ''));
+        if (!isNaN(parsedOrder)) {
+            const allEvents = await prisma.exhibitorEvent.findMany({
+                orderBy: [
+                    { order: 'asc' },
+                    { id: 'asc' }
+                ]
+            });
+            const currentIndex = allEvents.findIndex(e => e.id === id);
+            if (currentIndex !== -1) {
+                const [targetEvent] = allEvents.splice(currentIndex, 1);
+                const targetPos = Math.min(Math.max(0, parsedOrder - 1), allEvents.length);
+                allEvents.splice(targetPos, 0, targetEvent);
+
+                await prisma.$transaction([
+                    prisma.exhibitorEvent.update({
+                        where: { id },
+                        data: updateData
+                    }),
+                    ...allEvents.map((ev, idx) => {
+                        const formattedChronicle = String(idx + 1).padStart(2, '0');
+                        return prisma.exhibitorEvent.update({
+                            where: { id: ev.id },
+                            data: {
+                                order: idx,
+                                chronicleNumber: formattedChronicle
+                            }
+                        });
+                    })
+                ]);
+
+                revalidatePath('/admin/exhibitors');
+                revalidatePath('/exhibitors');
+                return { success: true };
+            }
+        }
+
+        updateData.chronicleNumber = chronicleNumber;
         await prisma.exhibitorEvent.update({
             where: { id },
             data: updateData
@@ -174,6 +212,56 @@ export async function updateEvent(formData) {
         return { success: false, error: error.message || 'Failed to update event' };
     }
 }
+
+export async function moveEventOrder(id, direction) {
+    try {
+        const eventId = parseInt(id);
+        if (!eventId) return { success: false, error: 'Invalid event ID' };
+
+        const allEvents = await prisma.exhibitorEvent.findMany({
+            orderBy: [
+                { order: 'asc' },
+                { id: 'asc' }
+            ]
+        });
+
+        const currentIndex = allEvents.findIndex((e) => e.id === eventId);
+        if (currentIndex === -1) return { success: false, error: 'Event not found' };
+
+        const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        if (targetIndex < 0 || targetIndex >= allEvents.length) {
+            return { success: false, error: 'Cannot move further' };
+        }
+
+        // Swap positions in array
+        const temp = allEvents[currentIndex];
+        allEvents[currentIndex] = allEvents[targetIndex];
+        allEvents[targetIndex] = temp;
+
+        // Persist new orders and sync chronicleNumbers ("01", "02", etc.)
+        await prisma.$transaction(
+            allEvents.map((ev, idx) => {
+                const formattedChronicle = String(idx + 1).padStart(2, '0');
+                return prisma.exhibitorEvent.update({
+                    where: { id: ev.id },
+                    data: {
+                        order: idx,
+                        chronicleNumber: formattedChronicle
+                    }
+                });
+            })
+        );
+
+        revalidatePath('/admin/exhibitors');
+        revalidatePath('/exhibitors');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Move Event Order Error:", error);
+        return { success: false, error: error.message || 'Failed to reorder event' };
+    }
+}
+
 
 export async function deleteEvent(id) {
     try {

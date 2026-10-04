@@ -120,7 +120,7 @@ export default function EventModal({ isOpen, onClose, event = null, onSuccess })
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label className={styles.formLabel}>Chronicle Index</label>
+                                <label className={styles.formLabel}>Chronicle Order (e.g. 01, 02)</label>
                                 <input
                                     type="text"
                                     name="chronicleNumber"
@@ -129,6 +129,7 @@ export default function EventModal({ isOpen, onClose, event = null, onSuccess })
                                     placeholder="e.g. 01, 02"
                                     className={styles.formInput}
                                 />
+                                <span className={styles.formHelp}>Sets the display order (#01, #02, etc.)</span>
                             </div>
                         </div>
 
