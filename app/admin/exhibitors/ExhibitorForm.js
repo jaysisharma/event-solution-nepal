@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { COMPANY_LOGOS } from '@/data/exhibitorsData';
-import { createExhibitor, updateExhibitor } from './actions';
+import { createExhibitor, updateExhibitor, getCompanyLogos, uploadCompanyLogos } from './actions';
 import styles from './exhibitorsAdmin.module.css';
 import {
     ArrowLeft,
@@ -19,7 +19,9 @@ import {
     User,
     Video,
     ImageIcon,
-    MapPin
+    MapPin,
+    Plus,
+    Loader2
 } from 'lucide-react';
 
 export default function ExhibitorForm({
@@ -32,8 +34,67 @@ export default function ExhibitorForm({
 }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [availableLogos, setAvailableLogos] = useState(COMPANY_LOGOS);
     const [selectedLogo, setSelectedLogo] = useState(initialData?.logo || COMPANY_LOGOS[0]);
     const [errorMsg, setErrorMsg] = useState('');
+    const [uploadingLogos, setUploadingLogos] = useState(false);
+    const [uploadSuccessMsg, setUploadSuccessMsg] = useState('');
+    const fileInputRef = useRef(null);
+
+    // Fetch existing logos dynamically from public/company on mount
+    useEffect(() => {
+        let isMounted = true;
+        async function fetchLogos() {
+            try {
+                const res = await getCompanyLogos();
+                if (res?.success && Array.isArray(res.logos) && res.logos.length > 0 && isMounted) {
+                    // Combine with COMPANY_LOGOS to guarantee uniqueness
+                    const combined = Array.from(new Set([...res.logos, ...COMPANY_LOGOS]));
+                    setAvailableLogos(combined);
+                }
+            } catch (e) {
+                console.error("Failed to load company logos dynamically:", e);
+            }
+        }
+        fetchLogos();
+        return () => { isMounted = false; };
+    }, []);
+
+    const handleBatchLogoUpload = async (e) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        setUploadingLogos(true);
+        setErrorMsg('');
+        setUploadSuccessMsg('');
+
+        try {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('logoFiles', files[i]);
+            }
+
+            const res = await uploadCompanyLogos(formData);
+            if (res.success && res.uploadedUrls?.length > 0) {
+                // Update available logos list with newly uploaded logos at the front
+                const updatedList = Array.from(new Set([...res.uploadedUrls, ...availableLogos]));
+                setAvailableLogos(updatedList);
+                // Automatically select the first newly uploaded logo
+                setSelectedLogo(res.uploadedUrls[0]);
+                setUploadSuccessMsg(`Successfully uploaded ${res.uploadedUrls.length} new logo(s)! They are added to the library below.`);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+            } else {
+                setErrorMsg(res.error || 'Failed to upload logo files.');
+            }
+        } catch (err) {
+            console.error("Batch logo upload error:", err);
+            setErrorMsg(err.message || 'Error occurred while uploading logos.');
+        } finally {
+            setUploadingLogos(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -162,13 +223,13 @@ export default function ExhibitorForm({
                 {/* Interactive Logo Picker (public/company) */}
                 <div className={styles.formGroupFull}>
                     <label className={styles.formLabel}>
-                        Company Logo (Choose from public/company or Upload)
+                        Company Logo (Choose from library or Upload Multiple)
                     </label>
 
                     <div className={styles.logoPickerSection}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                             <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b' }}>
-                                Select one of {COMPANY_LOGOS.length} Brand Logos from /public/company:
+                                Select one of {availableLogos.length} Brand Logos from /public/company:
                             </span>
                             {selectedLogo && (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: '#10b981', fontWeight: 700 }}>
@@ -180,8 +241,15 @@ export default function ExhibitorForm({
                             )}
                         </div>
 
+                        {uploadSuccessMsg && (
+                            <div style={{ padding: '0.5rem 0.75rem', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '6px', color: '#047857', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <Check size={14} color="#10b981" />
+                                {uploadSuccessMsg}
+                            </div>
+                        )}
+
                         <div className={styles.logoPickerGrid}>
-                            {COMPANY_LOGOS.map((logoPath, idx) => {
+                            {availableLogos.map((logoPath, idx) => {
                                 const isSelected = selectedLogo === logoPath;
                                 return (
                                     <button
@@ -208,17 +276,38 @@ export default function ExhibitorForm({
                             })}
                         </div>
 
-                        <div style={{ marginTop: '0.75rem' }}>
-                            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.35rem' }}>
-                                <Upload size={14} /> Or Upload Custom Logo Image:
-                            </label>
-                            <input
-                                type="file"
-                                name="logoFile"
-                                accept="image/png, image/jpeg, image/webp"
-                                className={styles.formInput}
-                                style={{ width: '100%', fontSize: '0.8rem' }}
-                            />
+                        <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#ffffff', border: '1px dashed #cbd5e1', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                <label style={{ fontSize: '0.825rem', fontWeight: 600, color: '#334155', display: 'flex', alignItems: 'center', gap: '0.4rem', margin: 0 }}>
+                                    <Upload size={15} color="#2563eb" /> Upload Custom Brand Logo(s) (Multiple allowed):
+                                </label>
+                                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                    PNG, JPG, WEBP, SVG • Select multiple files at once
+                                </span>
+                            </div>
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    name="logoFiles"
+                                    multiple
+                                    accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                                    onChange={handleBatchLogoUpload}
+                                    disabled={uploadingLogos}
+                                    className={styles.formInput}
+                                    style={{ flex: 1, minWidth: '220px', fontSize: '0.8rem', padding: '0.4rem 0.6rem' }}
+                                />
+                                {uploadingLogos && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#2563eb', fontWeight: 600 }}>
+                                        <Loader2 size={16} className={styles.spinner} style={{ animation: 'spin 1s linear infinite' }} />
+                                        <span>Uploading & Adding to Library...</span>
+                                    </div>
+                                )}
+                            </div>
+                            <span style={{ fontSize: '0.725rem', color: '#94a3b8', display: 'block', marginTop: '0.35rem' }}>
+                                💡 Tip: You can select and upload multiple logos simultaneously. They will be saved to <code>/public/company</code> and will automatically appear in the library above!
+                            </span>
                         </div>
                     </div>
                 </div>

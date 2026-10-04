@@ -4,6 +4,80 @@ import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { saveFile } from '@/lib/upload';
 import { seedDefaultExhibitorsIfEmpty } from '@/lib/exhibitorService';
+import fs from 'fs/promises';
+import path from 'path';
+
+/* =========================================================================
+   COMPANY LOGOS (Multi-upload & dynamic listing)
+   ========================================================================= */
+
+export async function getCompanyLogos() {
+    try {
+        const companyDir = path.join(process.cwd(), 'public', 'company');
+        const files = await fs.readdir(companyDir);
+        const validExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
+        const logos = files
+            .filter(file => validExtensions.includes(path.extname(file).toLowerCase()) && !file.startsWith('.'))
+            .map(file => `/company/${encodeURIComponent(file)}`);
+        return { success: true, logos };
+    } catch (error) {
+        console.error("Error reading company logos:", error);
+        return { success: false, logos: [] };
+    }
+}
+
+export async function uploadCompanyLogos(formData) {
+    try {
+        const files = formData.getAll('logoFiles');
+        if (!files || files.length === 0) {
+            return { success: false, error: 'No files selected for upload.' };
+        }
+
+        const companyDir = path.join(process.cwd(), 'public', 'company');
+        await fs.mkdir(companyDir, { recursive: true });
+
+        const uploadedUrls = [];
+        const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
+
+        for (const file of files) {
+            if (!file || typeof file !== 'object' || file.size === 0) continue;
+            
+            const originalName = file.name || 'logo.png';
+            const ext = path.extname(originalName).toLowerCase();
+            if (!allowedExtensions.includes(ext)) continue;
+
+            const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+            const uniqueFilename = `${baseName}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}${ext}`;
+            const targetPath = path.join(companyDir, uniqueFilename);
+
+            const bytes = await file.arrayBuffer();
+            const buffer = Buffer.from(bytes);
+            await fs.writeFile(targetPath, buffer);
+
+            uploadedUrls.push(`/company/${encodeURIComponent(uniqueFilename)}`);
+        }
+
+        if (uploadedUrls.length === 0) {
+            return { success: false, error: 'No valid image files were processed.' };
+        }
+
+        // Return updated list of logos
+        const { logos: allLogos } = await getCompanyLogos();
+
+        revalidatePath('/admin/exhibitors');
+
+        return {
+            success: true,
+            uploadedUrls,
+            allLogos,
+            count: uploadedUrls.length
+        };
+    } catch (error) {
+        console.error("Upload company logos error:", error);
+        return { success: false, error: error.message || 'Failed to upload logos' };
+    }
+}
+
 
 /* =========================================================================
    EVENTS CRUD
@@ -272,11 +346,14 @@ export async function createExhibitor(formData) {
             slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         }
 
-        // Logo handling: either chosen public logo OR uploaded image file
+        // Logo handling: either chosen public logo OR uploaded image file(s)
         let logo = formData.get('logoSelected') || '';
-        const logoFile = formData.get('logoFile');
-        if (logoFile && typeof logoFile === 'object' && logoFile.size > 0) {
-            const uploadedPath = await saveFile(logoFile, 'exhibitors/logos');
+        const logoFiles = formData.getAll('logoFiles').filter(f => f && typeof f === 'object' && f.size > 0);
+        const singleLogoFile = formData.get('logoFile');
+        const fileToUpload = logoFiles.length > 0 ? logoFiles[0] : (singleLogoFile && typeof singleLogoFile === 'object' && singleLogoFile.size > 0 ? singleLogoFile : null);
+
+        if (fileToUpload) {
+            const uploadedPath = await saveFile(fileToUpload, 'exhibitors/logos');
             if (uploadedPath) logo = uploadedPath;
         }
 
@@ -374,9 +451,12 @@ export async function updateExhibitor(formData) {
         }
 
         let logo = formData.get('logoSelected');
-        const logoFile = formData.get('logoFile');
-        if (logoFile && typeof logoFile === 'object' && logoFile.size > 0) {
-            const uploadedPath = await saveFile(logoFile, 'exhibitors/logos');
+        const logoFiles = formData.getAll('logoFiles').filter(f => f && typeof f === 'object' && f.size > 0);
+        const singleLogoFile = formData.get('logoFile');
+        const fileToUpload = logoFiles.length > 0 ? logoFiles[0] : (singleLogoFile && typeof singleLogoFile === 'object' && singleLogoFile.size > 0 ? singleLogoFile : null);
+
+        if (fileToUpload) {
+            const uploadedPath = await saveFile(fileToUpload, 'exhibitors/logos');
             if (uploadedPath) logo = uploadedPath;
         }
 
