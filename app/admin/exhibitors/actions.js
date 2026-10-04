@@ -638,6 +638,47 @@ export async function deleteExhibitor(id, eventSlug, year) {
     }
 }
 
+export async function deleteMultipleExhibitors(ids, eventSlug, year) {
+    try {
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return { success: false, error: 'No exhibitors selected' };
+        }
+
+        const intIds = ids.map(id => parseInt(id)).filter(id => !isNaN(id) && id > 0);
+        const stringSlugs = ids.map(id => String(id)).filter(id => isNaN(parseInt(id)));
+
+        const conditions = [];
+        if (intIds.length > 0) {
+            conditions.push({ id: { in: intIds } });
+        }
+        if (stringSlugs.length > 0) {
+            conditions.push({ slug: { in: stringSlugs } });
+        }
+
+        if (conditions.length === 0) {
+            return { success: false, error: 'No valid IDs provided' };
+        }
+
+        const deleted = await prisma.exhibitor.deleteMany({
+            where: {
+                OR: conditions
+            }
+        });
+
+        revalidatePath('/admin/exhibitors');
+        if (eventSlug && year) {
+            revalidatePath(`/admin/exhibitors/${eventSlug}/${year}`);
+            revalidatePath(`/exhibitors/${eventSlug}/${year}`);
+        }
+        revalidatePath('/exhibitors');
+
+        return { success: true, count: deleted.count };
+    } catch (error) {
+        console.error("Delete Multiple Exhibitors Error:", error);
+        return { success: false, error: error.message || "Failed to delete selected exhibitors" };
+    }
+}
+
 export async function approveExhibitor(id) {
     try {
         const exhibitorId = parseInt(id);

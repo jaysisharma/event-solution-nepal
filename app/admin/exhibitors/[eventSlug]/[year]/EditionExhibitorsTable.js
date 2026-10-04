@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import styles from '../../exhibitorsAdmin.module.css';
 import DeleteExhibitorButton from './DeleteExhibitorButton';
-import { reorderEditionExhibitors } from '../../actions';
+import { reorderEditionExhibitors, deleteMultipleExhibitors } from '../../actions';
 import {
     ArrowUpDown,
     ArrowUpAZ,
@@ -22,7 +22,8 @@ import {
     X,
     Save,
     Check,
-    Loader2
+    Loader2,
+    Trash2
 } from 'lucide-react';
 
 export default function EditionExhibitorsTable({ initialExhibitors, event, edition }) {
@@ -49,6 +50,11 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
 
     const [isSavingDb, setIsSavingDb] = useState(false);
     const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+    // Multi-Select Batch Delete State
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [isBatchDeleting, setIsBatchDeleting] = useState(false);
+    const [batchError, setBatchError] = useState('');
 
     // Synchronize sort state to localStorage and update URL without full reload
     const handleSortChange = (newMode) => {
@@ -165,6 +171,66 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
             alert(err.message || 'Error saving order');
         } finally {
             setIsSavingDb(false);
+        }
+    };
+
+    // Multi-Select Handlers
+    const allVisibleIds = useMemo(() => {
+        return filteredAndSortedExhibitors.map((c) => c.dbId || c.id);
+    }, [filteredAndSortedExhibitors]);
+
+    const isAllSelected = useMemo(() => {
+        return allVisibleIds.length > 0 && allVisibleIds.every((id) => selectedIds.includes(id));
+    }, [allVisibleIds, selectedIds]);
+
+    const isSomeSelected = useMemo(() => {
+        return selectedIds.length > 0 && !isAllSelected;
+    }, [selectedIds, isAllSelected]);
+
+    const toggleSelectAll = () => {
+        if (isAllSelected) {
+            setSelectedIds((prev) => prev.filter((id) => !allVisibleIds.includes(id)));
+        } else {
+            setSelectedIds((prev) => {
+                const next = new Set([...prev, ...allVisibleIds]);
+                return Array.from(next);
+            });
+        }
+    };
+
+    const toggleSelectOne = (id) => {
+        setSelectedIds((prev) => {
+            if (prev.includes(id)) {
+                return prev.filter((x) => x !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
+    };
+
+    const handleBatchDelete = async () => {
+        if (selectedIds.length === 0) return;
+        const count = selectedIds.length;
+        if (!confirm(`Are you sure you want to permanently delete ${count} selected exhibitor${count > 1 ? 's' : ''}? This action cannot be undone.`)) {
+            return;
+        }
+
+        setIsBatchDeleting(true);
+        setBatchError('');
+        try {
+            const res = await deleteMultipleExhibitors(selectedIds, event.slug, edition.year);
+            if (res.success) {
+                setSaveSuccessMsg(`Successfully deleted ${res.count || count} exhibitors.`);
+                setSelectedIds([]);
+                router.refresh();
+                setTimeout(() => setSaveSuccessMsg(''), 4000);
+            } else {
+                setBatchError(res.error || 'Failed to delete selected exhibitors');
+            }
+        } catch (err) {
+            setBatchError(err.message || 'Error occurred while deleting exhibitors');
+        } finally {
+            setIsBatchDeleting(false);
         }
     };
 
@@ -370,6 +436,57 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                 </div>
             )}
 
+            {/* Batch Error Toast */}
+            {batchError && (
+                <div style={{
+                    padding: '0.6rem 1rem',
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '6px',
+                    color: '#dc2626',
+                    fontSize: '0.825rem',
+                    fontWeight: 600,
+                    marginBottom: '1rem'
+                }}>
+                    {batchError}
+                </div>
+            )}
+
+            {/* Batch Action Bar */}
+            {selectedIds.length > 0 && (
+                <div className={styles.batchActionBar}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span className={styles.batchSelectedCount}>
+                            {selectedIds.length} exhibitor{selectedIds.length > 1 ? 's' : ''} selected
+                        </span>
+                        <button
+                            type="button"
+                            onClick={() => setSelectedIds([])}
+                            className={styles.batchDeselectBtn}
+                        >
+                            Deselect all
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleBatchDelete}
+                        disabled={isBatchDeleting}
+                        className={styles.btnDanger}
+                        style={{ backgroundColor: '#ef4444', color: '#ffffff', border: 'none', padding: '0.45rem 0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    >
+                        {isBatchDeleting ? (
+                            <>
+                                <Loader2 size={14} className="animate-spin" /> Deleting...
+                            </>
+                        ) : (
+                            <>
+                                <Trash2 size={14} /> Delete Selected ({selectedIds.length})
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
+
             {/* Exhibitors Table */}
             <div className={styles.tableContainer}>
                 {filteredAndSortedExhibitors.length === 0 ? (
@@ -401,6 +518,18 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     <table className={styles.table}>
                         <thead>
                             <tr>
+                                <th style={{ width: '40px', textAlign: 'center' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={isAllSelected}
+                                        ref={(el) => {
+                                            if (el) el.indeterminate = isSomeSelected;
+                                        }}
+                                        onChange={toggleSelectAll}
+                                        title={isAllSelected ? "Deselect all" : "Select all"}
+                                        style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                    />
+                                </th>
                                 <th style={{ width: '64px' }}>Logo</th>
                                 <th style={{ cursor: 'pointer' }} onClick={() => handleSortChange(sortMode === 'az' ? 'za' : 'az')} title="Click to toggle A-Z / Z-A">
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -422,8 +551,24 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredAndSortedExhibitors.map((company) => (
-                                <tr key={company.id}>
+                            {filteredAndSortedExhibitors.map((company) => {
+                                const isSelected = selectedIds.includes(company.dbId || company.id);
+                                return (
+                                <tr
+                                    key={company.id}
+                                    style={{
+                                        backgroundColor: isSelected ? '#eff6ff' : undefined
+                                    }}
+                                >
+                                    <td style={{ textAlign: 'center' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => toggleSelectOne(company.dbId || company.id)}
+                                            title={`Select ${company.name}`}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                        />
+                                    </td>
                                     <td>
                                         <div className={styles.logoThumb}>
                                             {company.logo ? (
@@ -507,7 +652,8 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            );
+                            })}
                         </tbody>
                     </table>
                 )}

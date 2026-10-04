@@ -30,7 +30,8 @@ import {
     Phone,
     Globe,
     ChevronUp,
-    ChevronDown
+    ChevronDown,
+    Loader2
 } from 'lucide-react';
 import EventModal from './EventModal';
 import EditionModal from './EditionModal';
@@ -39,6 +40,7 @@ import {
     deleteEvent,
     deleteEdition,
     deleteExhibitor,
+    deleteMultipleExhibitors,
     approveExhibitor,
     rejectExhibitor,
     moveEventOrder
@@ -240,6 +242,121 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
             router.refresh();
         } else {
             setSnackbar({ message: res.error || 'Failed to delete exhibitor', type: 'error' });
+        }
+    };
+
+    // Multi-Select Batch Delete State
+    const [selectedExhibitorIds, setSelectedExhibitorIds] = useState([]);
+    const [selectedAppIds, setSelectedAppIds] = useState([]);
+    const [isBatchDeleting, setIsBatchDeleting] = useState(false);
+
+    // Tab 2 (Directory) multi-select
+    const allVisibleExhibitorIds = useMemo(() => {
+        return filteredExhibitors.map((ex) => ex.id || ex.dbId || ex.slug);
+    }, [filteredExhibitors]);
+
+    const isAllExhibitorsSelected = useMemo(() => {
+        return allVisibleExhibitorIds.length > 0 && allVisibleExhibitorIds.every((id) => selectedExhibitorIds.includes(id));
+    }, [allVisibleExhibitorIds, selectedExhibitorIds]);
+
+    const isSomeExhibitorsSelected = useMemo(() => {
+        return selectedExhibitorIds.length > 0 && !isAllExhibitorsSelected;
+    }, [selectedExhibitorIds, isAllExhibitorsSelected]);
+
+    const toggleSelectAllExhibitors = () => {
+        if (isAllExhibitorsSelected) {
+            setSelectedExhibitorIds((prev) => prev.filter((id) => !allVisibleExhibitorIds.includes(id)));
+        } else {
+            setSelectedExhibitorIds((prev) => Array.from(new Set([...prev, ...allVisibleExhibitorIds])));
+        }
+    };
+
+    const toggleSelectOneExhibitor = (id) => {
+        setSelectedExhibitorIds((prev) => {
+            if (prev.includes(id)) {
+                return prev.filter((x) => x !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
+    };
+
+    const handleBatchDeleteExhibitors = async () => {
+        if (selectedExhibitorIds.length === 0) return;
+        const count = selectedExhibitorIds.length;
+        if (!confirm(`Are you sure you want to permanently delete ${count} selected exhibitor${count > 1 ? 's' : ''}? This action cannot be undone.`)) {
+            return;
+        }
+
+        setIsBatchDeleting(true);
+        try {
+            const res = await deleteMultipleExhibitors(selectedExhibitorIds);
+            if (res.success) {
+                setSnackbar({ message: `Successfully deleted ${res.count || count} exhibitors`, type: 'success' });
+                setSelectedExhibitorIds([]);
+                router.refresh();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to delete selected exhibitors', type: 'error' });
+            }
+        } catch (err) {
+            setSnackbar({ message: err.message || 'Error occurred while deleting', type: 'error' });
+        } finally {
+            setIsBatchDeleting(false);
+        }
+    };
+
+    // Tab 3 (Applications) multi-select
+    const allVisibleAppIds = useMemo(() => {
+        return filteredApplications.map((app) => app.id || app.dbId || app.slug);
+    }, [filteredApplications]);
+
+    const isAllAppsSelected = useMemo(() => {
+        return allVisibleAppIds.length > 0 && allVisibleAppIds.every((id) => selectedAppIds.includes(id));
+    }, [allVisibleAppIds, selectedAppIds]);
+
+    const isSomeAppsSelected = useMemo(() => {
+        return selectedAppIds.length > 0 && !isAllAppsSelected;
+    }, [selectedAppIds, isAllAppsSelected]);
+
+    const toggleSelectAllApps = () => {
+        if (isAllAppsSelected) {
+            setSelectedAppIds((prev) => prev.filter((id) => !allVisibleAppIds.includes(id)));
+        } else {
+            setSelectedAppIds((prev) => Array.from(new Set([...prev, ...allVisibleAppIds])));
+        }
+    };
+
+    const toggleSelectOneApp = (id) => {
+        setSelectedAppIds((prev) => {
+            if (prev.includes(id)) {
+                return prev.filter((x) => x !== id);
+            } else {
+                return [...prev, id];
+            }
+        });
+    };
+
+    const handleBatchDeleteApps = async () => {
+        if (selectedAppIds.length === 0) return;
+        const count = selectedAppIds.length;
+        if (!confirm(`Are you sure you want to delete ${count} selected application${count > 1 ? 's' : ''}?`)) {
+            return;
+        }
+
+        setIsBatchDeleting(true);
+        try {
+            const res = await deleteMultipleExhibitors(selectedAppIds);
+            if (res.success) {
+                setSnackbar({ message: `Successfully deleted ${res.count || count} applications`, type: 'success' });
+                setSelectedAppIds([]);
+                router.refresh();
+            } else {
+                setSnackbar({ message: res.error || 'Failed to delete selected applications', type: 'error' });
+            }
+        } catch (err) {
+            setSnackbar({ message: err.message || 'Error occurred while deleting', type: 'error' });
+        } finally {
+            setIsBatchDeleting(false);
         }
     };
 
@@ -626,10 +743,57 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                         </span>
                     </div>
 
+                    {/* Batch Action Bar */}
+                    {selectedExhibitorIds.length > 0 && (
+                        <div className={styles.batchActionBar}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span className={styles.batchSelectedCount}>
+                                    {selectedExhibitorIds.length} exhibitor{selectedExhibitorIds.length > 1 ? 's' : ''} selected
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedExhibitorIds([])}
+                                    className={styles.batchDeselectBtn}
+                                >
+                                    Deselect all
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleBatchDeleteExhibitors}
+                                disabled={isBatchDeleting}
+                                className={styles.btnDanger}
+                                style={{ backgroundColor: '#ef4444', color: '#ffffff', border: 'none', padding: '0.45rem 0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                {isBatchDeleting ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" /> Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 size={14} /> Delete Selected ({selectedExhibitorIds.length})
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
                     <div className={styles.tableContainer}>
                         <table className={styles.table}>
                             <thead>
                                 <tr>
+                                    <th style={{ width: '40px', textAlign: 'center' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllExhibitorsSelected}
+                                            ref={(el) => {
+                                                if (el) el.indeterminate = isSomeExhibitorsSelected;
+                                            }}
+                                            onChange={toggleSelectAllExhibitors}
+                                            title={isAllExhibitorsSelected ? "Deselect all" : "Select all"}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                        />
+                                    </th>
                                     <th style={{ width: '64px' }}>Logo</th>
                                     <th>Exhibitor Name & Category</th>
                                     <th>Event & Edition</th>
@@ -642,7 +806,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                             <tbody>
                                 {filteredExhibitors.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className={styles.emptyState}>
+                                        <td colSpan="8" className={styles.emptyState}>
                                             <Store size={36} opacity={0.4} />
                                             <span>No exhibitors match your filter.</span>
                                             <button
@@ -656,8 +820,23 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredExhibitors.map((ex) => (
-                                        <tr key={ex.id || ex.slug}>
+                                    filteredExhibitors.map((ex) => {
+                                        const exId = ex.id || ex.dbId || ex.slug;
+                                        const isSelected = selectedExhibitorIds.includes(exId);
+                                        return (
+                                        <tr
+                                            key={exId}
+                                            style={{ backgroundColor: isSelected ? '#eff6ff' : undefined }}
+                                        >
+                                            <td style={{ textAlign: 'center' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => toggleSelectOneExhibitor(exId)}
+                                                    title={`Select ${ex.name}`}
+                                                    style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                                />
+                                            </td>
                                             <td>
                                                 <div className={styles.logoThumb}>
                                                     {ex.logo ? (
@@ -735,8 +914,8 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                )}
+                                    );
+                                }))}
                             </tbody>
                         </table>
                     </div>
@@ -799,10 +978,54 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                         </div>
                     </div>
 
+                    {selectedAppIds.length > 0 && (
+                        <div className={styles.batchActionBar}>
+                            <div className={styles.batchSelectedCount}>
+                                <span><strong>{selectedAppIds.length}</strong> application{selectedAppIds.length > 1 ? 's' : ''} selected</span>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedAppIds([])}
+                                    className={styles.batchDeselectBtn}
+                                >
+                                    Deselect all
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleBatchDeleteApps}
+                                disabled={isBatchDeleting}
+                                className={styles.btnDanger}
+                                style={{ backgroundColor: '#ef4444', color: '#ffffff', border: 'none', padding: '0.45rem 0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            >
+                                {isBatchDeleting ? (
+                                    <>
+                                        <Loader2 size={14} className="animate-spin" /> Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 size={14} /> Delete Selected ({selectedAppIds.length})
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
                     <div className={styles.tableContainer}>
                         <table className={styles.table}>
                             <thead>
                                 <tr>
+                                    <th style={{ width: '40px', textAlign: 'center' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isAllAppsSelected}
+                                            ref={(el) => {
+                                                if (el) el.indeterminate = isSomeAppsSelected;
+                                            }}
+                                            onChange={toggleSelectAllApps}
+                                            title={isAllAppsSelected ? "Deselect all" : "Select all"}
+                                            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                        />
+                                    </th>
                                     <th style={{ width: '64px' }}>Logo</th>
                                     <th>Brand / Company Name</th>
                                     <th>Event & Edition</th>
@@ -814,14 +1037,29 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                             <tbody>
                                 {filteredApplications.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className={styles.emptyState}>
+                                        <td colSpan="7" className={styles.emptyState}>
                                             <FileText size={36} opacity={0.4} />
                                             <span>No applications match your filter.</span>
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredApplications.map((app) => (
-                                        <tr key={app.id || app.slug}>
+                                    filteredApplications.map((app) => {
+                                        const appId = app.id || app.dbId || app.slug;
+                                        const isSelected = selectedAppIds.includes(appId);
+                                        return (
+                                        <tr
+                                            key={appId}
+                                            style={{ backgroundColor: isSelected ? '#eff6ff' : undefined }}
+                                        >
+                                            <td style={{ textAlign: 'center' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => toggleSelectOneApp(appId)}
+                                                    title={`Select ${app.name}`}
+                                                    style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: '#2563eb' }}
+                                                />
+                                            </td>
                                             <td>
                                                 <div className={styles.logoThumb}>
                                                     {app.logo ? (
@@ -922,8 +1160,8 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                                 </div>
                                             </td>
                                         </tr>
-                                    ))
-                                )}
+                                    );
+                                }))}
                             </tbody>
                         </table>
                     </div>
