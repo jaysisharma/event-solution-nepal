@@ -227,46 +227,71 @@ export default function ExhibitorForm({
                     </label>
 
                     <div className={styles.logoPickerSection}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>
-                                Select one of {availableLogos.length} Brand Logos from /public/company:
-                            </span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', width: '100%' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                                    Brand Logo Library ({availableLogos.length} Logos)
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                    Select from /public/company or upload custom files below
+                                </span>
+                            </div>
+
                             {selectedLogo && (
                                 <div style={{
+                                    marginLeft: 'auto',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '0.75rem',
-                                    padding: '0.4rem 0.75rem 0.4rem 0.5rem',
+                                    gap: '1rem',
+                                    padding: '0.6rem 1rem 0.6rem 0.75rem',
                                     background: '#ffffff',
-                                    border: '1.5px solid #10b981',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                                    border: '2px solid #10b981',
+                                    borderRadius: '10px',
+                                    boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05)'
                                 }}>
                                     <div style={{
                                         position: 'relative',
-                                        width: 100,
-                                        height: 56,
-                                        borderRadius: '6px',
+                                        width: 160,
+                                        height: 90,
+                                        borderRadius: '8px',
                                         overflow: 'hidden',
                                         background: '#f8fafc',
                                         border: '1px solid #e2e8f0',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        justifyContent: 'center'
+                                        justifyContent: 'center',
+                                        boxShadow: 'inset 0 0 4px rgba(0,0,0,0.03)'
                                     }}>
                                         <Image
                                             src={selectedLogo}
                                             alt="Selected Logo Preview"
                                             fill
-                                            sizes="100px"
-                                            style={{ objectFit: 'contain', padding: '4px' }}
+                                            sizes="160px"
+                                            style={{ objectFit: 'contain', padding: '6px' }}
                                         />
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{ fontSize: '0.725rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <Check size={13} strokeWidth={3} /> Active Logo
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.06em',
+                                            color: '#059669',
+                                            fontWeight: 800,
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        }}>
+                                            <Check size={14} strokeWidth={3} /> Selected Preview
                                         </span>
-                                        <span style={{ fontSize: '0.75rem', color: '#64748b', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={selectedLogo}>
+                                        <span style={{
+                                            fontSize: '0.775rem',
+                                            color: '#334155',
+                                            fontWeight: 500,
+                                            maxWidth: '190px',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }} title={selectedLogo}>
                                             {selectedLogo.split('/').pop().replace(/%20/g, ' ')}
                                         </span>
                                     </div>
