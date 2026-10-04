@@ -296,9 +296,9 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
             {/* Redesigned Clean Header */}
             <div className={styles.pageHeader}>
                 <div className={styles.titleGroup}>
-                    <h1 className={styles.pageTitle}>Exhibition & Exhibitors Hub</h1>
+                    <h1 className={styles.pageTitle}>Exhibitions & Exhibitors</h1>
                     <p className={styles.pageSubtitle}>
-                        Select an event below to manage its participating brand stalls and annual editions.
+                        Manage exhibition series, annual editions, and participating brand stalls.
                     </p>
                 </div>
                 <div className={styles.headerActions}>
@@ -332,6 +332,39 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                 </div>
             </div>
 
+            {/* Clean Compact Stats Ribbon */}
+            <div className={styles.statsRibbon}>
+                <div className={styles.statItem}>
+                    <Building2 size={15} color="#2563eb" />
+                    <span>Series:</span>
+                    <strong>{events.length}</strong>
+                </div>
+                <span className={styles.statDivider}>•</span>
+                <div className={styles.statItem}>
+                    <Calendar size={15} color="#059669" />
+                    <span>Editions:</span>
+                    <strong>{allEditions.length}</strong>
+                </div>
+                <span className={styles.statDivider}>•</span>
+                <div className={styles.statItem}>
+                    <Store size={15} color="#7c3aed" />
+                    <span>Total Brands:</span>
+                    <strong>{allExhibitors.length}</strong>
+                </div>
+                <span className={styles.statDivider}>•</span>
+                <div className={styles.statItem}>
+                    {pendingCount > 0 ? (
+                        <span style={{ color: '#d97706', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <AlertCircle size={14} /> {pendingCount} Pending Review
+                        </span>
+                    ) : (
+                        <span style={{ color: '#16a34a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <CheckCircle size={14} /> Moderation Clear
+                        </span>
+                    )}
+                </div>
+            </div>
+
             {/* Clean Segmented Tab Navigation (Overview, Directory, Applications) */}
             <div className={styles.tabNav}>
                 <button
@@ -340,7 +373,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                     onClick={() => setActiveTab('overview')}
                 >
                     <Layers size={16} />
-                    <span>Exhibition Events & Editions</span>
+                    <span>Exhibition Series & Editions</span>
                     <span className={styles.tabCount}>{events.length}</span>
                 </button>
 
@@ -373,251 +406,187 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                 </button>
             </div>
 
-            {/* TAB 1: REDESIGNED CLEAN OVERVIEW (Visual Cards per Event Series) */}
+            {/* TAB 1: CLEAN ORGANIZED MASTER TABLE FOR EXHIBITION EVENTS & EDITIONS */}
             {activeTab === 'overview' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {/* Quick Metric Bar */}
-                    <div className={styles.metricsGrid}>
-                        <div className={styles.metricCard}>
-                            <div className={styles.metricHeader}>
-                                <span className={styles.metricLabel}>Exhibition Series</span>
-                                <div className={styles.metricIcon}>
-                                    <Building2 size={18} />
-                                </div>
-                            </div>
-                            <div className={styles.metricValue}>{events.length}</div>
-                            <div className={styles.metricSubtitle}>Active Exhibition Events</div>
-                        </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className={styles.tableContainer}>
+                        <table className={styles.table}>
+                            <thead>
+                                <tr>
+                                    <th style={{ width: '90px' }}>Order</th>
+                                    <th style={{ minWidth: '220px' }}>Exhibition Series</th>
+                                    <th>Annual Editions (Manage Stalls)</th>
+                                    <th style={{ width: '130px' }}>Total Brands</th>
+                                    <th style={{ textAlign: 'right', width: '130px' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {events.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className={styles.emptyState}>
+                                            <Layers size={36} opacity={0.4} />
+                                            <span>No exhibition events created yet.</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditingEvent(null);
+                                                    setIsEventModalOpen(true);
+                                                }}
+                                                className={styles.btnPrimary}
+                                                style={{ marginTop: '0.5rem' }}
+                                            >
+                                                <Plus size={14} /> Create First Event
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    events.map((ev, evIdx) => {
+                                        const eventEditions = ev.editions || [];
+                                        const totalStalls = eventEditions.reduce(
+                                            (acc, cur) => acc + (cur.exhibitors ? cur.exhibitors.length : 0),
+                                            0
+                                        );
 
-                        <div className={styles.metricCard}>
-                            <div className={styles.metricHeader}>
-                                <span className={styles.metricLabel}>Annual Editions</span>
-                                <div className={styles.metricIcon}>
-                                    <Calendar size={18} />
-                                </div>
-                            </div>
-                            <div className={styles.metricValue}>{allEditions.length}</div>
-                            <div className={styles.metricSubtitle}>Recorded Editions</div>
-                        </div>
-
-                        <div className={styles.metricCard}>
-                            <div className={styles.metricHeader}>
-                                <span className={styles.metricLabel}>Total Brand Stalls</span>
-                                <div className={styles.metricIcon}>
-                                    <Users size={18} />
-                                </div>
-                            </div>
-                            <div className={styles.metricValue}>
-                                {allExhibitors.length}
-                                {pendingCount > 0 && (
-                                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d97706', marginLeft: '6px' }}>
-                                        ({pendingCount} review)
-                                    </span>
-                                )}
-                            </div>
-                            <div className={styles.metricSubtitle}>Participating Exhibitors</div>
-                        </div>
-                    </div>
-
-                    {/* Event Series Cards Grid */}
-                    <div className={styles.eventsHubGrid}>
-                        {events.map((ev, evIdx) => {
-                            const eventEditions = ev.editions || [];
-                            const totalStalls = eventEditions.reduce(
-                                (acc, cur) => acc + (cur.exhibitors ? cur.exhibitors.length : 0),
-                                0
-                            );
-
-                            return (
-                                <div key={ev.id} className={styles.eventHubCard}>
-                                    <div>
-                                        {/* Event Header */}
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                                            <div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                                    <span style={{
-                                                        fontSize: '0.7rem',
-                                                        fontWeight: 800,
-                                                        fontFamily: 'monospace',
-                                                        backgroundColor: '#eff6ff',
-                                                        color: '#2563eb',
-                                                        padding: '2px 6px',
-                                                        borderRadius: '4px',
-                                                        border: '1px solid #bfdbfe'
-                                                    }}>
-                                                        #{ev.chronicleNumber || '01'}
-                                                    </span>
-                                                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, color: '#0f172a' }}>
-                                                        {ev.title}
-                                                    </h3>
-                                                </div>
-                                                <span style={{ fontSize: '0.775rem', color: '#64748b' }}>
-                                                    {eventEditions.length} edition{eventEditions.length !== 1 ? 's' : ''} • {totalStalls} registered exhibitor{totalStalls !== 1 ? 's' : ''}
-                                                </span>
-                                            </div>
-
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                <button
-                                                    type="button"
-                                                    title="Move Earlier in Order (#01, #02...)"
-                                                    disabled={evIdx === 0 || isReordering}
-                                                    onClick={() => handleMoveEvent(ev.id, 'up')}
-                                                    className={styles.btnIcon}
-                                                    style={{
-                                                        width: '28px',
-                                                        height: '28px',
-                                                        opacity: evIdx === 0 ? 0.35 : 1,
-                                                        cursor: evIdx === 0 ? 'not-allowed' : 'pointer'
-                                                    }}
-                                                >
-                                                    <ChevronUp size={14} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Move Later in Order"
-                                                    disabled={evIdx === events.length - 1 || isReordering}
-                                                    onClick={() => handleMoveEvent(ev.id, 'down')}
-                                                    className={styles.btnIcon}
-                                                    style={{
-                                                        width: '28px',
-                                                        height: '28px',
-                                                        opacity: evIdx === events.length - 1 ? 0.35 : 1,
-                                                        cursor: evIdx === events.length - 1 ? 'not-allowed' : 'pointer'
-                                                    }}
-                                                >
-                                                    <ChevronDown size={14} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Edit Event Title/Image/Order"
-                                                    onClick={() => {
-                                                        setEditingEvent(ev);
-                                                        setIsEventModalOpen(true);
-                                                    }}
-                                                    className={styles.btnIcon}
-                                                    style={{ width: '28px', height: '28px' }}
-                                                >
-                                                    <Pencil size={12} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    title="Delete Event Series"
-                                                    onClick={() => handleDeleteEvent(ev.id, ev.title)}
-                                                    className={`${styles.btnIcon} ${styles.btnIconDanger}`}
-                                                    style={{ width: '28px', height: '28px' }}
-                                                >
-                                                    <Trash2 size={12} />
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {ev.description && (
-                                            <p style={{
-                                                fontSize: '0.8rem',
-                                                color: '#64748b',
-                                                lineHeight: 1.45,
-                                                marginBottom: '1rem',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
-                                                overflow: 'hidden'
-                                            }}>
-                                                {ev.description}
-                                            </p>
-                                        )}
-
-                                        {/* Available Editions Section */}
-                                        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                                            <span style={{ fontSize: '0.725rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#94a3b8' }}>
-                                                Annual Editions:
-                                            </span>
-
-                                            {eventEditions.length === 0 ? (
-                                                <div style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic', padding: '0.4rem 0' }}>
-                                                    No editions yet.
-                                                </div>
-                                            ) : (
-                                                eventEditions.map((ed) => {
-                                                    const count = ed.exhibitors ? ed.exhibitors.length : 0;
-                                                    return (
-                                                        <Link
-                                                            key={ed.id}
-                                                            href={`/admin/exhibitors/${ev.slug}/${ed.year}`}
-                                                            className={styles.editionPill}
-                                                            title={`Manage exhibitors for Year ${ed.year}`}
+                                        return (
+                                            <tr key={ev.id}>
+                                                <td>
+                                                    <div className={styles.orderControlCell}>
+                                                        <span className={styles.chronicleBadge}>
+                                                            #{ev.chronicleNumber || '01'}
+                                                        </span>
+                                                        <div className={styles.orderButtons}>
+                                                            <button
+                                                                type="button"
+                                                                title="Move Earlier in Order (#01, #02...)"
+                                                                disabled={evIdx === 0 || isReordering}
+                                                                onClick={() => handleMoveEvent(ev.id, 'up')}
+                                                                className={styles.orderBtn}
+                                                            >
+                                                                <ChevronUp size={11} />
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                title="Move Later in Order"
+                                                                disabled={evIdx === events.length - 1 || isReordering}
+                                                                onClick={() => handleMoveEvent(ev.id, 'down')}
+                                                                className={styles.orderBtn}
+                                                            >
+                                                                <ChevronDown size={11} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                            <strong style={{ fontSize: '0.95rem', color: '#0f172a' }}>
+                                                                {ev.title}
+                                                            </strong>
+                                                            <span style={{ fontSize: '0.72rem', color: '#64748b', backgroundColor: '#f1f5f9', padding: '1px 6px', borderRadius: '4px' }}>
+                                                                /{ev.slug}
+                                                            </span>
+                                                        </div>
+                                                        {ev.description && (
+                                                            <span style={{
+                                                                fontSize: '0.78rem',
+                                                                color: '#64748b',
+                                                                maxWidth: '460px',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap'
+                                                            }}>
+                                                                {ev.description}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.editionChipsWrap}>
+                                                        {eventEditions.length === 0 ? (
+                                                            <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                                                                No editions yet
+                                                            </span>
+                                                        ) : (
+                                                            eventEditions.map((ed) => {
+                                                                const count = ed.exhibitors ? ed.exhibitors.length : 0;
+                                                                return (
+                                                                    <Link
+                                                                        key={ed.id}
+                                                                        href={`/admin/exhibitors/${ev.slug}/${ed.year}`}
+                                                                        className={styles.editionChip}
+                                                                        title={`Manage exhibitors for ${ev.title} — ${ed.year}`}
+                                                                    >
+                                                                        <Calendar size={13} color="#2563eb" />
+                                                                        <span>Edition {ed.year}</span>
+                                                                        <span className={styles.editionChipCount}>
+                                                                            {count} Brands
+                                                                        </span>
+                                                                        <ArrowRight size={11} color="#94a3b8" />
+                                                                    </Link>
+                                                                );
+                                                            })
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setEditingEdition(null);
+                                                                setTargetEventIdForEdition(ev.id);
+                                                                setIsEditionModalOpen(true);
+                                                            }}
+                                                            className={styles.addEditionBtnSmall}
+                                                            title={`Add new annual edition for ${ev.title}`}
                                                         >
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                <Calendar size={14} color="#2563eb" />
-                                                                <strong style={{ fontSize: '0.875rem' }}>Edition {ed.year}</strong>
-                                                                {ed.venue && (
-                                                                    <span style={{ fontSize: '0.75rem', color: '#64748b', maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                                        • {ed.venue}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                <span style={{
-                                                                    fontSize: '0.75rem',
-                                                                    fontWeight: 700,
-                                                                    color: '#15803d',
-                                                                    backgroundColor: '#dcfce7',
-                                                                    padding: '2px 7px',
-                                                                    borderRadius: '999px'
-                                                                }}>
-                                                                    {count} Brand{count !== 1 ? 's' : ''}
-                                                                </span>
-                                                                <ChevronRight size={14} color="#94a3b8" />
-                                                            </div>
+                                                            <Plus size={12} /> Add Edition
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                        <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0f172a' }}>
+                                                            {totalStalls}
+                                                        </span>
+                                                        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                                                            {totalStalls === 1 ? 'brand stall' : 'brand stalls'}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className={styles.actionsCell}>
+                                                        <button
+                                                            type="button"
+                                                            title="Edit Event Title / Chronicle Index"
+                                                            onClick={() => {
+                                                                setEditingEvent(ev);
+                                                                setIsEventModalOpen(true);
+                                                            }}
+                                                            className={styles.btnIcon}
+                                                        >
+                                                            <Pencil size={13} />
+                                                        </button>
+                                                        <Link
+                                                            href={`/exhibitors/${ev.slug}`}
+                                                            target="_blank"
+                                                            title="View Public Event Page"
+                                                            className={styles.btnIcon}
+                                                        >
+                                                            <ExternalLink size={13} />
                                                         </Link>
-                                                    );
-                                                })
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Card Footer Actions */}
-                                    <div style={{
-                                        marginTop: '1.25rem',
-                                        paddingTop: '0.75rem',
-                                        borderTop: '1px solid #f1f5f9',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        gap: '0.5rem'
-                                    }}>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setEditingEdition(null);
-                                                setTargetEventIdForEdition(ev.id);
-                                                setIsEditionModalOpen(true);
-                                            }}
-                                            className={styles.btnSecondary}
-                                            style={{ padding: '0.35rem 0.65rem', fontSize: '0.775rem' }}
-                                        >
-                                            <Plus size={13} /> Add Year Edition
-                                        </button>
-
-                                        <Link
-                                            href={`/exhibitors/${ev.slug}`}
-                                            target="_blank"
-                                            style={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '4px',
-                                                fontSize: '0.775rem',
-                                                color: '#2563eb',
-                                                fontWeight: 600,
-                                                textDecoration: 'none'
-                                            }}
-                                        >
-                                            <span>Public Page</span>
-                                            <ExternalLink size={12} />
-                                        </Link>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                                        <button
+                                                            type="button"
+                                                            title="Delete Event Series"
+                                                            onClick={() => handleDeleteEvent(ev.id, ev.title)}
+                                                            className={`${styles.btnIcon} ${styles.btnIconDanger}`}
+                                                        >
+                                                            <Trash2 size={13} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             )}
@@ -652,14 +621,9 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                             </select>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() => setIsSelectEditionModalOpen(true)}
-                            className={styles.btnPrimary}
-                            style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}
-                        >
-                            <Plus size={15} /> Add Exhibitor
-                        </button>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+                            Showing <strong style={{ color: '#0f172a' }}>{filteredExhibitors.length}</strong> of {allExhibitors.length} exhibitors
+                        </span>
                     </div>
 
                     <div className={styles.tableContainer}>
@@ -820,14 +784,19 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                             </select>
                         </div>
 
-                        <Link
-                            href="/exhibitors/apply"
-                            target="_blank"
-                            className={styles.btnSecondary}
-                            style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}
-                        >
-                            <ExternalLink size={14} /> Open Public Form
-                        </Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>
+                                Showing <strong style={{ color: '#0f172a' }}>{filteredApplications.length}</strong> of {allExhibitors.length}
+                            </span>
+                            <Link
+                                href="/exhibitors/apply"
+                                target="_blank"
+                                className={styles.btnSecondary}
+                                style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem' }}
+                            >
+                                <ExternalLink size={14} /> Open Public Form
+                            </Link>
+                        </div>
                     </div>
 
                     <div className={styles.tableContainer}>

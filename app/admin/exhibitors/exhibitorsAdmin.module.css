@@ -850,6 +850,203 @@
     gap: 0.75rem;
 }
 
+/* Clean Stat Ribbon */
+.statsRibbon {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.75rem 1.25rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    flex-wrap: wrap;
+}
+
+:global(.dark) .statsRibbon {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+.statItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 500;
+}
+
+.statItem strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+:global(.dark) .statItem strong {
+    color: #f8fafc;
+}
+
+.statDivider {
+    color: #cbd5e1;
+}
+
+:global(.dark) .statDivider {
+    color: #475569;
+}
+
+/* Master Event Series Table & Order Controller */
+.orderControlCell {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chronicleBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    font-family: monospace;
+    background-color: #eff6ff;
+    color: #2563eb;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid #bfdbfe;
+    min-width: 34px;
+}
+
+:global(.dark) .chronicleBadge {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+    border-color: #1d4ed8;
+}
+
+.orderButtons {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.orderBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+:global(.dark) .orderBtn {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+.orderBtn:hover:not(:disabled) {
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+:global(.dark) .orderBtn:hover:not(:disabled) {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+}
+
+.orderBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Editions Chip List */
+.editionChipsWrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.editionChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e293b;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+:global(.dark) .editionChip {
+    background: #0f172a;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+.editionChip:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+    transform: translateY(-1px);
+}
+
+.editionChipCount {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #166534;
+    background: #dcfce7;
+    padding: 1px 6px;
+    border-radius: 999px;
+}
+
+:global(.dark) .editionChipCount {
+    background: #064e3b;
+    color: #86efac;
+}
+
+.addEditionBtnSmall {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    background: transparent;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+:global(.dark) .addEditionBtnSmall {
+    color: #94a3b8;
+    border-color: #475569;
+}
+
+.addEditionBtnSmall:hover {
+    color: #2563eb;
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+:global(.dark) .addEditionBtnSmall:hover {
+    color: #93c5fd;
+    border-color: #3b82f6;
+    background: #1e3a8a;
+}
+
 /* Redesigned Hub Cards & Layout */
 .eventsHubGrid {
     display: grid;
