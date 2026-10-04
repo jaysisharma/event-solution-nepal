@@ -86,10 +86,10 @@ const Footer = () => {
                             <div className={styles.column}>
                                 <h3 className={styles.heading}>Services</h3>
                                 <ul className={styles.list}>
-                                    <li><Link href="/services" className={styles.link}>Wedding Planning</Link></li>
-                                    <li><Link href="/services" className={styles.link}>Corporate Events</Link></li>
-                                    <li><Link href="/services" className={styles.link}>Concerts</Link></li>
-                                    <li><Link href="/services" className={styles.link}>Decoration</Link></li>
+                                    <li><Link href="/services" className={styles.link}>Expo Management</Link></li>
+                                    <li><Link href="/services" className={styles.link}>Conference Management</Link></li>
+                                    <li><Link href="/services" className={styles.link}>Product Launching Management</Link></li>
+                                    <li><Link href="/services" className={styles.link}>Wedding Management</Link></li>
                                 </ul>
                             </div>
 
