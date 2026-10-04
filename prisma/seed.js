@@ -138,7 +138,7 @@ async function main() {
                             await prisma.exhibitor.create({
                                 data: {
                                     editionId: edition.id,
-                                    slug: ex.slug || `stock-exhibitor-${i + 1}`,
+                                    slug: ex.slug || `stock-exhibitor-2025-${i + 1}`,
                                     name: ex.name,
                                     logo: ex.logo || '',
                                     contactPerson: ex.contactPerson || '',
@@ -159,6 +159,39 @@ async function main() {
                             });
                         }
                         console.log(`✅ Seeded ${edData.exhibitors.length} exhibitors for Stock Clearance Year ${edition.year}.`);
+                    } else if (edData.year === '2026' && Array.isArray(edData.exhibitors)) {
+                        const existingCount = await prisma.exhibitor.count({
+                            where: { editionId: edition.id }
+                        });
+                        if (existingCount === 0) {
+                            console.log(`⏳ Seeding ${edData.exhibitors.length} exhibitors for Stock Clearance Year 2026...`);
+                            for (let i = 0; i < edData.exhibitors.length; i++) {
+                                const ex = edData.exhibitors[i];
+                                await prisma.exhibitor.create({
+                                    data: {
+                                        editionId: edition.id,
+                                        slug: ex.slug || `stock-exhibitor-2026-${i + 1}`,
+                                        name: ex.name,
+                                        logo: ex.logo || '',
+                                        contactPerson: ex.contactPerson || '',
+                                        contact: ex.contact || '',
+                                        email: ex.email || '',
+                                        website: ex.website || '',
+                                        booth: ex.booth || '',
+                                        category: ex.category || 'Festive & Consumer Trade',
+                                        tagline: ex.tagline || `${ex.name} at Stock Clearance 2026`,
+                                        description: ex.description || `Participating exhibitor at Stock Clearance 2026. ${ex.booth}.`,
+                                        photos: typeof ex.photos === 'string' ? ex.photos : JSON.stringify(ex.photos || []),
+                                        videoUrl: ex.videoUrl || '',
+                                        videoPoster: ex.videoPoster || '',
+                                        videoTitle: ex.videoTitle || '',
+                                        order: ex.order ?? i,
+                                        status: ex.status || 'APPROVED'
+                                    }
+                                });
+                            }
+                            console.log(`✅ Seeded ${edData.exhibitors.length} exhibitors for Stock Clearance Year 2026.`);
+                        }
                     }
                 }
             }
