@@ -42,34 +42,66 @@ async function main() {
         console.log('ℹ️ Site settings already exist.');
     }
 
-    // Seed Dashain Fest & Exhibitors from JSON if not exists
+    // Clean up earlier duplicate 'dashain-fest' event if present
+    try {
+        const duplicateDashain = await prisma.exhibitorEvent.findUnique({
+            where: { slug: 'dashain-fest' }
+        });
+        if (duplicateDashain) {
+            const editions = await prisma.exhibitorEdition.findMany({
+                where: { eventId: duplicateDashain.id }
+            });
+            for (const ed of editions) {
+                await prisma.exhibitor.deleteMany({
+                    where: { editionId: ed.id }
+                });
+            }
+            await prisma.exhibitorEdition.deleteMany({
+                where: { eventId: duplicateDashain.id }
+            });
+            await prisma.exhibitorEvent.delete({
+                where: { id: duplicateDashain.id }
+            });
+            console.log('🧹 Cleaned up earlier duplicate dashain-fest event from database.');
+        }
+    } catch (cleanErr) {
+        console.warn('⚠️ Warning cleaning duplicate dashain-fest:', cleanErr.message);
+    }
+
+    // Seed Stock Clearance 2025 Exhibitors from JSON
     const fs = require('fs');
     const path = require('path');
-    const dataFilePath = path.join(__dirname, 'dashain_fest_data.json');
+    const stockDataFilePath = path.join(__dirname, 'stock_clearance_data.json');
 
-    if (fs.existsSync(dataFilePath)) {
+    if (fs.existsSync(stockDataFilePath)) {
         try {
-            const dashainData = JSON.parse(fs.readFileSync(dataFilePath, 'utf8'));
-            if (dashainData && dashainData.slug) {
-                let event = await prisma.exhibitorEvent.findUnique({
-                    where: { slug: dashainData.slug }
+            const stockData = JSON.parse(fs.readFileSync(stockDataFilePath, 'utf8'));
+            if (stockData && stockData.slug) {
+                let event = await prisma.exhibitorEvent.findFirst({
+                    where: {
+                        OR: [
+                            { slug: stockData.slug },
+                            { slug: 'stock-clearance' },
+                            { title: { contains: 'Stock Clearance', mode: 'insensitive' } }
+                        ]
+                    }
                 });
 
                 if (!event) {
                     event = await prisma.exhibitorEvent.create({
                         data: {
-                            slug: dashainData.slug,
-                            title: dashainData.title,
-                            chronicleNumber: dashainData.chronicleNumber || '05',
-                            description: dashainData.description || '',
-                            previewImage: dashainData.previewImage || '',
-                            order: dashainData.order ?? 5,
+                            slug: stockData.slug || 'stock-clearance',
+                            title: stockData.title || 'Stock Clearance',
+                            chronicleNumber: stockData.chronicleNumber || '04',
+                            description: stockData.description || '',
+                            previewImage: stockData.previewImage || '',
+                            order: stockData.order ?? 3,
                         }
                     });
                     console.log(`✅ Seeded ExhibitorEvent: ${event.title}`);
                 }
 
-                for (const edData of (dashainData.editions || [])) {
+                for (const edData of (stockData.editions || [])) {
                     let edition = await prisma.exhibitorEdition.findFirst({
                         where: {
                             eventId: event.id,
@@ -82,40 +114,42 @@ async function main() {
                             data: {
                                 eventId: event.id,
                                 year: edData.year,
-                                title: edData.title,
-                                dates: edData.dates,
-                                venue: edData.venue,
-                                attendees: edData.attendees || '100K+',
+                                title: edData.title || `Edition ${edData.year}`,
+                                dates: edData.dates || '',
+                                venue: edData.venue || '',
+                                attendees: edData.attendees || '120K+',
                                 previewImage: edData.previewImage || '',
-                                order: edData.order ?? 0,
+                                order: edData.order ?? 2,
                             }
                         });
                         console.log(`✅ Seeded ExhibitorEdition: Year ${edition.year}`);
                     }
 
-                    const existingCount = await prisma.exhibitor.count({
-                        where: { editionId: edition.id }
-                    });
+                    if (edData.year === '2025' && Array.isArray(edData.exhibitors)) {
+                        // User request: remove earlier exhibitors of 2025 and seed the new list
+                        const deletedCount = await prisma.exhibitor.deleteMany({
+                            where: { editionId: edition.id }
+                        });
+                        console.log(`🗑️ Removed ${deletedCount.count} earlier 2025 exhibitors from Stock Clearance.`);
 
-                    if (existingCount === 0 && Array.isArray(edData.exhibitors)) {
-                        console.log(`⏳ Seeding ${edData.exhibitors.length} exhibitors for Year ${edition.year}...`);
+                        console.log(`⏳ Seeding ${edData.exhibitors.length} fresh exhibitors for Stock Clearance Year ${edition.year}...`);
                         for (let i = 0; i < edData.exhibitors.length; i++) {
                             const ex = edData.exhibitors[i];
                             await prisma.exhibitor.create({
                                 data: {
                                     editionId: edition.id,
-                                    slug: ex.slug || `exhibitor-${i + 1}`,
+                                    slug: ex.slug || `stock-exhibitor-${i + 1}`,
                                     name: ex.name,
-                                    logo: ex.logo,
+                                    logo: ex.logo || '',
                                     contactPerson: ex.contactPerson || '',
                                     contact: ex.contact || '',
                                     email: ex.email || '',
                                     website: ex.website || '',
                                     booth: ex.booth || '',
-                                    category: ex.category || 'Exhibition Showcase',
-                                    tagline: ex.tagline || '',
-                                    description: ex.description || '',
-                                    photos: ex.photos || '[]',
+                                    category: ex.category || 'Festive & Consumer Trade',
+                                    tagline: ex.tagline || `${ex.name} at Stock Clearance 2025`,
+                                    description: ex.description || `Participating exhibitor at Stock Clearance 2025. ${ex.booth}.`,
+                                    photos: typeof ex.photos === 'string' ? ex.photos : JSON.stringify(ex.photos || []),
                                     videoUrl: ex.videoUrl || '',
                                     videoPoster: ex.videoPoster || '',
                                     videoTitle: ex.videoTitle || '',
@@ -124,7 +158,7 @@ async function main() {
                                 }
                             });
                         }
-                        console.log(`✅ Seeded ${edData.exhibitors.length} exhibitors for Year ${edition.year}.`);
+                        console.log(`✅ Seeded ${edData.exhibitors.length} exhibitors for Stock Clearance Year ${edition.year}.`);
                     }
                 }
             }
