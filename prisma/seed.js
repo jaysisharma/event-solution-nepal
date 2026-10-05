@@ -73,7 +73,6 @@ async function main() {
         const updatedLogos = await prisma.exhibitor.updateMany({
             where: {
                 OR: [
-                    { logo: { contains: 'Screenshot' } },
                     { logo: '' },
                     { logo: null }
                 ]

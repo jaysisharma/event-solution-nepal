@@ -599,7 +599,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                                     <td>
                                         <div className={styles.logoThumb}>
                                             <Image
-                                                src={(company.logo && !company.logo.includes('Screenshot')) ? company.logo : '/placeholder-logo.svg'}
+                                                src={company.logo || '/placeholder-logo.svg'}
                                                 alt={company.name}
                                                 fill
                                                 sizes="52px"

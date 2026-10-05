@@ -37,9 +37,7 @@ export default function ExhibitorForm({
     const defaultPlaceholder = '/placeholder-logo.svg';
     const [availableLogos, setAvailableLogos] = useState([defaultPlaceholder]);
     const [selectedLogo, setSelectedLogo] = useState(
-        (initialData?.logo && !initialData?.logo.includes('Screenshot')) 
-            ? initialData.logo 
-            : defaultPlaceholder
+        initialData?.logo || defaultPlaceholder
     );
     const [errorMsg, setErrorMsg] = useState('');
     const [uploadingLogos, setUploadingLogos] = useState(false);
@@ -53,8 +51,7 @@ export default function ExhibitorForm({
             try {
                 const res = await getCompanyLogos();
                 if (res?.success && Array.isArray(res.logos) && isMounted) {
-                    const customLogos = res.logos.filter(l => !l.includes('Screenshot'));
-                    const combined = Array.from(new Set([defaultPlaceholder, ...customLogos]));
+                    const combined = Array.from(new Set([defaultPlaceholder, ...res.logos]));
                     setAvailableLogos(combined);
                 }
             } catch (e) {
@@ -79,10 +76,27 @@ export default function ExhibitorForm({
                 formData.append('logoFiles', files[i]);
             }
 
-            const res = await uploadCompanyLogos(formData);
+            let res = null;
+            try {
+                const apiRes = await fetch('/api/admin/exhibitors/upload-logos', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (apiRes.ok) {
+                    res = await apiRes.json();
+                }
+            } catch (apiErr) {
+                console.warn("Direct API upload failed, trying server action fallback:", apiErr);
+            }
+
+            if (!res || !res.success) {
+                res = await uploadCompanyLogos(formData);
+            }
+
             if (res.success && res.uploadedUrls?.length > 0) {
+                const allFromRes = Array.isArray(res.allLogos) ? res.allLogos : [];
                 // Update available logos list with newly uploaded logos at the front
-                const updatedList = Array.from(new Set([...res.uploadedUrls, ...availableLogos]));
+                const updatedList = Array.from(new Set([...res.uploadedUrls, ...allFromRes, ...availableLogos]));
                 setAvailableLogos(updatedList);
                 // Automatically select the first newly uploaded logo
                 setSelectedLogo(res.uploadedUrls[0]);

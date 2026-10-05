@@ -14,16 +14,43 @@ import path from 'path';
 export async function getCompanyLogos() {
     try {
         const companyDir = path.join(process.cwd(), 'public', 'company');
-        const files = await fs.readdir(companyDir);
+        let files = [];
+        try {
+            files = await fs.readdir(companyDir);
+        } catch (dirErr) {
+            console.warn("Could not read companyDir, creating it:", dirErr.message);
+            await fs.mkdir(companyDir, { recursive: true });
+        }
         const validExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
         const logos = files
-            .filter(file => validExtensions.includes(path.extname(file).toLowerCase()) && !file.startsWith('.') && !file.includes('Screenshot'))
+            .filter(file => validExtensions.includes(path.extname(file).toLowerCase()) && !file.startsWith('.') && !file.includes('placeholder'))
             .map(file => `/company/${encodeURIComponent(file)}`);
-        const resultLogos = ['/placeholder-logo.svg', ...logos.filter(l => !l.includes('placeholder'))];
+
+        // Also fetch any distinct non-placeholder logos assigned to exhibitors in database
+        let dbLogos = [];
+        try {
+            const exhibitors = await prisma.exhibitor.findMany({
+                where: { logo: { not: null } },
+                select: { logo: true },
+                distinct: ['logo']
+            });
+            dbLogos = exhibitors
+                .map(e => e.logo)
+                .filter(l => l && !l.includes('placeholder') && (l.startsWith('/company') || l.startsWith('/uploads') || l.startsWith('http')));
+        } catch (dbErr) {
+            // DB might be offline or empty
+        }
+
+        const resultLogos = Array.from(new Set([
+            '/placeholder-logo.svg',
+            ...logos,
+            ...dbLogos
+        ]));
+
         return { success: true, logos: resultLogos };
     } catch (error) {
         console.error("Error reading company logos:", error);
-        return { success: false, logos: [] };
+        return { success: false, logos: ['/placeholder-logo.svg'] };
     }
 }
 
@@ -47,8 +74,8 @@ export async function uploadCompanyLogos(formData) {
             const ext = path.extname(originalName).toLowerCase();
             if (!allowedExtensions.includes(ext)) continue;
 
-            const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
-            const uniqueFilename = `${baseName}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}${ext}`;
+            const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+            const uniqueFilename = `${baseName || 'logo'}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}${ext}`;
             const targetPath = path.join(companyDir, uniqueFilename);
 
             const bytes = await file.arrayBuffer();
@@ -446,7 +473,7 @@ export async function createExhibitor(formData) {
             if (uploadedPath) logo = uploadedPath;
         }
 
-        if (!logo || logo.includes('Screenshot')) {
+        if (!logo) {
             logo = '/placeholder-logo.svg';
         }
 
@@ -776,7 +803,7 @@ export async function bulkCreateExhibitors({ editionId, eventSlug, year, exhibit
             const tagline = typeof raw === 'object' && raw.tagline ? String(raw.tagline).trim() : `${name} at Exhibition ${resolvedYear || ''}`.trim();
             const description = typeof raw === 'object' && raw.description ? String(raw.description).trim() : (booth ? `Exhibiting at Stall ${booth}.` : `Participating exhibitor at ${resolvedYear || 'this edition'}.`);
 
-            const assignedLogo = (typeof raw === 'object' && raw.logo && !raw.logo.includes('Screenshot')) ? raw.logo : '/placeholder-logo.svg';
+            const assignedLogo = (typeof raw === 'object' && raw.logo) ? raw.logo : '/placeholder-logo.svg';
 
             recordsToCreate.push({
                 editionId: resolvedEditionId,
@@ -923,7 +950,7 @@ export async function submitPublicExhibitorApplication(formData) {
             if (uploadedPath) logo = uploadedPath;
         }
 
-        if (!logo || logo.includes('Screenshot')) {
+        if (!logo) {
             logo = '/placeholder-logo.svg';
         }
 

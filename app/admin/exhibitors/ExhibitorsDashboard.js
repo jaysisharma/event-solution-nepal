@@ -853,7 +853,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                             <td>
                                                 <div className={styles.logoThumb}>
                                                     <Image
-                                                        src={(ex.logo && !ex.logo.includes('Screenshot')) ? ex.logo : '/placeholder-logo.svg'}
+                                                        src={ex.logo || '/placeholder-logo.svg'}
                                                         alt={ex.name}
                                                         fill
                                                         sizes="52px"
@@ -1072,7 +1072,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                             <td>
                                                 <div className={styles.logoThumb}>
                                                     <Image
-                                                        src={(app.logo && !app.logo.includes('Screenshot')) ? app.logo : '/placeholder-logo.svg'}
+                                                        src={app.logo || '/placeholder-logo.svg'}
                                                         alt={app.name}
                                                         fill
                                                         sizes="52px"
