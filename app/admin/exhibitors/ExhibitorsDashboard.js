@@ -31,11 +31,13 @@ import {
     Globe,
     ChevronUp,
     ChevronDown,
-    Loader2
+    Loader2,
+    Upload
 } from 'lucide-react';
 import EventModal from './EventModal';
 import EditionModal from './EditionModal';
 import SelectEditionModal from './SelectEditionModal';
+import BulkUploadExhibitorsModal from './BulkUploadExhibitorsModal';
 import {
     deleteEvent,
     deleteEdition,
@@ -86,6 +88,7 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
 
     // Select Edition Modal State (For Add Exhibitor flow)
     const [isSelectEditionModalOpen, setIsSelectEditionModalOpen] = useState(false);
+    const [isBulkUploadModalOpen, setIsBulkUploadModalOpen] = useState(false);
 
     // Search and Filters
     const [exhibitorSearch, setExhibitorSearch] = useState('');
@@ -436,6 +439,16 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                         className={styles.btnPrimary}
                     >
                         <Plus size={15} /> Add Exhibitor
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsBulkUploadModalOpen(true)}
+                        className={styles.btnSecondary}
+                        title="Upload multiple exhibitors using comma-separated text or Excel file"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    >
+                        <Upload size={14} color="#2563eb" /> Bulk Upload
                     </button>
 
                     <Link
@@ -1199,6 +1212,16 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                     setEditingEdition(null);
                     setTargetEventIdForEdition(evtId);
                     setIsEditionModalOpen(true);
+                }}
+            />
+
+            <BulkUploadExhibitorsModal
+                isOpen={isBulkUploadModalOpen}
+                onClose={() => setIsBulkUploadModalOpen(false)}
+                events={events}
+                onSuccess={(res) => {
+                    handleSuccessToast(`Successfully uploaded ${res.count} exhibitors!`);
+                    router.refresh();
                 }}
             />
         </div>

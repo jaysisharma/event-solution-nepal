@@ -679,6 +679,165 @@ export async function deleteMultipleExhibitors(ids, eventSlug, year) {
     }
 }
 
+export async function bulkCreateExhibitors({ editionId, eventSlug, year, exhibitors = [], defaultCategory = 'Exhibition Showcase' }) {
+    try {
+        if (!Array.isArray(exhibitors) || exhibitors.length === 0) {
+            return { success: false, error: 'No exhibitors provided to upload' };
+        }
+
+        let resolvedEditionId = parseInt(editionId);
+        let resolvedEventSlug = eventSlug;
+        let resolvedYear = year;
+
+        // If editionId is missing, resolve from eventSlug and year
+        if (!resolvedEditionId && eventSlug && year) {
+            const ev = await prisma.exhibitorEvent.findFirst({
+                where: {
+                    OR: [
+                        { slug: eventSlug },
+                        { slug: eventSlug.toLowerCase() }
+                    ]
+                },
+                include: { editions: true }
+            });
+            const ed = ev?.editions.find((e) => e.year === String(year));
+            if (ed) {
+                resolvedEditionId = ed.id;
+                resolvedEventSlug = ev.slug;
+                resolvedYear = ed.year;
+            }
+        }
+
+        // If editionId is provided, get eventSlug and year if not provided
+        if (resolvedEditionId && (!resolvedEventSlug || !resolvedYear)) {
+            const ed = await prisma.exhibitorEdition.findUnique({
+                where: { id: resolvedEditionId },
+                include: { event: true }
+            });
+            if (ed) {
+                resolvedEventSlug = ed.event?.slug || resolvedEventSlug;
+                resolvedYear = ed.year || resolvedYear;
+            }
+        }
+
+        if (!resolvedEditionId) {
+            return { success: false, error: 'Target exhibition edition could not be identified' };
+        }
+
+        // Fetch existing slugs & max order in this edition
+        const existingExhibitors = await prisma.exhibitor.findMany({
+            where: { editionId: resolvedEditionId },
+            select: { slug: true, order: true }
+        });
+
+        const existingSlugs = new Set(existingExhibitors.map(e => e.slug));
+        const maxOrder = existingExhibitors.reduce((max, e) => (e.order > max ? e.order : max), -1);
+
+        // Fetch available logos to assign dynamically
+        let availableLogos = [];
+        try {
+            const logoRes = await getCompanyLogos();
+            if (logoRes.success && logoRes.logos.length > 0) {
+                availableLogos = logoRes.logos;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        // Helper slugify
+        const slugify = (text) => {
+            if (!text) return 'exhibitor';
+            return text
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '') || 'exhibitor';
+        };
+
+        const recordsToCreate = [];
+        let orderTracker = maxOrder + 1;
+
+        for (let i = 0; i < exhibitors.length; i++) {
+            const raw = exhibitors[i];
+            const name = (typeof raw === 'string' ? raw : raw?.name || '').trim();
+            if (!name) continue;
+
+            // Generate unique slug
+            let baseSlug = slugify(name);
+            let candidateSlug = baseSlug;
+            let counter = 1;
+            while (existingSlugs.has(candidateSlug)) {
+                candidateSlug = `${baseSlug}-${counter}`;
+                counter++;
+            }
+            existingSlugs.add(candidateSlug);
+
+            const booth = typeof raw === 'object' && raw.booth ? String(raw.booth).trim() : '';
+            const contactPerson = typeof raw === 'object' && raw.contactPerson ? String(raw.contactPerson).trim() : '';
+            const contact = typeof raw === 'object' && raw.contact ? String(raw.contact).trim() : '';
+            const email = typeof raw === 'object' && raw.email ? String(raw.email).trim() : '';
+            const website = typeof raw === 'object' && raw.website ? String(raw.website).trim() : '';
+            const category = typeof raw === 'object' && raw.category ? String(raw.category).trim() : (defaultCategory || 'Exhibition Showcase');
+            const tagline = typeof raw === 'object' && raw.tagline ? String(raw.tagline).trim() : `${name} at Exhibition ${resolvedYear || ''}`.trim();
+            const description = typeof raw === 'object' && raw.description ? String(raw.description).trim() : (booth ? `Exhibiting at Stall ${booth}.` : `Participating exhibitor at ${resolvedYear || 'this edition'}.`);
+
+            const assignedLogo = (typeof raw === 'object' && raw.logo) ? raw.logo : (availableLogos.length > 0 ? availableLogos[(orderTracker + i) % availableLogos.length] : '');
+
+            recordsToCreate.push({
+                editionId: resolvedEditionId,
+                slug: candidateSlug,
+                name,
+                logo: assignedLogo,
+                contactPerson: contactPerson || 'Exhibition Representative',
+                contact: contact || '',
+                email: email || '',
+                website: website || '',
+                booth: booth || '',
+                category: category || defaultCategory,
+                tagline: tagline || '',
+                description: description || '',
+                photos: JSON.stringify([]),
+                videoUrl: '',
+                videoPoster: '',
+                videoTitle: '',
+                order: orderTracker,
+                status: 'APPROVED'
+            });
+
+            orderTracker++;
+        }
+
+        if (recordsToCreate.length === 0) {
+            return { success: false, error: 'No valid exhibitor names were found' };
+        }
+
+        // Insert into database
+        await prisma.exhibitor.createMany({
+            data: recordsToCreate
+        });
+
+        // Revalidate cached paths
+        revalidatePath('/admin/exhibitors');
+        revalidatePath('/exhibitors');
+        if (resolvedEventSlug && resolvedYear) {
+            revalidatePath(`/admin/exhibitors/${resolvedEventSlug}/${resolvedYear}`);
+            revalidatePath(`/exhibitors/${resolvedEventSlug}/${resolvedYear}`);
+        }
+
+        return {
+            success: true,
+            count: recordsToCreate.length,
+            eventSlug: resolvedEventSlug,
+            year: resolvedYear
+        };
+    } catch (error) {
+        console.error("Bulk Create Exhibitors Error:", error);
+        return { success: false, error: error.message || 'Failed to bulk upload exhibitors' };
+    }
+}
+
+
 export async function approveExhibitor(id) {
     try {
         const exhibitorId = parseInt(id);

@@ -23,8 +23,10 @@ import {
     Save,
     Check,
     Loader2,
-    Trash2
+    Trash2,
+    Upload
 } from 'lucide-react';
+import BulkUploadExhibitorsModal from '../../BulkUploadExhibitorsModal';
 
 export default function EditionExhibitorsTable({ initialExhibitors, event, edition }) {
     const router = useRouter();
@@ -55,6 +57,7 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
     const [selectedIds, setSelectedIds] = useState([]);
     const [isBatchDeleting, setIsBatchDeleting] = useState(false);
     const [batchError, setBatchError] = useState('');
+    const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
     // Synchronize sort state to localStorage and update URL without full reload
     const handleSortChange = (newMode) => {
@@ -402,6 +405,30 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                         </button>
                     )}
 
+                    {/* Bulk Upload Button */}
+                    <button
+                        type="button"
+                        onClick={() => setIsBulkUploadOpen(true)}
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '0.4rem 0.75rem',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            borderRadius: '6px',
+                            border: '1px solid #bfdbfe',
+                            backgroundColor: '#eff6ff',
+                            color: '#1d4ed8',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                        }}
+                        title="Upload multiple exhibitors using comma list or Excel spreadsheet"
+                    >
+                        <Upload size={13} />
+                        <span>Bulk Upload</span>
+                    </button>
+
                     {/* Results count pill */}
                     <div style={{
                         padding: '0.35rem 0.65rem',
@@ -658,6 +685,18 @@ export default function EditionExhibitorsTable({ initialExhibitors, event, editi
                     </table>
                 )}
             </div>
+
+            {/* Bulk Upload Modal */}
+            <BulkUploadExhibitorsModal
+                isOpen={isBulkUploadOpen}
+                onClose={() => setIsBulkUploadOpen(false)}
+                initialEventSlug={event?.slug}
+                initialYear={edition?.year}
+                initialEditionId={edition?.id}
+                onSuccess={() => {
+                    router.refresh();
+                }}
+            />
         </div>
     );
 }
