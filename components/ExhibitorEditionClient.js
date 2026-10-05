@@ -82,7 +82,7 @@ export default function ExhibitorEditionClient({ event, edition }) {
                                         {/* Company Logo from public/company */}
                                         <div className={styles.logoWrapper}>
                                             <Image
-                                                src={company.logo}
+                                                src={(company.logo && !company.logo.includes('Screenshot')) ? company.logo : '/placeholder-logo.svg'}
                                                 alt={`${company.name} Logo`}
                                                 fill
                                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

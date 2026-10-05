@@ -34,8 +34,13 @@ export default function ExhibitorForm({
 }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [availableLogos, setAvailableLogos] = useState(COMPANY_LOGOS);
-    const [selectedLogo, setSelectedLogo] = useState(initialData?.logo || COMPANY_LOGOS[0]);
+    const defaultPlaceholder = '/placeholder-logo.svg';
+    const [availableLogos, setAvailableLogos] = useState([defaultPlaceholder]);
+    const [selectedLogo, setSelectedLogo] = useState(
+        (initialData?.logo && !initialData?.logo.includes('Screenshot')) 
+            ? initialData.logo 
+            : defaultPlaceholder
+    );
     const [errorMsg, setErrorMsg] = useState('');
     const [uploadingLogos, setUploadingLogos] = useState(false);
     const [uploadSuccessMsg, setUploadSuccessMsg] = useState('');
@@ -47,9 +52,9 @@ export default function ExhibitorForm({
         async function fetchLogos() {
             try {
                 const res = await getCompanyLogos();
-                if (res?.success && Array.isArray(res.logos) && res.logos.length > 0 && isMounted) {
-                    // Combine with COMPANY_LOGOS to guarantee uniqueness
-                    const combined = Array.from(new Set([...res.logos, ...COMPANY_LOGOS]));
+                if (res?.success && Array.isArray(res.logos) && isMounted) {
+                    const customLogos = res.logos.filter(l => !l.includes('Screenshot'));
+                    const combined = Array.from(new Set([defaultPlaceholder, ...customLogos]));
                     setAvailableLogos(combined);
                 }
             } catch (e) {

@@ -2475,45 +2475,7 @@ export const EXHIBITOR_EVENTS = [
 ];
 
 export const COMPANY_LOGOS = [
-    "/company/Screenshot%202025-12-28%20at%201.24.13%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.27.03%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.27.15%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.27.31%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.27.41%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.00%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.15%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.26%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.37%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.44%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.28.50%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.00%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.07%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.15%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.23%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.29%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.38%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.45%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.29.55%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.30.02%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.30.18%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.30.48%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.30.54%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.11%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.16%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.30%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.35%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.41%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.46%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.52%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.31.57%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.32.47%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.32.58%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.33.04%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.33.10%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.33.20%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.33.29%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.33.34%E2%80%AFPM.png",
-    "/company/Screenshot%202025-12-28%20at%201.40.40%E2%80%AFPM.png"
+    "/placeholder-logo.svg"
 ];
 
 export function getEventBySlug(slug) {

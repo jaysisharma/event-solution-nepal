@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC" />
+      <stop offset="100%" stop-color="#EDF2F7" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#60A5FA" />
+    </linearGradient>
+  </defs>
+
+  <!-- Card Background -->
+  <rect width="200" height="200" rx="28" fill="url(#bgGradient)" stroke="#E2E8F0" stroke-width="2" />
+
+  <!-- Inner subtle border -->
+  <rect x="6" y="6" width="188" height="188" rx="22" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.8" />
+
+  <!-- Exhibition Stall / Booth Graphic (Brand Showcase Pavilion - NOT a person) -->
+  <g transform="translate(100, 82)">
+    <!-- Top Pennant / Flag Sparkle -->
+    <path d="M 0,-44 L 4,-34 L 14,-30 L 4,-26 L 0,-16 L -4,-26 L -14,-30 L -4,-34 Z" fill="#F59E0B" />
+
+    <!-- Pavilion Roof / Canopy -->
+    <path d="M -46,-12 L 0,-26 L 46,-12 L 40,-2 L -40,-2 Z" fill="url(#iconGradient)" />
+
+    <!-- Striped Awning Scallops -->
+    <path d="M -40,-2 C -40,4 -32,4 -32,-2 C -32,4 -24,4 -24,-2 C -24,4 -16,4 -16,-2 C -16,4 -8,4 -8,-2 C -8,4 0,4 0,-2 C 0,4 8,4 8,-2 C 8,4 16,4 16,-2 C 16,4 24,4 24,-2 C 24,4 32,4 32,-2 C 32,4 40,4 40,-2 Z" fill="#1E40AF" />
+
+    <!-- Left & Right Support Pillars -->
+    <rect x="-36" y="2" width="6" height="30" rx="2" fill="#64748B" />
+    <rect x="30" y="2" width="6" height="30" rx="2" fill="#64748B" />
+    <rect x="-3" y="2" width="6" height="30" rx="2" fill="#CBD5E1" opacity="0.6" />
+
+    <!-- Showcase Display Counter -->
+    <rect x="-42" y="22" width="84" height="18" rx="4" fill="#334155" />
+    <rect x="-38" y="25" width="76" height="5" rx="2" fill="url(#accentGradient)" opacity="0.85" />
+
+    <!-- Counter Front Plate & Base -->
+    <path d="M -40,32 L 40,32 L 36,40 L -36,40 Z" fill="#1E293B" />
+  </g>
+
+  <!-- Clean Exhibitor Brand Label -->
+  <text 
+    x="100" 
+    y="156" 
+    text-anchor="middle" 
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" 
+    font-size="11" 
+    font-weight="800" 
+    letter-spacing="2.5" 
+    fill="#475569"
+  >EXHIBITOR</text>
+  
+  <text 
+    x="100" 
+    y="170" 
+    text-anchor="middle" 
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" 
+    font-size="9" 
+    font-weight="500" 
+    letter-spacing="1" 
+    fill="#94A3B8"
+  >BRAND SHOWCASE</text>
+</svg>

@@ -68,6 +68,26 @@ async function main() {
         console.warn('⚠️ Warning cleaning duplicate dashain-fest:', cleanErr.message);
     }
 
+    // Sanitize any legacy screenshot logos to use the clean placeholder logo
+    try {
+        const updatedLogos = await prisma.exhibitor.updateMany({
+            where: {
+                OR: [
+                    { logo: { contains: 'Screenshot' } },
+                    { logo: '' },
+                    { logo: null }
+                ]
+            },
+            data: {
+                logo: '/placeholder-logo.svg'
+            }
+        });
+        if (updatedLogos.count > 0) {
+            console.log(`🖼️ Sanitized ${updatedLogos.count} exhibitor logos to /placeholder-logo.svg.`);
+        }
+    } catch (sanitizeErr) {
+        console.warn('⚠️ Warning updating legacy exhibitor logos:', sanitizeErr.message);
+    }
 }
 
 main()

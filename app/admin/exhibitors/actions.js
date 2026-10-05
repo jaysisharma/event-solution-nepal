@@ -17,9 +17,10 @@ export async function getCompanyLogos() {
         const files = await fs.readdir(companyDir);
         const validExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.svg'];
         const logos = files
-            .filter(file => validExtensions.includes(path.extname(file).toLowerCase()) && !file.startsWith('.'))
+            .filter(file => validExtensions.includes(path.extname(file).toLowerCase()) && !file.startsWith('.') && !file.includes('Screenshot'))
             .map(file => `/company/${encodeURIComponent(file)}`);
-        return { success: true, logos };
+        const resultLogos = ['/placeholder-logo.svg', ...logos.filter(l => !l.includes('placeholder'))];
+        return { success: true, logos: resultLogos };
     } catch (error) {
         console.error("Error reading company logos:", error);
         return { success: false, logos: [] };
@@ -445,6 +446,10 @@ export async function createExhibitor(formData) {
             if (uploadedPath) logo = uploadedPath;
         }
 
+        if (!logo || logo.includes('Screenshot')) {
+            logo = '/placeholder-logo.svg';
+        }
+
         const contactPerson = formData.get('contactPerson')?.trim() || '';
         const contact = formData.get('contact')?.trim() || '';
         const email = formData.get('email')?.trim() || '';
@@ -733,17 +738,6 @@ export async function bulkCreateExhibitors({ editionId, eventSlug, year, exhibit
         const existingSlugs = new Set(existingExhibitors.map(e => e.slug));
         const maxOrder = existingExhibitors.reduce((max, e) => (e.order > max ? e.order : max), -1);
 
-        // Fetch available logos to assign dynamically
-        let availableLogos = [];
-        try {
-            const logoRes = await getCompanyLogos();
-            if (logoRes.success && logoRes.logos.length > 0) {
-                availableLogos = logoRes.logos;
-            }
-        } catch (e) {
-            // ignore
-        }
-
         // Helper slugify
         const slugify = (text) => {
             if (!text) return 'exhibitor';
@@ -782,7 +776,7 @@ export async function bulkCreateExhibitors({ editionId, eventSlug, year, exhibit
             const tagline = typeof raw === 'object' && raw.tagline ? String(raw.tagline).trim() : `${name} at Exhibition ${resolvedYear || ''}`.trim();
             const description = typeof raw === 'object' && raw.description ? String(raw.description).trim() : (booth ? `Exhibiting at Stall ${booth}.` : `Participating exhibitor at ${resolvedYear || 'this edition'}.`);
 
-            const assignedLogo = (typeof raw === 'object' && raw.logo) ? raw.logo : (availableLogos.length > 0 ? availableLogos[(orderTracker + i) % availableLogos.length] : '');
+            const assignedLogo = (typeof raw === 'object' && raw.logo && !raw.logo.includes('Screenshot')) ? raw.logo : '/placeholder-logo.svg';
 
             recordsToCreate.push({
                 editionId: resolvedEditionId,
@@ -927,6 +921,10 @@ export async function submitPublicExhibitorApplication(formData) {
         if (logoFile && typeof logoFile === 'object' && logoFile.size > 0) {
             const uploadedPath = await saveFile(logoFile, 'exhibitors/logos');
             if (uploadedPath) logo = uploadedPath;
+        }
+
+        if (!logo || logo.includes('Screenshot')) {
+            logo = '/placeholder-logo.svg';
         }
 
         const contactPerson = formData.get('contactPerson')?.trim() || '';

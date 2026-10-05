@@ -852,17 +852,13 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                             </td>
                                             <td>
                                                 <div className={styles.logoThumb}>
-                                                    {ex.logo ? (
-                                                        <Image
-                                                            src={ex.logo}
-                                                            alt={ex.name}
-                                                            fill
-                                                            sizes="52px"
-                                                            className={styles.logoImg}
-                                                        />
-                                                    ) : (
-                                                        <Store size={16} color="#94a3b8" />
-                                                    )}
+                                                    <Image
+                                                        src={(ex.logo && !ex.logo.includes('Screenshot')) ? ex.logo : '/placeholder-logo.svg'}
+                                                        alt={ex.name}
+                                                        fill
+                                                        sizes="52px"
+                                                        className={styles.logoImg}
+                                                    />
                                                 </div>
                                             </td>
                                             <td>
@@ -1075,17 +1071,13 @@ export default function ExhibitorsDashboard({ initialEvents = [] }) {
                                             </td>
                                             <td>
                                                 <div className={styles.logoThumb}>
-                                                    {app.logo ? (
-                                                        <Image
-                                                            src={app.logo}
-                                                            alt={app.name}
-                                                            fill
-                                                            sizes="52px"
-                                                            className={styles.logoImg}
-                                                        />
-                                                    ) : (
-                                                        <Store size={16} color="#94a3b8" />
-                                                    )}
+                                                    <Image
+                                                        src={(app.logo && !app.logo.includes('Screenshot')) ? app.logo : '/placeholder-logo.svg'}
+                                                        alt={app.name}
+                                                        fill
+                                                        sizes="52px"
+                                                        className={styles.logoImg}
+                                                    />
                                                 </div>
                                             </td>
                                             <td>
