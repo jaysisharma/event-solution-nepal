@@ -13,161 +13,29 @@ if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
 }
 
-const PROCESS_SECTIONS = [
-    {
-        id: "01",
-        slug: "family-baby-expo",
-        title: "Family & Baby Expo",
-        description: "A dedicated platform bringing together leading brands, businesses, and service providers focused on families, children, parenting, and everyday family needs. Explore the exhibitors and brands that have participated across previous editions.",
-        subItems: [
-            {
-                id: "01",
-                title: "Edition 2021",
-                year: "2021",
-                href: "/exhibitors/family-baby-expo/2021",
-                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "02",
-                title: "Edition 2023",
-                year: "2023",
-                href: "/exhibitors/family-baby-expo/2023",
-                image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "03",
-                title: "Edition 2024",
-                year: "2024",
-                href: "/exhibitors/family-baby-expo/2024",
-                image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80"
-            },
-        ]
-    },
-    {
-        id: "02",
-        slug: "global-consumer-expo",
-        title: "Global Consumer Expo",
-        description: "A dynamic consumer exhibition connecting brands and businesses with a wide audience through products, services, innovations, and emerging market opportunities. Discover the companies that have showcased their offerings at the expo.",
-        subItems: [
-            {
-                id: "01",
-                title: "Edition 2022",
-                year: "2022",
-                href: "/exhibitors/global-consumer-expo/2022",
-                image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "02",
-                title: "Edition 2023",
-                year: "2023",
-                href: "/exhibitors/global-consumer-expo/2023",
-                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "03",
-                title: "Edition 2024",
-                year: "2024",
-                href: "/exhibitors/global-consumer-expo/2024",
-                image: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "04",
-                title: "Edition 2025",
-                year: "2025",
-                href: "/exhibitors/global-consumer-expo/2025",
-                image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80"
-            },
-        ]
-    },
-    {
-        id: "03",
-        slug: "the-hotel-expo",
-        title: "The Hotel Expo",
-        description: "A dedicated platform for the hospitality and hotel industry, bringing together businesses, suppliers, manufacturers, and service providers. Explore the brands and companies showcasing solutions for hotels, restaurants, and the wider hospitality sector.",
-        subItems: [
-            {
-                id: "01",
-                title: "Edition 2023",
-                year: "2023",
-                href: "/exhibitors/the-hotel-expo/2023",
-                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "02",
-                title: "Edition 2024",
-                year: "2024",
-                href: "/exhibitors/the-hotel-expo/2024",
-                image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "03",
-                title: "Edition 2025",
-                year: "2025",
-                href: "/exhibitors/the-hotel-expo/2025",
-                image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
-            },
-        ]
-    },
-    {
-        id: "04",
-        slug: "stock-clearance",
-        title: "Stock Clearance",
-        description: "A premier consumer shopping and clearance festival connecting leading manufacturers, retail distributors, and domestic brands directly with shoppers. Discover the participating companies and outlets offering exceptional deals, seasonal clearances, and wholesale bargains across previous editions.",
-        subItems: [
-            {
-                id: "01",
-                title: "Edition 2023",
-                year: "2023",
-                href: "/exhibitors/stock-clearance/2023",
-                image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "02",
-                title: "Edition 2024",
-                year: "2024",
-                href: "/exhibitors/stock-clearance/2024",
-                image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80"
-            },
-            {
-                id: "03",
-                title: "Edition 2025",
-                year: "2025",
-                href: "/exhibitors/stock-clearance/2025",
-                image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80"
-            },
-        ]
-    }
-];
-
 export default function ExhibitorsClient({ events }) {
     const { theme } = useTheme();
     const containerRef = useRef(null);
     const rowsRef = useRef([]);
 
-    // Normalize sections from database events if available, falling back to static PROCESS_SECTIONS
+    // Normalize sections directly from database events
     const sections = (events && events.length > 0)
-        ? events.map((ev, eIdx) => {
-            const fallbackSection = PROCESS_SECTIONS.find(s => s.slug === ev.slug || s.id === ev.chronicleNumber) || PROCESS_SECTIONS[eIdx];
-            return {
-                id: ev.chronicleNumber || `0${eIdx + 1}`,
-                slug: ev.slug,
-                title: ev.title || fallbackSection?.title,
-                description: ev.description || fallbackSection?.description,
-                subItems: (ev.editions && ev.editions.length > 0)
-                    ? ev.editions.map((ed, edIdx) => {
-                        const fallbackSub = fallbackSection?.subItems?.find(s => s.year === ed.year) || fallbackSection?.subItems?.[edIdx];
-                        return {
-                            id: `0${edIdx + 1}`,
-                            title: ed.title || `Edition ${ed.year}`,
-                            year: ed.year,
-                            href: `/exhibitors/${ev.slug}/${ed.year}`,
-                            image: ed.previewImage || fallbackSub?.image || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80"
-                        };
-                    })
-                    : (fallbackSection?.subItems || [])
-            };
-        })
-        : PROCESS_SECTIONS;
+        ? events.map((ev, eIdx) => ({
+            id: ev.chronicleNumber || String(eIdx + 1).padStart(2, '0'),
+            slug: ev.slug,
+            title: ev.title,
+            description: ev.description || '',
+            subItems: (ev.editions && ev.editions.length > 0)
+                ? ev.editions.map((ed, edIdx) => ({
+                    id: String(edIdx + 1).padStart(2, '0'),
+                    title: ed.title || `Edition ${ed.year}`,
+                    year: ed.year,
+                    href: `/exhibitors/${ev.slug}/${ed.year}`,
+                    image: ed.previewImage || ev.previewImage || "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80"
+                }))
+                : []
+        }))
+        : [];
 
     // Floating Image on Hover State
     const [hoveredItem, setHoveredItem] = useState(null);
@@ -243,57 +111,63 @@ export default function ExhibitorsClient({ events }) {
 
                 {/* Split Rows Container with Section Pinning */}
                 <div className={styles.rowsContainer} ref={containerRef}>
-                    {sections.map((section, index) => (
-                        <div
-                            key={section.id}
-                            className={styles.splitRow}
-                            style={{ zIndex: index + 1 }}
-                            ref={(el) => {
-                                if (el) rowsRef.current[index] = el;
-                            }}
-                        >
-                            {/* Left Side: 20% */}
-                            <div className={styles.leftCol}>
-                                <span className={styles.largeNumber}>{section.id}</span>
-                            </div>
+                    {sections.length === 0 ? (
+                        <div style={{ padding: '3.5rem 1rem', textAlign: 'center', color: '#64748b' }}>
+                            <p style={{ fontSize: '1rem', fontWeight: 500 }}>No exhibition events are currently published.</p>
+                        </div>
+                    ) : (
+                        sections.map((section, index) => (
+                            <div
+                                key={section.slug || section.id || index}
+                                className={styles.splitRow}
+                                style={{ zIndex: index + 1 }}
+                                ref={(el) => {
+                                    if (el) rowsRef.current[index] = el;
+                                }}
+                            >
+                                {/* Left Side: 20% */}
+                                <div className={styles.leftCol}>
+                                    <span className={styles.largeNumber}>{section.id}</span>
+                                </div>
 
-                            {/* Right Side: 80% */}
-                            <div className={styles.rightCol}>
-                                <h2 className={styles.itemTitle}>{section.title}</h2>
-                                <p className={styles.itemText}>{section.description}</p>
+                                {/* Right Side: 80% */}
+                                <div className={styles.rightCol}>
+                                    <h2 className={styles.itemTitle}>{section.title}</h2>
+                                    <p className={styles.itemText}>{section.description}</p>
 
-                                <div className={styles.subItemsList}>
-                                    {section.subItems.map((sub) => (
-                                        <Link
-                                            key={sub.id}
-                                            href={sub.href}
-                                            className={styles.subItem}
-                                            onMouseEnter={(e) => {
-                                                setHoveredItem({
-                                                    image: sub.image,
-                                                    title: `${section.title} • ${sub.title}`
-                                                });
-                                                setMousePos({ x: e.clientX, y: e.clientY });
-                                            }}
-                                            onMouseMove={(e) => {
-                                                setMousePos({ x: e.clientX, y: e.clientY });
-                                            }}
-                                            onMouseLeave={() => setHoveredItem(null)}
-                                        >
-                                            <div className={styles.subItemLeft}>
-                                                <span className={styles.subNumber}>{sub.id}</span>
-                                                <span className={styles.subTitle}>{sub.title}</span>
-                                            </div>
-                                            <div className={styles.subItemRight}>
-                                                <span className={styles.subItemHint}>View Exhibitors</span>
-                                                <ArrowUpRight size={18} className={styles.subItemArrow} />
-                                            </div>
-                                        </Link>
-                                    ))}
+                                    <div className={styles.subItemsList}>
+                                        {section.subItems.map((sub) => (
+                                            <Link
+                                                key={sub.year || sub.id}
+                                                href={sub.href}
+                                                className={styles.subItem}
+                                                onMouseEnter={(e) => {
+                                                    setHoveredItem({
+                                                        image: sub.image,
+                                                        title: `${section.title} • ${sub.title}`
+                                                    });
+                                                    setMousePos({ x: e.clientX, y: e.clientY });
+                                                }}
+                                                onMouseMove={(e) => {
+                                                    setMousePos({ x: e.clientX, y: e.clientY });
+                                                }}
+                                                onMouseLeave={() => setHoveredItem(null)}
+                                            >
+                                                <div className={styles.subItemLeft}>
+                                                    <span className={styles.subNumber}>{sub.id}</span>
+                                                    <span className={styles.subTitle}>{sub.title}</span>
+                                                </div>
+                                                <div className={styles.subItemRight}>
+                                                    <span className={styles.subItemHint}>View Exhibitors</span>
+                                                    <ArrowUpRight size={18} className={styles.subItemArrow} />
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
 

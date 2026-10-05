@@ -1,576 +1,8 @@
 export const EXHIBITOR_EVENTS = [
     {
-        "id": "family-baby-expo",
-        "slug": "family-baby-expo",
-        "chronicleNumber": "01",
-        "title": "Family & Baby Expo",
-        "description": "A dedicated platform bringing together leading brands, businesses, and service providers focused on families, children, parenting, and everyday family needs. Explore the exhibitors and brands that have participated across previous editions.",
-        "previewImage": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
-        "editions": [
-            {
-                "year": "2021",
-                "title": "Edition 2021",
-                "previewImage": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
-                "dates": "March 12 - 15, 2021",
-                "venue": "Heritage Garden, Sanepa, Lalitpur",
-                "exhibitors": [
-                    {
-                        "id": "tinysteps-babycare",
-                        "name": "TinySteps Baby Care",
-                        "tagline": "Organic Infant Nutrition & Ergonomic Nursery Gear",
-                        "category": "Maternity & Infant Wellness",
-                        "booth": "Pavilion Green • Stall 02",
-                        "contact": "+977-1-5522334",
-                        "email": "hello@tinysteps.com.np",
-                        "website": "https://tinysteps.com.np",
-                        "description": "TinySteps Baby Care introduced certified organic infant purees and pediatrician-approved baby ergonomic strollers to the Himalayan market in 2021.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Infant Nutrition Display Booth",
-                            "Photo 02: Stroller Safety Testing Zone",
-                            "Photo 03: Mother & Child Interactive Corner"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
-                            "title": "TinySteps 2021 Expo Documentary"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2023",
-                "title": "Edition 2023",
-                "previewImage": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
-                "dates": "February 24 - 27, 2023",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "little-explorers-nepal",
-                        "name": "Little Explorers Early Learning",
-                        "tagline": "Montessori Educational Toys & STEM Development Kits",
-                        "category": "Child Development & Education",
-                        "booth": "Hall A • Stall A-08",
-                        "contact": "+977-1-4411990",
-                        "email": "info@littleexplorers.np",
-                        "website": "https://littleexplorers.np",
-                        "description": "Little Explorers brings sensory-friendly wooden educational toys and Montessori early-childhood learning tools designed by child psychologists.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1500995617113-cf789362a3e1?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Wooden Montessori Play Station",
-                            "Photo 02: STEM Puzzle Workshop with Kids",
-                            "Photo 03: Parent Consultation Area"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-                            "poster": "https://images.unsplash.com/photo-1500995617113-cf789362a3e1?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Little Explorers 2023 Learning Showcase"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2024",
-                "title": "Edition 2024",
-                "previewImage": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
-                "dates": "March 15 - 18, 2024",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "himalayan-family-wellness",
-                        "name": "Himalayan Family Health Systems",
-                        "tagline": "Pediatric Diagnostics & Postnatal Care Ecosystems",
-                        "category": "Pediatric Health & Family Care",
-                        "booth": "Hall B • Stall B-15",
-                        "contact": "+977-1-4477889",
-                        "email": "care@familyhealth.com.np",
-                        "website": "https://familyhealth.com.np",
-                        "description": "Himalayan Family Health Systems delivers specialized postnatal mother care gear, hypoallergenic bedding, and infant health telemetry monitors.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Smart Baby Monitor Demonstration",
-                            "Photo 02: Hypoallergenic Infant Cradle Room",
-                            "Photo 03: Pediatric Doctor Consultation Desk"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-                            "poster": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Himalayan Family Health 2024 Reel"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "global-consumer-expo",
-        "slug": "global-consumer-expo",
-        "chronicleNumber": "02",
-        "title": "Global Consumer Expo",
-        "description": "A dynamic consumer exhibition connecting brands and businesses with a wide audience through products, services, innovations, and emerging market opportunities. Discover the companies that have showcased their offerings at the expo.",
-        "previewImage": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
-        "editions": [
-            {
-                "year": "2022",
-                "title": "Edition 2022",
-                "previewImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-                "dates": "September 08 - 12, 2022",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "trans-himalaya-logistics",
-                        "name": "Trans-Himalayan Freight & Logistics",
-                        "contact": "+977-1-4266778",
-                        "email": "support@transhimalaya.np",
-                        "website": "https://transhimalaya.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
-                            "poster": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "everest-renewable-energy",
-                        "name": "Everest Renewable Energy Solutions",
-                        "contact": "+977-1-4412389",
-                        "email": "info@everestrenewable.com.np",
-                        "website": "https://everestrenewable.com.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "nordic-agrotech-systems",
-                        "name": "Nordic AgroTech Systems",
-                        "contact": "+977-1-4523991",
-                        "email": "contact@nordicagrotech.com",
-                        "website": "https://nordicagrotech.com",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "vertex-medical-technologies",
-                        "name": "Vertex Medical Technologies",
-                        "contact": "+977-1-4491122",
-                        "email": "inquiry@vertexmed.np",
-                        "website": "https://vertexmed.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-                            "poster": "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "silkroute-digital-commerce",
-                        "name": "SilkRoute Digital Commerce",
-                        "contact": "+977-1-4288001",
-                        "email": "global@silkroutedigital.com",
-                        "website": "https://silkroutedigital.com",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "apex-heavy-machinery",
-                        "name": "Apex Heavy Machinery & Engineering",
-                        "contact": "+977-1-4109876",
-                        "email": "sales@apexmachinery.np",
-                        "website": "https://apexmachinery.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-                            "poster": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "zenith-clean-water",
-                        "name": "Zenith Clean Water Infrastructure",
-                        "contact": "+977-1-4433550",
-                        "email": "support@zenithwater.com",
-                        "website": "https://zenithwater.com",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-                            "poster": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "pacific-smart-electronics",
-                        "name": "Pacific Smart Electronics Corp",
-                        "contact": "+977-1-4789012",
-                        "email": "info@pacificsmart.com.np",
-                        "website": "https://pacificsmart.com.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
-                            "poster": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "kailash-organic-superfoods",
-                        "name": "Kailash Organic Superfoods & Exports",
-                        "contact": "+977-1-4467123",
-                        "email": "export@kailashorganics.np",
-                        "website": "https://kailashorganics.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-                            "poster": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "aerohimalaya-aviation-dynamics",
-                        "name": "AeroHimalaya Aviation & Drone Dynamics",
-                        "contact": "+977-1-4215678",
-                        "email": "flight@aerohimalaya.com",
-                        "website": "https://aerohimalaya.com",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-                            "poster": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2023",
-                "title": "Edition 2023",
-                "previewImage": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
-                "dates": "October 14 - 18, 2023",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "asia-tech-convergence",
-                        "name": "Asia Tech Convergence",
-                        "tagline": "Enterprise Cloud Infrastructure & AI Hardware",
-                        "category": "Technology & Software",
-                        "booth": "Hall B • Stall B-10",
-                        "contact": "+977-1-4488990",
-                        "email": "connect@asiatech.np",
-                        "website": "https://asiatech.np",
-                        "description": "Asia Tech Convergence brought 25 international cloud and cybersecurity enterprises to Kathmandu to establish high-speed local data corridors.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Cloud Server Hardware Rack Display",
-                            "Photo 02: AI Neural Processing Unit Demonstration",
-                            "Photo 03: Executive Business Networking Lounge"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Asia Tech 2023 Keynote Presentation"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2024",
-                "title": "Edition 2024",
-                "previewImage": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
-                "dates": "November 07 - 11, 2024",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "everest-clean-energy",
-                        "name": "Everest Clean Energy Alliance",
-                        "tagline": "Commercial Solar Grids, Hydro Power & Battery Storage",
-                        "category": "Renewable Energy & Power",
-                        "booth": "Hall C • Stall C-01",
-                        "contact": "+977-1-4112233",
-                        "email": "energy@everestclean.np",
-                        "website": "https://everestclean.np",
-                        "description": "Everest Clean Energy showcased high-efficiency bifacial solar panels and commercial micro-hydro turbine sets tailored for high-altitude Himalayan installations.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Bifacial High-Altitude Solar Arrays",
-                            "Photo 02: Industrial Battery Power Storage Bank",
-                            "Photo 03: Interactive Clean Energy Power Grid Simulator"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Everest Clean Energy 2024 Innovation Documentary"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2025",
-                "title": "Edition 2025",
-                "previewImage": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-                "dates": "October 22 - 26, 2025",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "global-smart-mobility",
-                        "name": "Global Smart Mobility Innovations",
-                        "tagline": "Autonomous Transport Systems & Urban EV Hubs",
-                        "category": "Mobility & Smart Cities",
-                        "booth": "Hall A • Stall A-10",
-                        "contact": "+977-1-5544778",
-                        "email": "mobility@globalsmart.np",
-                        "website": "https://globalsmart.np",
-                        "description": "Global Smart Mobility is pioneering rapid EV charging corridors and fleet telematics across South Asia, making urban mobility cleaner and faster.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Ultra-Fast Commercial EV Charging Station",
-                            "Photo 02: Electric Autonomous Fleet Bus Concept",
-                            "Photo 03: Smart City Urban Traffic Telemetry Console"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Global Smart Mobility 2025 Reveal Reel"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "the-hotel-expo",
-        "slug": "the-hotel-expo",
-        "chronicleNumber": "03",
-        "title": "The Hotel Expo",
-        "description": "A dedicated platform for the hospitality and hotel industry, bringing together businesses, suppliers, manufacturers, and service providers. Explore the brands and companies showcasing solutions for hotels, restaurants, and the wider hospitality sector.",
-        "previewImage": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
-        "editions": [
-            {
-                "year": "2023",
-                "title": "Edition 2023",
-                "previewImage": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
-                "dates": "September 14 - 17, 2023",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "himalayan-hospitality-tech",
-                        "name": "Himalayan Hospitality & Hotel Tech",
-                        "tagline": "Smart Property Management & Guest Experience Telemetry",
-                        "category": "Hospitality Technology & Software",
-                        "booth": "Hall A • Stall A-04",
-                        "contact": "+977-1-4422110",
-                        "email": "contact@himalayanhoteltech.np",
-                        "website": "https://himalayanhoteltech.np",
-                        "description": "Himalayan Hospitality Tech delivers next-gen cloud PMS, contactless check-in kiosks, and intelligent IoT room controllers for luxury resorts and boutique hotels across South Asia.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Smart Hotel Check-In Kiosk Showcase",
-                            "Photo 02: Suite Automation & Climate Controller",
-                            "Photo 03: Resort Analytics & PMS Live Dashboard"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Himalayan Hospitality Tech Showcase"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2024",
-                "title": "Edition 2024",
-                "previewImage": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
-                "dates": "September 19 - 22, 2024",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "everest-commercial-kitchen",
-                        "name": "Everest Commercial Kitchen & Bakery Solutions",
-                        "tagline": "Industrial Combi-Ovens, Cold Storage & Stainless Steel Fabrication",
-                        "category": "Commercial Kitchen & Catering",
-                        "booth": "Hall B • Stall B-12",
-                        "contact": "+977-1-4433990",
-                        "email": "kitchen@everestsupplies.com.np",
-                        "website": "https://everestsupplies.com.np",
-                        "description": "Everest Commercial Kitchen outfits leading five-star hotels and restaurant chains with energy-efficient combi steamers, induction ranges, and commercial refrigeration.",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "photoCaptions": [
-                            "Photo 01: Commercial Induction Cooking Suite",
-                            "Photo 02: Industrial Bakery Rotary Oven",
-                            "Photo 03: Stainless Steel Prep Line Counter"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
-                            "title": "Everest Commercial Kitchen Live Demo"
-                        }
-                    }
-                ]
-            },
-            {
-                "year": "2025",
-                "title": "Edition 2025",
-                "previewImage": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
-                "dates": "September 25 - 28, 2025",
-                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
-                "exhibitors": [
-                    {
-                        "id": "nepal-hotel-linen-decor",
-                        "name": "Nepal Luxury Hotel Linen & Decor",
-                        "contact": "+977-1-5522100",
-                        "email": "luxury@nepallinen.np",
-                        "website": "https://nepallinen.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-                            "poster": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "kathmandu-tableware-crockery",
-                        "name": "Kathmandu Banquet & Tableware Supply",
-                        "contact": "+977-1-4477890",
-                        "email": "sales@ktmtableware.np",
-                        "website": "https://ktmtableware.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
-                            "poster": "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "annapurna-resort-supplies",
-                        "name": "Annapurna Eco Resort & Spa Supplies",
-                        "contact": "+977-1-4221199",
-                        "email": "info@annapurnaresortsupplies.np",
-                        "website": "https://annapurnaresortsupplies.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-                            "poster": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "cleanpro-commercial-laundry",
-                        "name": "CleanPro Commercial Laundry & Sanitation",
-                        "contact": "+977-1-4389922",
-                        "email": "service@cleanpro.com.np",
-                        "website": "https://cleanpro.com.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-                            "poster": "https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    },
-                    {
-                        "id": "smartkey-hotel-automation",
-                        "name": "SmartKey Hotel Automation & Access Systems",
-                        "contact": "+977-1-4411880",
-                        "email": "sales@smartkey.np",
-                        "website": "https://smartkey.np",
-                        "photos": [
-                            "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=1200&q=80",
-                            "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
-                        ],
-                        "video": {
-                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-                            "poster": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "id": "stock-clearance",
         "slug": "stock-clearance",
-        "chronicleNumber": "04",
+        "chronicleNumber": "01",
         "title": "Stock Clearance",
         "description": "A premier consumer shopping and clearance festival connecting leading manufacturers, retail distributors, and domestic brands directly with shoppers. Discover the participating companies and outlets offering exceptional deals, seasonal clearances, and wholesale bargains across previous editions.",
         "previewImage": "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1200&q=80",
@@ -2471,6 +1903,405 @@ export const EXHIBITOR_EVENTS = [
                 ]
             }
         ]
+    },
+    {
+        "id": "family-baby-expo",
+        "slug": "family-baby-expo",
+        "chronicleNumber": "02",
+        "title": "Family & Baby Expo",
+        "description": "A dedicated platform bringing together leading brands, businesses, and service providers focused on families, children, parenting, and everyday family needs. Explore the exhibitors and brands that have participated across previous editions.",
+        "previewImage": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
+        "editions": [
+            {
+                "year": "2021",
+                "title": "Edition 2021",
+                "previewImage": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+                "dates": "March 12 - 15, 2021",
+                "venue": "Heritage Garden, Sanepa, Lalitpur",
+                "exhibitors": [
+                    {
+                        "id": "tinysteps-babycare",
+                        "name": "TinySteps Baby Care",
+                        "tagline": "Organic Infant Nutrition & Ergonomic Nursery Gear",
+                        "category": "Maternity & Infant Wellness",
+                        "booth": "Pavilion Green • Stall 02",
+                        "contact": "+977-1-5522334",
+                        "email": "hello@tinysteps.com.np",
+                        "website": "https://tinysteps.com.np",
+                        "description": "TinySteps Baby Care introduced certified organic infant purees and pediatrician-approved baby ergonomic strollers to the Himalayan market in 2021.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Infant Nutrition Display Booth",
+                            "Photo 02: Stroller Safety Testing Zone",
+                            "Photo 03: Mother & Child Interactive Corner"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1200&q=80",
+                            "title": "TinySteps 2021 Expo Documentary"
+                        }
+                    }
+                ]
+            },
+            {
+                "year": "2023",
+                "title": "Edition 2023",
+                "previewImage": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
+                "dates": "February 24 - 27, 2023",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "little-explorers-nepal",
+                        "name": "Little Explorers Early Learning",
+                        "tagline": "Montessori Educational Toys & STEM Development Kits",
+                        "category": "Child Development & Education",
+                        "booth": "Hall A • Stall A-08",
+                        "contact": "+977-1-4411990",
+                        "email": "info@littleexplorers.np",
+                        "website": "https://littleexplorers.np",
+                        "description": "Little Explorers brings sensory-friendly wooden educational toys and Montessori early-childhood learning tools designed by child psychologists.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1500995617113-cf789362a3e1?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Wooden Montessori Play Station",
+                            "Photo 02: STEM Puzzle Workshop with Kids",
+                            "Photo 03: Parent Consultation Area"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                            "poster": "https://images.unsplash.com/photo-1500995617113-cf789362a3e1?auto=format&fit=crop&w=1200&q=80",
+                            "title": "Little Explorers 2023 Learning Showcase"
+                        }
+                    }
+                ]
+            },
+            {
+                "year": "2024",
+                "title": "Edition 2024",
+                "previewImage": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=1200&q=80",
+                "dates": "March 15 - 18, 2024",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "himalayan-family-wellness",
+                        "name": "Himalayan Family Health Systems",
+                        "tagline": "Pediatric Diagnostics & Postnatal Care Ecosystems",
+                        "category": "Pediatric Health & Family Care",
+                        "booth": "Hall B • Stall B-15",
+                        "contact": "+977-1-4477889",
+                        "email": "care@familyhealth.com.np",
+                        "website": "https://familyhealth.com.np",
+                        "description": "Himalayan Family Health Systems delivers specialized postnatal mother care gear, hypoallergenic bedding, and infant health telemetry monitors.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Smart Baby Monitor Demonstration",
+                            "Photo 02: Hypoallergenic Infant Cradle Room",
+                            "Photo 03: Pediatric Doctor Consultation Desk"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+                            "poster": "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1200&q=80",
+                            "title": "Himalayan Family Health 2024 Reel"
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "global-expo",
+        "slug": "global-expo",
+        "chronicleNumber": "03",
+        "title": "Global Expo",
+        "description": "A dynamic consumer exhibition connecting brands and businesses with a wide audience through products, services, innovations, and emerging market opportunities. Discover the companies that have showcased their offerings at the expo.",
+        "previewImage": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+        "editions": [
+            {
+                "year": "2022",
+                "title": "Edition 2022",
+                "previewImage": "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
+                "dates": "September 08 - 12, 2022",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "trans-himalaya-logistics",
+                        "name": "Trans-Himalayan Freight & Logistics",
+                        "contact": "+977-1-4266778",
+                        "email": "support@transhimalaya.np",
+                        "website": "https://transhimalaya.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
+                            "poster": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "everest-renewable-energy",
+                        "name": "Everest Renewable Energy Solutions",
+                        "contact": "+977-1-4412389",
+                        "email": "info@everestrenewable.com.np",
+                        "website": "https://everestrenewable.com.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "nordic-agrotech-systems",
+                        "name": "Nordic AgroTech Systems",
+                        "contact": "+977-1-4523991",
+                        "email": "contact@nordicagrotech.com",
+                        "website": "https://nordicagrotech.com",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "vertex-medical-technologies",
+                        "name": "Vertex Medical Technologies",
+                        "contact": "+977-1-4491122",
+                        "email": "inquiry@vertexmed.np",
+                        "website": "https://vertexmed.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+                            "poster": "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "silkroute-digital-commerce",
+                        "name": "SilkRoute Digital Commerce",
+                        "contact": "+977-1-4288001",
+                        "email": "global@silkroutedigital.com",
+                        "website": "https://silkroutedigital.com",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1556742049-0a67c5574f73?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "apex-heavy-machinery",
+                        "name": "Apex Heavy Machinery & Engineering",
+                        "contact": "+977-1-4109876",
+                        "email": "sales@apexmachinery.np",
+                        "website": "https://apexmachinery.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+                            "poster": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "zenith-clean-water",
+                        "name": "Zenith Clean Water Infrastructure",
+                        "contact": "+977-1-4433550",
+                        "email": "support@zenithwater.com",
+                        "website": "https://zenithwater.com",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+                            "poster": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "pacific-smart-electronics",
+                        "name": "Pacific Smart Electronics Corp",
+                        "contact": "+977-1-4789012",
+                        "email": "info@pacificsmart.com.np",
+                        "website": "https://pacificsmart.com.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackSeeTheWorld.mp4",
+                            "poster": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "kailash-organic-superfoods",
+                        "name": "Kailash Organic Superfoods & Exports",
+                        "contact": "+977-1-4467123",
+                        "email": "export@kailashorganics.np",
+                        "website": "https://kailashorganics.np",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                            "poster": "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    },
+                    {
+                        "id": "aerohimalaya-aviation-dynamics",
+                        "name": "AeroHimalaya Aviation & Drone Dynamics",
+                        "contact": "+977-1-4215678",
+                        "email": "flight@aerohimalaya.com",
+                        "website": "https://aerohimalaya.com",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+                            "poster": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=1200&q=80"
+                        }
+                    }
+                ]
+            },
+            {
+                "year": "2023",
+                "title": "Edition 2023",
+                "previewImage": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80",
+                "dates": "October 14 - 18, 2023",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "asia-tech-convergence",
+                        "name": "Asia Tech Convergence",
+                        "tagline": "Enterprise Cloud Infrastructure & AI Hardware",
+                        "category": "Technology & Software",
+                        "booth": "Hall B • Stall B-10",
+                        "contact": "+977-1-4488990",
+                        "email": "connect@asiatech.np",
+                        "website": "https://asiatech.np",
+                        "description": "Asia Tech Convergence brought 25 international cloud and cybersecurity enterprises to Kathmandu to establish high-speed local data corridors.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Cloud Server Hardware Rack Display",
+                            "Photo 02: AI Neural Processing Unit Demonstration",
+                            "Photo 03: Executive Business Networking Lounge"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
+                            "title": "Asia Tech 2023 Keynote Presentation"
+                        }
+                    }
+                ]
+            },
+            {
+                "year": "2024",
+                "title": "Edition 2024",
+                "previewImage": "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
+                "dates": "November 07 - 11, 2024",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "everest-clean-energy",
+                        "name": "Everest Clean Energy Alliance",
+                        "tagline": "Commercial Solar Grids, Hydro Power & Battery Storage",
+                        "category": "Renewable Energy & Power",
+                        "booth": "Hall C • Stall C-01",
+                        "contact": "+977-1-4112233",
+                        "email": "energy@everestclean.np",
+                        "website": "https://everestclean.np",
+                        "description": "Everest Clean Energy showcased high-efficiency bifacial solar panels and commercial micro-hydro turbine sets tailored for high-altitude Himalayan installations.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1497440001374-f26997328c1b?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Bifacial High-Altitude Solar Arrays",
+                            "Photo 02: Industrial Battery Power Storage Bank",
+                            "Photo 03: Interactive Clean Energy Power Grid Simulator"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+                            "title": "Everest Clean Energy 2024 Innovation Documentary"
+                        }
+                    }
+                ]
+            },
+            {
+                "year": "2025",
+                "title": "Edition 2025",
+                "previewImage": "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+                "dates": "October 22 - 26, 2025",
+                "venue": "Bhrikutimandap Exhibition Hall, Kathmandu",
+                "exhibitors": [
+                    {
+                        "id": "global-smart-mobility",
+                        "name": "Global Smart Mobility Innovations",
+                        "tagline": "Autonomous Transport Systems & Urban EV Hubs",
+                        "category": "Mobility & Smart Cities",
+                        "booth": "Hall A • Stall A-10",
+                        "contact": "+977-1-5544778",
+                        "email": "mobility@globalsmart.np",
+                        "website": "https://globalsmart.np",
+                        "description": "Global Smart Mobility is pioneering rapid EV charging corridors and fleet telematics across South Asia, making urban mobility cleaner and faster.",
+                        "photos": [
+                            "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80",
+                            "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
+                        ],
+                        "photoCaptions": [
+                            "Photo 01: Ultra-Fast Commercial EV Charging Station",
+                            "Photo 02: Electric Autonomous Fleet Bus Concept",
+                            "Photo 03: Smart City Urban Traffic Telemetry Console"
+                        ],
+                        "video": {
+                            "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                            "poster": "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80",
+                            "title": "Global Smart Mobility 2025 Reveal Reel"
+                        }
+                    }
+                ]
+            }
+        ]
     }
 ];
 
@@ -2486,9 +2317,8 @@ export function getEventBySlug(slug) {
         e.id === normalized ||
         (normalized === 'global-expo' && (e.slug === 'global-consumer-expo' || e.slug === 'global-expo')) ||
         (normalized === 'global-consumer-expo' && (e.slug === 'global-consumer-expo' || e.slug === 'global-expo')) ||
-        (normalized === 'hotel-expo' && (e.slug === 'the-hotel-expo' || e.slug === 'hotel-expo')) ||
-        (normalized === 'the-hotel-expo' && (e.slug === 'the-hotel-expo' || e.slug === 'hotel-expo')) ||
-        (normalized === 'stock-clearance' && (e.slug === 'stock-clearance' || e.id === 'stock-clearance'))
+        (normalized === 'stock-clearance' && (e.slug === 'stock-clearance' || e.id === 'stock-clearance')) ||
+        (normalized === 'family-baby-expo' && (e.slug === 'family-baby-expo' || e.id === 'family-baby-expo'))
     );
 }
 

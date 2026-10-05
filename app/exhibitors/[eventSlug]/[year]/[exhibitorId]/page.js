@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation';
 import { getExhibitorData } from '@/lib/exhibitorService';
 import ExhibitorDetailClient from '@/components/ExhibitorDetailClient';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateMetadata({ params }) {
     const { eventSlug, year, exhibitorId } = await params;
     const data = await getExhibitorData(eventSlug, year, exhibitorId);
