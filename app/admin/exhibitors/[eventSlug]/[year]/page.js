@@ -10,6 +10,9 @@ import {
     ExternalLink
 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateMetadata({ params }) {
     const { eventSlug, year } = await params;
     const data = await getEditionData(eventSlug, year);

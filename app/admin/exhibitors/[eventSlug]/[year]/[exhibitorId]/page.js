@@ -6,6 +6,9 @@ import ExhibitorForm from '../../../ExhibitorForm';
 import styles from '../../../exhibitorsAdmin.module.css';
 import { ArrowLeft } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function generateMetadata({ params }) {
     const { eventSlug, year, exhibitorId } = await params;
     const data = await getExhibitorData(eventSlug, year, exhibitorId);

@@ -561,13 +561,33 @@ export async function createExhibitor(formData) {
 
 export async function updateExhibitor(formData) {
     try {
-        const id = parseInt(formData.get('id'));
+        const rawId = formData.get('id');
+        let id = parseInt(rawId);
         const eventSlug = formData.get('eventSlug');
         const year = formData.get('year');
         const name = formData.get('name')?.trim();
 
-        if (!id || !name) {
-            return { success: false, error: 'Exhibitor ID and Name are required' };
+        if (!name) {
+            return { success: false, error: 'Exhibitor Name is required' };
+        }
+
+        let target = null;
+        if (!isNaN(id) && id > 0) {
+            target = await prisma.exhibitor.findUnique({ where: { id } });
+        }
+
+        if (!target) {
+            const editionId = parseInt(formData.get('editionId'));
+            const slug = formData.get('slug')?.trim() || rawId;
+            if (editionId && slug) {
+                target = await prisma.exhibitor.findUnique({
+                    where: { editionId_slug: { editionId, slug } }
+                });
+            }
+        }
+
+        if (!target) {
+            return { success: false, error: 'Exhibitor not found in database to update' };
         }
 
         let logo = formData.get('logoSelected');
@@ -624,23 +644,37 @@ export async function updateExhibitor(formData) {
             videoTitle
         };
 
-        if (logo) updateData.logo = logo;
+        if (logo !== undefined && logo !== null) {
+            updateData.logo = logo || '/placeholder-logo.svg';
+        }
         if (photoUrls.length > 0) updateData.photos = JSON.stringify(photoUrls);
 
+        const newSlug = formData.get('slug')?.trim();
+        if (newSlug && newSlug !== target.slug) {
+            const existingSlug = await prisma.exhibitor.findUnique({
+                where: { editionId_slug: { editionId: target.editionId, slug: newSlug } }
+            });
+            if (!existingSlug) {
+                updateData.slug = newSlug;
+            }
+        }
+
         const updated = await prisma.exhibitor.update({
-            where: { id },
+            where: { id: target.id },
             data: updateData
         });
 
         revalidatePath('/admin/exhibitors');
+        revalidatePath('/exhibitors');
         if (eventSlug && year) {
             revalidatePath(`/admin/exhibitors/${eventSlug}/${year}`);
             revalidatePath(`/exhibitors/${eventSlug}/${year}`);
             revalidatePath(`/exhibitors/${eventSlug}/${year}/${updated.slug}`);
+            revalidatePath(`/admin/exhibitors/${eventSlug}/${year}/${updated.slug}`);
+            revalidatePath(`/admin/exhibitors/${eventSlug}/${year}/${target.slug}`);
         }
-        revalidatePath('/exhibitors');
 
-        return { success: true };
+        return { success: true, updated };
     } catch (error) {
         console.error("Update Exhibitor Error:", error);
         return { success: false, error: error.message || "Failed to update exhibitor" };
